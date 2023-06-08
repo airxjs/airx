@@ -4,15 +4,26 @@
   "description": "a front framework with jsx",
   "types": "./output/index.d.ts",
   "exports": {
-    "default": ["./output/index.js"]
+    "default": [
+      "./output/index.js"
+    ]
   },
-  "files": ["./output/*"],
+  "files": [
+    "./output/*"
+  ],
   "scripts": {
     "build": "tsc",
-    "dev": "tsc -w"
+    "dev": "tsc -w",
+    "lint": "eslint source"
   },
   "dependencies": {
     "csstype": "^3.1.2"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.59.9",
+    "@typescript-eslint/parser": "^5.59.9",
+    "eslint": "^8.42.0",
+    "typescript": "~5.0.0"
   },
   "author": "",
   "license": "ISC"

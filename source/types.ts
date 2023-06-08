@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as CSS from 'csstype'
 
 export interface Events {
@@ -293,7 +294,7 @@ interface AriaAttributes {
 export type StyleValue = string | CSSProperties | Array<StyleValue>
 export interface HTMLAttributes extends AriaAttributes, EventHandlers<Events> {
   innerHTML?: string
-  class?: any
+  class?: string
   style?: StyleValue
   children?: any
   accesskey?: string
@@ -366,8 +367,7 @@ export interface AreaHTMLAttributes extends HTMLAttributes {
   shape?: string
   target?: string
 }
-export interface AudioHTMLAttributes extends MediaHTMLAttributes {
-}
+export type AudioHTMLAttributes = MediaHTMLAttributes
 export interface BaseHTMLAttributes extends HTMLAttributes {
   href?: string
   target?: string
@@ -1156,23 +1156,25 @@ export type ReservedProps = {
 }
 
 export type NativeElements = {
-  [K in keyof IntrinsicElementAttributes]: IntrinsicElementAttributes[K] & ReservedProps;
+  [K in keyof IntrinsicElementAttributes]: IntrinsicElementAttributes[K] & ReservedProps
 }
 
 declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace JSX {
-    export interface ElementAttributesProperty { }
-  
+    /* eslint-disable-next-line @typescript-eslint/no-empty-interface */
+    export interface ElementAttributesProperty {}
+
     export interface ElementChildrenAttribute {
-      children: any;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      children: any
     }
 
     export interface IntrinsicElements extends NativeElements {
-      // allow arbitrary elements
-      // @ts-ignore suppress ts:2374 = Duplicate string index signature.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       [name: string]: any
     }
 
-    export interface IntrinsicAttributes extends ReservedProps {}
+    export type IntrinsicAttributes = ReservedProps
   }
 }

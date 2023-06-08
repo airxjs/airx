@@ -7,8 +7,7 @@ import {
   AirxComponentRender,
   AirxComponentContext,
   AirxComponentMountListener,
-  AirxComponentUnmountListener,
-  AirxComponentProps
+  AirxComponentUnmountListener
 } from './element'
 import { createLogger } from './logger'
 
@@ -21,7 +20,7 @@ class InnerAirxComponentContext implements AirxComponentContext {
 
   public triggerMount() {
     this.mountListeners.forEach(listener => {
-      let disposer: any = null
+      let disposer: Disposer | null = null
 
       try {
         disposer = listener()
@@ -142,7 +141,7 @@ export function render(element: AirxElement, domRef: HTMLElement) {
    * @param parentInstance  当前正在处理的组件的实例
    * @param children  当前组件的子节点
    */
-  function reconcileChildren(parentInstance: Instance, childrenElementArray: AirxElement<any>[]) {
+  function reconcileChildren(parentInstance: Instance, childrenElementArray: AirxElement[]) {
     const logger = createLogger('reconcileChildren')
     logger.log('reconcileChildren', parentInstance, childrenElementArray)
     // parentInstance ←-------- 
@@ -166,10 +165,12 @@ export function render(element: AirxElement, domRef: HTMLElement) {
      * @param firstChild children 实例的第一个元素
      * @returns 从 firstChild 开始之后的所有 sibling 实例组成的 Map
      */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     function getChildrenInstanceMap(firstChild?: Instance): Map<any, Instance> {
       // 不使用递归是因为递归容易爆栈
       let nextIndex = 0
       let nextChild = firstChild
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const map = new Map<any, Instance>()
 
       while (nextChild) {
@@ -207,10 +208,15 @@ export function render(element: AirxElement, domRef: HTMLElement) {
      * @param prev  之前的 props
      * @param next  下一个 props
      */
-    function isPropsEqual(prev: AirxComponentProps, next: AirxComponentProps): boolean {
+    function isPropsEqual(prev: unknown, next: unknown): boolean {
       // 是一个对象，直接返回 true
       if (Object.is(prev, next)) {
         return true
+      }
+
+      if (typeof prev !== 'object' || typeof next !== 'object' || prev === null || next === null) {
+        logger.log('props must be an object')
+        return false
       }
 
       const prevKeys = Object.keys(prev)
@@ -225,7 +231,8 @@ export function render(element: AirxElement, domRef: HTMLElement) {
       for (let index = 0; index < prevKeys.length; index++) {
         const key = prevKeys[index]
         if (!Object.hasOwn(next, key)) return false
-        if (!Object.is(prev[key], next[key])) return false
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        if (!Object.is((prev as any)[key], (next as any)[key])) return false
       }
 
       return true
@@ -294,11 +301,13 @@ export function render(element: AirxElement, domRef: HTMLElement) {
 
     const element = instance.element
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     function childrenAsElements(children: AirxChildren): AirxElement<any>[] {
       const childrenAsArray = Array.isArray(children) ? children : [children]
       return childrenAsArray.flat(3).map(element => {
         if (isValidElement(element)) return element
-        return createElement('text', { textContent: String(element) })
+
+        return createElement<{ textContent: string }>('text', { textContent: String(element) })
       })
     }
 
@@ -309,7 +318,7 @@ export function render(element: AirxElement, domRef: HTMLElement) {
       if (instance.render == null) {
         const component = element.type
         const safeContext = instance.context.getSafeContext()
-        instance.render = collector.collect(() => component(element!.props, safeContext))
+        instance.render = collector.collect(() => component(element?.props, safeContext))
         const children = collector.collect(() => instance.render?.())
         reconcileChildren(instance, childrenAsElements(children))
       }
@@ -371,7 +380,7 @@ export function render(element: AirxElement, domRef: HTMLElement) {
     const logger = createLogger('commitDom')
     logger.log('commitDom', rootInstance)
 
-    type Props = Record<string, any>
+    type Props = Record<string, unknown>
 
     function updateDomProperties(dom: HTMLElement, nextProps: Props, prevProps: Props = {}) {
       const isKey = (key: string) => key === 'key'
@@ -387,7 +396,7 @@ export function render(element: AirxElement, domRef: HTMLElement) {
       if (dom.nodeName === '#text') {
         const textNode = (dom as unknown as Text)
         if (textNode.data !== nextProps.textContent) {
-          textNode.data = nextProps.textContent || ''
+          textNode.data = String(nextProps.textContent)
         }
         return
       }
@@ -399,15 +408,20 @@ export function render(element: AirxElement, domRef: HTMLElement) {
       })
 
       // add new style
-      const newStyle = nextProps?.style || {}
-      Object.keys(nextProps).forEach(key => {
-        dom.style.setProperty(key, newStyle[key])
-      })
+      const newStyle = nextProps?.style
+      if (typeof newStyle === 'object' && newStyle !== null) {
+        Object.keys(nextProps).forEach(key => {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const value = (newStyle as any)[key]
+          dom.style.setProperty(key, value)
+        })
+      }
+
 
       if (dom.className !== nextProps?.class) {
         if (!nextProps?.class) {
           dom.removeAttribute('class')
-        } else {
+        } else if (typeof nextProps?.class === 'string') {
           dom.setAttribute('class', nextProps?.class)
         }
       }
@@ -425,10 +439,12 @@ export function render(element: AirxElement, domRef: HTMLElement) {
             .toLowerCase()
             .substring(2)
 
-          dom.removeEventListener(
-            eventType,
-            prevProps[name]
-          )
+          if (typeof prevProps[name] !== 'function') {
+            console.error('EventListener is not a function')
+          } else {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            dom.removeEventListener(eventType as any, prevProps[name] as any)
+          }
         })
 
       // Add event listeners
@@ -439,10 +455,12 @@ export function render(element: AirxElement, domRef: HTMLElement) {
           const eventType = name
             .toLowerCase()
             .substring(2)
-          dom.addEventListener(
-            eventType,
-            nextProps[name]
-          )
+          if (typeof prevProps[name] !== 'function') {
+            console.error('EventListener is not a function')
+          } else {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            dom.addEventListener(eventType as any, prevProps[name] as any)
+          }
         })
 
       // Remove old properties
@@ -455,7 +473,8 @@ export function render(element: AirxElement, domRef: HTMLElement) {
       Object.keys(nextProps)
         .filter(isProperty)
         .filter(isNew(prevProps, nextProps))
-        .forEach(name => dom.setAttribute(name, nextProps[name]))
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .forEach(name => dom.setAttribute(name, nextProps[name] as any))
     }
 
     function getParentDom(instance: Instance): HTMLElement {
@@ -499,6 +518,7 @@ export function render(element: AirxElement, domRef: HTMLElement) {
         if (typeof nextInstance.element.type === 'string') {
           if (nextInstance.element.type === 'text') {
             const textContent = nextInstance.element.props.textContent
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             nextInstance.domRef = document.createTextNode(textContent as string) as any
           } else {
             nextInstance.domRef = document.createElement(nextInstance.element.type)
