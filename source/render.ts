@@ -230,9 +230,21 @@ export function render(element: AirxElement, domRef: HTMLElement) {
       // 对应 key 的值不相同返回 false
       for (let index = 0; index < prevKeys.length; index++) {
         const key = prevKeys[index]
-        if (!Object.hasOwn(next, key)) return false
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        if (!Object.is((prev as any)[key], (next as any)[key])) return false
+        if (key !== 'children' && key !== 'key') {
+          if (!Object.hasOwn(next, key)) return false
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          if (!Object.is((prev as any)[key], (next as any)[key])) return false
+        }
+
+        if (key === 'children') {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const prevChildren = (prev as any)['children'] as AirxChildren[]
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const nextChildren = (next as any)['children'] as AirxChildren[]
+          if (prevChildren.length !== nextChildren.length) return false
+          // TODO: children 如何做深比对，有点麻烦了。。。
+        }
+
       }
 
       return true
