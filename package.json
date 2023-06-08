@@ -1,0 +1,19 @@
+{
+  "name": "airx",
+  "version": "0.0.1",
+  "description": "a front framework with jsx",
+  "types": "./output/index.d.ts",
+  "exports": {
+    "default": ["./output/index.js"]
+  },
+  "files": ["./output/*"],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc -w"
+  },
+  "dependencies": {
+    "csstype": "^3.1.2"
+  },
+  "author": "",
+  "license": "ISC"
+}

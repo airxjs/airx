@@ -1,0 +1,71 @@
+import * as symbol from './symbol'
+
+export type AirxComponentProps = Record<string, unknown>
+type AirxElementType<P extends AirxComponentProps = {}> = string | AirxComponent<P>
+
+/**
+ * AirxElement 表示一个 Airx 元素
+ * type 表示元素的类型，可能是一个 html 标签，
+ * 也可能是一个自定义组件
+ * props 表示元素的属性
+ * children 表示元素的子元素
+ */
+export interface AirxElement<P extends AirxComponentProps = {}> {
+  type: AirxElementType<P>
+  props: { [propKey: string]: unknown }
+  [symbol.airxElementSymbol]: true
+}
+
+export type AirxChildren =
+  | null
+  | string
+  | number
+  | boolean
+  | undefined
+  | AirxElement<{}>
+  | Array<AirxElement<{}>>
+
+/**
+ * 函数式组件接收自己的 props，并返回一个 AirxElement
+ */
+export type AirxComponent<P extends AirxComponentProps = {}> = (props: P, ctx: AirxComponentContext) => AirxComponentRender
+export type AirxComponentRender = () => AirxChildren
+
+/**
+ * createElement 是用于创建 AirxElement 的工具函数
+ */
+export function createElement<P extends AirxComponentProps = {}>(
+  type: AirxElementType<P>,
+  props: { [key: string]: any } & P,
+  ...children: AirxChildren[]
+): AirxElement<P> {
+  return {
+    type,
+    props: {
+      ...props,
+      children
+    },
+    [symbol.airxElementSymbol]: true
+  }
+}
+
+export function isValidElement(element: unknown): element is AirxElement<any> {
+  return typeof element === 'object'
+    && element !== null
+    && Reflect.get(element, symbol.airxElementSymbol)
+}
+
+export function Fragment(props: { children: AirxElement<{}> }) {
+  return () => props.children
+}
+
+export type AirxComponentUnmountListener = () => void
+export type AirxComponentMountListener = () => () => void | void
+
+export interface AirxComponentLifecycle {
+  onMount: (listener: AirxComponentMountListener) => void
+  onUnmount: (listener: AirxComponentUnmountListener) => void
+}
+
+export interface AirxComponentContext extends AirxComponentLifecycle {
+}
