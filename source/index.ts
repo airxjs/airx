@@ -21,8 +21,8 @@ export interface AirxApp {
 }
 
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function createApp(element: AirxElement<any>): AirxApp {
-
   const app: AirxApp = {
     plugin: (plugins) => {
       console.log(plugins)
@@ -30,8 +30,7 @@ export function createApp(element: AirxElement<any>): AirxApp {
     },
 
     mount: (container: HTMLElement) => {
-      const root = render(element, container)
-      console.log('root', root)
+      render(element, container)
       return app
     }
   }

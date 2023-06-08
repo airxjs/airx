@@ -6,7 +6,7 @@ export function createLogger(name: string) {
     return `[${date}][${name}]`
   }
 
-  function log(...args: any[]) {
+  function log(...args: unknown[]) {
     if (!logger) return
     console.log(getPrintPrefix(), ...args)
   }

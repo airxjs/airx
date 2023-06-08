@@ -2,11 +2,11 @@ import * as symbol from './symbol'
 
 /** TODO: 污染全局总是不好的 */
 const globalContext = {
-  dependencies: new Set<Ref<any>>()
+  dependencies: new Set<Ref<unknown>>()
 }
 
 export function createCollector() {
-  const newDependencies = new Set<Ref<any>>()
+  const newDependencies = new Set<Ref<unknown>>()
   return {
     complete: () => [...newDependencies.values()],
     collect: <R = unknown>(process: () => R) => {
@@ -19,7 +19,7 @@ export function createCollector() {
   }
 }
 
-function triggerRef<T = any>(ref: Ref<T>) {
+function triggerRef<T = unknown>(ref: Ref<T>) {
   requestAnimationFrame(() => {
     const deps = Reflect.get(ref, symbol.airxReactiveDependenciesSymbol)
     for (const dep of deps) {
@@ -28,11 +28,11 @@ function triggerRef<T = any>(ref: Ref<T>) {
   })
 }
 
-interface Ref<T = any> {
+interface Ref<T = unknown> {
   value: T
 }
 
-function createRefObject<T = any>(value: T): Ref<T> {
+function createRefObject<T = unknown>(value: T): Ref<T> {
   const object = Object.create({ value })
 
   Reflect.defineProperty(object, symbol.airxReactiveDependenciesSymbol, {
@@ -45,19 +45,19 @@ function createRefObject<T = any>(value: T): Ref<T> {
   return object
 }
 
-function isRefObject<T = any>(obj: unknown): obj is Ref<T> {
+function isRefObject<T = unknown>(obj: unknown): obj is Ref<T> {
   return obj != null
     && typeof obj === 'object'
     && Reflect.has(obj, symbol.airxReactiveDependenciesSymbol)
 }
 
-export function watch<T = any>(ref: Ref<T>, listener: () => any) {
-  const deps: Set<() => any> = Reflect.get(ref, symbol.airxReactiveDependenciesSymbol)
+export function watch<T = unknown>(ref: Ref<T>, listener: () => unknown) {
+  const deps: Set<() => unknown> = Reflect.get(ref, symbol.airxReactiveDependenciesSymbol)
   deps.add(listener)
   return () => { deps.delete(listener) }
 }
 
-export function createRef<T extends unknown>(obj: T): Ref<T> {
+export function createRef<T>(obj: T): Ref<T> {
   const ref = isRefObject<T>(obj) ? obj : createRefObject(obj)
 
   if (!globalContext.dependencies.has(ref)) {

@@ -1,7 +1,6 @@
 import * as symbol from './symbol'
 
-export type AirxComponentProps = Record<string, unknown>
-type AirxElementType<P extends AirxComponentProps = {}> = string | AirxComponent<P>
+type AirxElementType<P> = string | AirxComponent<P>
 
 /**
  * AirxElement 表示一个 Airx 元素
@@ -10,7 +9,7 @@ type AirxElementType<P extends AirxComponentProps = {}> = string | AirxComponent
  * props 表示元素的属性
  * children 表示元素的子元素
  */
-export interface AirxElement<P extends AirxComponentProps = {}> {
+export interface AirxElement<P = unknown> {
   type: AirxElementType<P>
   props: { [propKey: string]: unknown }
   [symbol.airxElementSymbol]: true
@@ -22,21 +21,21 @@ export type AirxChildren =
   | number
   | boolean
   | undefined
-  | AirxElement<{}>
-  | Array<AirxElement<{}>>
+  | AirxElement<never>
+  | Array<AirxElement<never>>
 
 /**
  * 函数式组件接收自己的 props，并返回一个 AirxElement
  */
-export type AirxComponent<P extends AirxComponentProps = {}> = (props: P, ctx: AirxComponentContext) => AirxComponentRender
+export type AirxComponent<P = unknown> = (props: P, ctx: AirxComponentContext) => AirxComponentRender
 export type AirxComponentRender = () => AirxChildren
 
 /**
  * createElement 是用于创建 AirxElement 的工具函数
  */
-export function createElement<P extends AirxComponentProps = {}>(
+export function createElement<P = unknown>(
   type: AirxElementType<P>,
-  props: { [key: string]: any } & P,
+  props: { [key: string]: unknown } & P,
   ...children: AirxChildren[]
 ): AirxElement<P> {
   return {
@@ -49,13 +48,13 @@ export function createElement<P extends AirxComponentProps = {}>(
   }
 }
 
-export function isValidElement(element: unknown): element is AirxElement<any> {
+export function isValidElement(element: unknown): element is AirxElement {
   return typeof element === 'object'
     && element !== null
     && Reflect.get(element, symbol.airxElementSymbol)
 }
 
-export function Fragment(props: { children: AirxElement<{}> }) {
+export function Fragment(props: { children: AirxElement }) {
   return () => props.children
 }
 
@@ -67,5 +66,4 @@ export interface AirxComponentLifecycle {
   onUnmount: (listener: AirxComponentUnmountListener) => void
 }
 
-export interface AirxComponentContext extends AirxComponentLifecycle {
-}
+export type AirxComponentContext = AirxComponentLifecycle
