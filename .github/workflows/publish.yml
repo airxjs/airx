@@ -1,4 +1,4 @@
-name: Publish airx package
+name: Publish package to npm
 
 on:
   release:
@@ -15,12 +15,9 @@ jobs:
       - run: npm ci
       - run: npm build
 
-  publish-gpr:
+  publish:
     needs: build
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
