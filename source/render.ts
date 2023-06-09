@@ -241,10 +241,22 @@ export function render(element: AirxElement, domRef: HTMLElement) {
           const prevChildren = (prev as any)['children'] as AirxChildren[]
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const nextChildren = (next as any)['children'] as AirxChildren[]
-          if (prevChildren.length !== nextChildren.length) return false
-          // TODO: children 如何做深比对，有点麻烦了。。。
-        }
 
+          // TODO: children 如何做深比对，有点麻烦了。。。
+          if (prevChildren.length === 0 && nextChildren.length === 0) return true
+          if (prevChildren.length !== nextChildren.length) return false
+
+          for (let index = 0; index < prevChildren.length; index++) {
+            const prevChild = prevChildren[index]
+            const nextChild = nextChildren[index]
+            if (isValidElement(prevChild) && isValidElement(nextChild)) {
+              if (prevChild.type !== nextChild.type) return false
+              return isPropsEqual(prevChild.props, nextChild.props)
+            }
+
+            if (prevChild !== nextChild) return false
+          }
+        }
       }
 
       return true
@@ -451,6 +463,7 @@ export function render(element: AirxElement, domRef: HTMLElement) {
             .toLowerCase()
             .substring(2)
 
+          if (prevProps[name] == null) return
           if (typeof prevProps[name] !== 'function') {
             console.error('EventListener is not a function')
           } else {
@@ -467,11 +480,12 @@ export function render(element: AirxElement, domRef: HTMLElement) {
           const eventType = name
             .toLowerCase()
             .substring(2)
-          if (typeof prevProps[name] !== 'function') {
+          if (nextProps[name] == null) return
+          if (typeof nextProps[name] !== 'function') {
             console.error('EventListener is not a function')
           } else {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            dom.addEventListener(eventType as any, prevProps[name] as any)
+            dom.addEventListener(eventType as any, nextProps[name] as any)
           }
         })
 
