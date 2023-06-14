@@ -103,11 +103,12 @@ interface Instance {
   sibling?: Instance // 兄弟节点
   deletions?: Set<Instance> // 需要移除的实例
 
-  needUpdate?: boolean
   element?: AirxElement
   beforeElement?: AirxElement
   render?: AirxComponentRender
 
+  memoProps?: object // props 的引用
+  requiredUpdate?: boolean
   context: InnerAirxComponentContext
 }
 
@@ -121,6 +122,7 @@ export function render(element: AirxElement, domRef: HTMLElement) {
   const context: RenderContext = {
     rootInstance: {
       domRef,
+      memoProps: {},
       context: new InnerAirxComponentContext()
     },
     nextUnitOfWork: null,
@@ -129,6 +131,7 @@ export function render(element: AirxElement, domRef: HTMLElement) {
 
   const appInstance: Instance = {
     element,
+    memoProps: {},
     parent: context.rootInstance,
     context: new InnerAirxComponentContext()
   }
@@ -208,55 +211,85 @@ export function render(element: AirxElement, domRef: HTMLElement) {
      * @param prev  之前的 props
      * @param next  下一个 props
      */
-    function isPropsEqual(prev: unknown, next: unknown): boolean {
-      // 是一个对象，直接返回 true
-      if (Object.is(prev, next)) {
+    function isSameElementType(instance: Instance, nextElement: AirxElement): boolean {
+      if (instance == null) return false
+      if (instance.element == null) return false
+      if (instance.element.type !== nextElement.type) return false
+      return true
+    }
+
+    function updateProps(instance: Instance) {
+      if (instance.element == null) return
+      if (instance.memoProps == null) instance.memoProps = {}
+      // 简单来说就是以下几件事情
+      // 始终保持 props 的引用不变
+      // 1. 创建一个新对象来保存 beforeElement props 的状态
+      // 2. 将新的 element 上的 props 引用设置为之前的 props
+      // 3. 将新的 element 上的 props 更新到之前的 props 上去
+
+      // 清空原来的东西
+      if (instance.beforeElement != null) {
+        for (const key in instance.beforeElement.props) {
+          Reflect.deleteProperty(instance.memoProps, key)
+        }
+      }
+
+      // 将新的 props 更新上去
+      for (const key in instance.element.props) {
+        const value = Reflect.get(instance.element.props, key)
+        Reflect.set(instance.memoProps, key, value)
+      }
+    }
+
+    function shouldUpdate(instance: Instance): boolean {
+      const nextProps = instance.element?.props
+      const preProps = instance.beforeElement?.props
+
+      if (Object.is(nextProps, preProps)) {
+        return false
+      }
+
+      if (
+        typeof preProps !== 'object'
+        || typeof nextProps !== 'object'
+        || preProps === null
+        || nextProps === null
+      ) {
+        logger.log('props must be an object')
         return true
       }
 
-      if (typeof prev !== 'object' || typeof next !== 'object' || prev === null || next === null) {
-        logger.log('props must be an object')
-        return false
-      }
+      const prevKeys = Object.keys(preProps)
+      const nextKeys = Object.keys(nextProps)
 
-      const prevKeys = Object.keys(prev)
-      const nextKeys = Object.keys(next)
-
-      // key 数量不同返回 false
-      if (prevKeys.length !== nextKeys.length) {
-        return false
-      }
+      // key 数量不同
+      if (prevKeys.length !== nextKeys.length) return true
 
       // 对应 key 的值不相同返回 false
       for (let index = 0; index < prevKeys.length; index++) {
         const key = prevKeys[index]
         if (key !== 'children' && key !== 'key') {
-          if (!Object.hasOwn(next, key)) return false
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          if (!Object.is((prev as any)[key], (next as any)[key])) return false
+          if (!Object.hasOwn(nextProps, key)) return true
+          if (!Object.is(preProps[key], nextProps[key])) return true
         }
 
         if (key === 'children') {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const prevChildren = (prev as any)['children'] as AirxChildren[]
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const nextChildren = (next as any)['children'] as AirxChildren[]
+          const prevChildren = preProps['children'] as AirxChildren[]
+          const nextChildren = nextProps['children'] as AirxChildren[]
+          // children 都是空的，则无需更新
+          if (prevChildren.length === 0 && nextChildren.length === 0) return false
 
-          // TODO: children 如何做深比对，有点麻烦了。。。
-          if (prevChildren.length === 0 && nextChildren.length === 0) return true
-          if (prevChildren.length !== nextChildren.length) return false
-
+          // 简单比较一下 child 的引用
           for (let index = 0; index < prevChildren.length; index++) {
             const prevChild = prevChildren[index]
             const nextChild = nextChildren[index]
-            if (isValidElement(prevChild) && isValidElement(nextChild)) {
-              if (prevChild.type !== nextChild.type) return false
-              return isPropsEqual(prevChild.props, nextChild.props)
-            }
 
-            if (prevChild !== nextChild) return false
+            if (prevChild !== nextChild) return true
+            if (typeof prevChild !== typeof nextChild) return true
           }
         }
+
+        return false
       }
 
       return true
@@ -266,27 +299,24 @@ export function render(element: AirxElement, domRef: HTMLElement) {
     for (let index = 0; index < childrenElementArray.length; index++) {
       const element = childrenElementArray[index]
       const [instance, seize] = getChildInstance(element, index)
-      logger.log('getChildInstance', element, index, instance, instance?.domRef)
-
-      const isSameType = instance
-        && instance.element?.type === element.type
-        && isPropsEqual(instance.element.props, element.props)
-
-      if (!isSameType) {
-        // 原来的实例不能复用
-        newChildrenInstanceArray.push({
-          element,
-          context: new InnerAirxComponentContext()
-        })
-      }
+      const isSameType = instance && isSameElementType(instance, element)
 
       if (isSameType) {
-        // 原来的实例可以复用
+        seize() // 从 childrenInstanceMap 中释放
         newChildrenInstanceArray.push(instance)
-        const beforeElement = instance.element
-        instance.beforeElement = beforeElement
+        instance.beforeElement = instance.element
         instance.element = element
-        seize() // 没收了
+        updateProps(instance)
+
+        // 未标注更新的检查一下是否需要更新
+        if (!instance.requiredUpdate) {
+          instance.requiredUpdate = shouldUpdate(instance)
+        }
+      } else {
+        const context = new InnerAirxComponentContext()
+        const instance: Instance = { element, context }
+        newChildrenInstanceArray.push(instance)
+        updateProps(instance)
       }
     }
 
@@ -321,17 +351,22 @@ export function render(element: AirxElement, domRef: HTMLElement) {
    * @returns 返回下一个需要处理的 instance
    */
   function performUnitOfWork(instance: Instance): Instance | null {
-    const logger = createLogger('performUnitOfWork')
-
     const element = instance.element
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     function childrenAsElements(children: AirxChildren): AirxElement<any>[] {
       const childrenAsArray = Array.isArray(children) ? children : [children]
+      function isComment(element: AirxChildren): boolean {
+        if (element === '') return true
+        if (element == null) return true
+        if (element === false) return true
+        return false
+      }
+
       return childrenAsArray.flat(3).map(element => {
         if (isValidElement(element)) return element
-
-        return createElement<{ textContent: string }>('text', { textContent: String(element) })
+        const elementType = isComment(element) ? 'comment' : 'text'
+        return createElement(elementType, { textContent: String(element) })
       })
     }
 
@@ -342,23 +377,21 @@ export function render(element: AirxElement, domRef: HTMLElement) {
       if (instance.render == null) {
         const component = element.type
         const safeContext = instance.context.getSafeContext()
-        instance.render = collector.collect(() => component(element?.props, safeContext))
+        instance.render = collector.collect(() => component(instance.memoProps, safeContext))
         const children = collector.collect(() => instance.render?.())
         reconcileChildren(instance, childrenAsElements(children))
       }
 
-      if (instance.needUpdate) {
-        logger.log('Before RE-RENDER', instance)
+      if (instance.requiredUpdate) {
         const children = collector.collect(() => instance.render?.())
         reconcileChildren(instance, childrenAsElements(children))
-        instance.needUpdate = false
-        logger.log('After RE-RENDER', instance)
+        instance.requiredUpdate = false
       }
 
       // 处理依赖触发的更新
       collector.complete().forEach(ref => {
         instance.context.addDisposer(watch(ref, () => {
-          instance.needUpdate = true
+          instance.requiredUpdate = true
           if (context.nextUnitOfWork == null && context.rootInstance.child) {
             context.nextUnitOfWork = context.rootInstance.child
           }
@@ -404,43 +437,44 @@ export function render(element: AirxElement, domRef: HTMLElement) {
     const logger = createLogger('commitDom')
     logger.log('commitDom', rootInstance)
 
-    type Props = Record<string, unknown>
+    type PropsType = Record<string, unknown>
 
-    function updateDomProperties(dom: HTMLElement, nextProps: Props, prevProps: Props = {}) {
+    function updateDomProperties(dom: HTMLElement, nextProps: PropsType, prevProps: PropsType = {}) {
       const isKey = (key: string) => key === 'key'
       const isStyle = (key: string) => key === 'style'
       const isClass = (key: string) => key === 'class'
       const isEvent = (key: string) => key.startsWith("on")
       const isChildren = (key: string) => key === 'children'
-      const isGone = (_prev: Props, next: Props) => (key: string) => !(key in next)
-      const isNew = (prev: Props, next: Props) => (key: string) => prev[key] !== next[key]
+      const isGone = (_prev: PropsType, next: PropsType) => (key: string) => !(key in next)
+      const isNew = (prev: PropsType, next: PropsType) => (key: string) => prev[key] !== next[key]
       const isProperty = (key: string) => !isChildren(key) && !isEvent(key) && !isStyle(key) && !isClass(key) && !isKey(key)
 
       // https://developer.mozilla.org/zh-CN/docs/Web/API/Node
-      if (dom.nodeName === '#text') {
-        const textNode = (dom as unknown as Text)
-        if (textNode.data !== nextProps.textContent) {
-          textNode.data = String(nextProps.textContent)
+      if (dom.nodeName === '#text' || dom.nodeName === '#comment') {
+        const textNode = (dom as unknown as Text | Comment)
+        if (textNode.nodeValue !== nextProps.textContent) {
+          textNode.nodeValue = String(nextProps.textContent)
         }
         return
       }
 
       // remove old style
-      const oldStyle = prevProps?.style || {}
-      Object.keys(oldStyle).forEach(key => {
-        dom.style.removeProperty(key)
-      })
+      const oldStyle = prevProps?.style
+      if (typeof oldStyle === 'object' && oldStyle != null) {
+        Object.keys(oldStyle).forEach(key => {
+          dom.style.removeProperty(key)
+        })
+      }
 
       // add new style
       const newStyle = nextProps?.style
-      if (typeof newStyle === 'object' && newStyle !== null) {
-        Object.keys(nextProps).forEach(key => {
+      if (typeof newStyle === 'object' && newStyle != null) {
+        Object.keys(newStyle).forEach(key => {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const value = (newStyle as any)[key]
           dom.style.setProperty(key, value)
         })
       }
-
 
       if (dom.className !== nextProps?.class) {
         if (!nextProps?.class) {
@@ -528,7 +562,6 @@ export function render(element: AirxElement, domRef: HTMLElement) {
     /* TODO: 不使用递归实现，递归会爆栈 */
     function commit(nextInstance: Instance, oldNode?: ChildNode) {
       // 移除标删元素
-      // ！先移除是为了真实 dom 和新的 instance tree 更匹配
       if (nextInstance.deletions) {
         for (const deletion of nextInstance.deletions) {
           const dom = deletion.domRef || getChildDom(deletion)
@@ -536,6 +569,7 @@ export function render(element: AirxElement, domRef: HTMLElement) {
           deletion.context.triggerUnmount()
           deletion.context.dispose()
         }
+        nextInstance.deletions.clear()
       }
 
       // 创建 dom
@@ -546,6 +580,10 @@ export function render(element: AirxElement, domRef: HTMLElement) {
             const textContent = nextInstance.element.props.textContent
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             nextInstance.domRef = document.createTextNode(textContent as string) as any
+          } else if (nextInstance.element.type === 'comment') {
+            const textContent = nextInstance.element.props.textContent
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            nextInstance.domRef = document.createComment(textContent as string) as any
           } else {
             nextInstance.domRef = document.createElement(nextInstance.element.type)
           }
@@ -554,7 +592,11 @@ export function render(element: AirxElement, domRef: HTMLElement) {
 
       // 更新属性
       if (nextInstance.domRef != null && nextInstance.element != null) {
-        updateDomProperties(nextInstance.domRef, nextInstance.element.props)
+        updateDomProperties(
+          nextInstance.domRef,
+          nextInstance.element.props,
+          nextInstance.beforeElement?.props
+        )
       }
 
       // 插入 parent
@@ -572,14 +614,19 @@ export function render(element: AirxElement, domRef: HTMLElement) {
       // 继续向下处理
       if (nextInstance.child != null) {
         const childNode = nextInstance.domRef
-          ? oldNode?.firstChild
+          ? nextInstance.domRef.firstChild
           : oldNode
+
         commit(nextInstance.child, childNode || undefined)
       }
 
       // 更新下一个兄弟节点
       if (nextInstance.sibling != null) {
-        commit(nextInstance.sibling, oldNode?.nextSibling || undefined)
+        const siblingNode = nextInstance.domRef
+          ? nextInstance.domRef.nextSibling
+          : oldNode?.nextSibling
+
+        commit(nextInstance.sibling, siblingNode || undefined)
       }
 
       // 如果没有 beforeElement 则说明该组件是首次渲染
@@ -616,6 +663,7 @@ export function render(element: AirxElement, domRef: HTMLElement) {
   }
 
   // 开始调度
-  requestIdleCallback(workLoop)
+  requestIdleCallback(workLoop);
+  (window as any).root = context.rootInstance
   return context.rootInstance
 }
