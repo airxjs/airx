@@ -6,10 +6,10 @@ export function createLogger(name: string) {
     return `[${date}][${name}]`
   }
 
-  function log(...args: unknown[]) {
+  function debug(...args: unknown[]) {
     if (!logger) return
     console.log(getPrintPrefix(), ...args)
   }
 
-  return { log }
+  return { debug }
 }

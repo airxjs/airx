@@ -146,7 +146,7 @@ export function render(element: AirxElement, domRef: HTMLElement) {
    */
   function reconcileChildren(parentInstance: Instance, childrenElementArray: AirxElement[]) {
     const logger = createLogger('reconcileChildren')
-    logger.log('reconcileChildren', parentInstance, childrenElementArray)
+    logger.debug('reconcileChildren', parentInstance, childrenElementArray)
     // parentInstance ←-------- 
     //   |    ↑                ↑
     // child parent          parent
@@ -255,7 +255,7 @@ export function render(element: AirxElement, domRef: HTMLElement) {
         || preProps === null
         || nextProps === null
       ) {
-        logger.log('props must be an object')
+        logger.debug('props must be an object')
         return true
       }
 
@@ -342,7 +342,7 @@ export function render(element: AirxElement, domRef: HTMLElement) {
       })
     }
 
-    logger.log('parentInstance', parentInstance)
+    logger.debug('parentInstance', parentInstance)
   }
 
   /**
@@ -435,7 +435,7 @@ export function render(element: AirxElement, domRef: HTMLElement) {
    */
   function commitDom(rootInstance: Instance, rootNode?: ChildNode) {
     const logger = createLogger('commitDom')
-    logger.log('commitDom', rootInstance)
+    logger.debug('commitDom', rootInstance)
 
     type PropsType = Record<string, unknown>
 
@@ -645,7 +645,7 @@ export function render(element: AirxElement, domRef: HTMLElement) {
     let shouldYield = false
     const logger = createLogger('workLoop')
     while (context.nextUnitOfWork && !shouldYield) {
-      logger.log('nextUnitOfWork', context.nextUnitOfWork)
+      logger.debug('nextUnitOfWork', context.nextUnitOfWork)
       context.nextUnitOfWork = performUnitOfWork(context.nextUnitOfWork)
       if (context.nextUnitOfWork == null) context.needCommitDom = true
       if (deadline) shouldYield = deadline.timeRemaining() < 1
