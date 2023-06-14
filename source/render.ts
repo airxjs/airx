@@ -559,8 +559,7 @@ export function render(element: AirxElement, domRef: HTMLElement) {
       return null
     }
 
-    /* TODO: 不使用递归实现，递归会爆栈 */
-    function commit(nextInstance: Instance, oldNode?: ChildNode) {
+    function commitInstanceDom(nextInstance: Instance, oldNode?: ChildNode) {
       // 移除标删元素
       if (nextInstance.deletions) {
         for (const deletion of nextInstance.deletions) {
@@ -610,14 +609,17 @@ export function render(element: AirxElement, domRef: HTMLElement) {
           parentDom.appendChild(nextInstance.domRef)
         }
       }
+    }
 
+    function commitWalkV1(nextInstance: Instance, oldNode?: ChildNode) {
+      commitInstanceDom(nextInstance, oldNode)
       // 继续向下处理
       if (nextInstance.child != null) {
         const childNode = nextInstance.domRef
           ? nextInstance.domRef.firstChild
           : oldNode
 
-        commit(nextInstance.child, childNode || undefined)
+        commitWalkV1(nextInstance.child, childNode || undefined)
       }
 
       // 更新下一个兄弟节点
@@ -626,7 +628,7 @@ export function render(element: AirxElement, domRef: HTMLElement) {
           ? nextInstance.domRef.nextSibling
           : oldNode?.nextSibling
 
-        commit(nextInstance.sibling, siblingNode || undefined)
+        commitWalkV1(nextInstance.sibling, siblingNode || undefined)
       }
 
       // 如果没有 beforeElement 则说明该组件是首次渲染
@@ -635,7 +637,55 @@ export function render(element: AirxElement, domRef: HTMLElement) {
       }
     }
 
-    commit(rootInstance, rootNode)
+    function commitWalkV2(initInstance: Instance, initNode?: ChildNode) {
+      // 创建一个栈，将根节点压入栈中
+
+      type StackLayer = [Instance, ChildNode | undefined] | (() => void)
+      const stack: StackLayer[] = [[initInstance, initNode]]
+
+      while (stack.length > 0) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const currentStack = stack.pop()!
+        if (typeof currentStack === 'function') {
+          currentStack()
+          continue
+        }
+
+        const [instance, node] = currentStack
+        commitInstanceDom(instance, node)
+
+        // stack 是先入后出
+        // 实际上是先渲染 child
+        // 这里然后再渲染 sibling
+
+        // 执行生命周期的 Mount
+        stack.push(() => {
+          if (instance.beforeElement == null) {
+            instance.context.triggerMount()
+          }
+        })
+
+        // 更新下一个兄弟节点
+        if (instance.sibling != null) {
+          const siblingNode = instance.domRef
+            ? instance.domRef.nextSibling
+            : node?.nextSibling
+
+          stack.push([instance.sibling, siblingNode || undefined])
+        }
+
+        // 更新下一个子节点
+        if (instance.child != null) {
+          const childNode = instance.domRef
+            ? instance.domRef.firstChild
+            : node
+
+          stack.push([instance.child, childNode || undefined])
+        }
+      }
+    }
+
+    commitWalkV2(rootInstance, rootNode)
   }
 
   /**
