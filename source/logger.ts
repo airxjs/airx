@@ -1,4 +1,4 @@
-const isDev = process.env.NODE_ENV === 'development'
+const isDev = localStorage.getItem('airx-dev')
 export function createLogger(name: string) {
   function getPrintPrefix() {
     const date = new Date().toLocaleString()
@@ -6,8 +6,7 @@ export function createLogger(name: string) {
   }
 
   function debug(...args: unknown[]) {
-    if (!isDev) return
-    console.log(getPrintPrefix(), ...args)
+    if (isDev) console.log(getPrintPrefix(), ...args)
   }
 
   return { debug }
