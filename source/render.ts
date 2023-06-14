@@ -710,7 +710,6 @@ export function render(element: AirxElement, domRef: HTMLElement) {
   }
 
   // 开始调度
-  requestIdleCallback(workLoop);
-  (window as any).root = context.rootInstance
+  requestIdleCallback(workLoop)
   return context.rootInstance
 }
