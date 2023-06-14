@@ -599,6 +599,7 @@ export function render(element: AirxElement, domRef: HTMLElement) {
       }
 
       // 插入 parent
+      // TODO: 针对仅移动时优化
       if (nextInstance.domRef != null) {
         if (oldNode !== nextInstance.domRef) {
           if (nextInstance.domRef.parentNode) {
