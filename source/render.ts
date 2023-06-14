@@ -6,8 +6,8 @@ import {
   isValidElement,
   AirxComponentRender,
   AirxComponentContext,
-  AirxComponentMountListener,
-  AirxComponentUnmountListener
+  AirxComponentMountedListener,
+  AirxComponentUnmountedListener
 } from './element'
 import { createLogger } from './logger'
 
@@ -15,10 +15,10 @@ export type Disposer = () => void
 
 class InnerAirxComponentContext implements AirxComponentContext {
   private disposers = new Set<Disposer>()
-  private mountListeners = new Set<AirxComponentMountListener>()
-  private unmountListeners = new Set<AirxComponentUnmountListener>()
+  private mountListeners = new Set<AirxComponentMountedListener>()
+  private unmountedListeners = new Set<AirxComponentUnmountedListener>()
 
-  public triggerMount() {
+  public triggerMounted() {
     this.mountListeners.forEach(listener => {
       let disposer: Disposer | null = null
 
@@ -32,24 +32,28 @@ class InnerAirxComponentContext implements AirxComponentContext {
         this.addDisposer(disposer)
       }
     })
+    // 生命周期只会调用一次
+    this.mountListeners.clear()
   }
 
-  public triggerUnmount() {
-    this.unmountListeners.forEach(listener => {
+  public triggerUnmounted() {
+    this.unmountedListeners.forEach(listener => {
       try {
         listener()
       } catch (err: unknown) {
         console.error(err, listener)
       }
     })
+    // 生命周期只会调用一次
+    this.mountListeners.clear()
   }
 
-  public onMount(listener: AirxComponentMountListener) {
+  public onMounted(listener: AirxComponentMountedListener) {
     this.mountListeners.add(listener)
   }
 
-  public onUnmount(listener: AirxComponentUnmountListener) {
-    this.unmountListeners.add(listener)
+  public onUnmounted(listener: AirxComponentUnmountedListener) {
+    this.unmountedListeners.add(listener)
   }
 
   addDisposer(...disposers: Disposer[]) {
@@ -72,7 +76,7 @@ class InnerAirxComponentContext implements AirxComponentContext {
 
     this.disposers.clear()
     this.mountListeners.clear()
-    this.unmountListeners.clear()
+    this.unmountedListeners.clear()
   }
 
   /**
@@ -81,8 +85,8 @@ class InnerAirxComponentContext implements AirxComponentContext {
    */
   public getSafeContext(): AirxComponentContext {
     return {
-      onMount: listener => this.onMount(listener),
-      onUnmount: listener => this.onUnmount(listener)
+      onMounted: listener => this.onMounted(listener),
+      onUnmounted: listener => this.onUnmounted(listener)
     }
   }
 }
@@ -259,13 +263,8 @@ export function render(element: AirxElement, domRef: HTMLElement) {
         return true
       }
 
-      const prevKeys = Object.keys(preProps)
-      const nextKeys = Object.keys(nextProps)
-
-      // key 数量不同
-      if (prevKeys.length !== nextKeys.length) return true
-
       // 对应 key 的值不相同返回 false
+      const prevKeys = Object.keys(preProps)
       for (let index = 0; index < prevKeys.length; index++) {
         const key = prevKeys[index]
         if (key !== 'children' && key !== 'key') {
@@ -366,7 +365,8 @@ export function render(element: AirxElement, domRef: HTMLElement) {
       return childrenAsArray.flat(3).map(element => {
         if (isValidElement(element)) return element
         const elementType = isComment(element) ? 'comment' : 'text'
-        return createElement(elementType, { textContent: String(element) })
+        const textContent = element === '' ? 'empty-string' : String(element)
+        return createElement(elementType, { textContent })
       })
     }
 
@@ -385,7 +385,7 @@ export function render(element: AirxElement, domRef: HTMLElement) {
       if (instance.requiredUpdate) {
         const children = collector.collect(() => instance.render?.())
         reconcileChildren(instance, childrenAsElements(children))
-        instance.requiredUpdate = false
+        delete instance.requiredUpdate
       }
 
       // 处理依赖触发的更新
@@ -565,7 +565,7 @@ export function render(element: AirxElement, domRef: HTMLElement) {
         for (const deletion of nextInstance.deletions) {
           const dom = deletion.domRef || getChildDom(deletion)
           if (dom && dom.parentNode) dom.parentNode.removeChild(dom)
-          deletion.context.triggerUnmount()
+          deletion.context.triggerUnmounted()
           deletion.context.dispose()
         }
         nextInstance.deletions.clear()
@@ -634,7 +634,7 @@ export function render(element: AirxElement, domRef: HTMLElement) {
 
       // 如果没有 beforeElement 则说明该组件是首次渲染
       if (nextInstance.beforeElement == null) {
-        nextInstance.context.triggerMount()
+        nextInstance.context.triggerMounted()
       }
     }
 
@@ -646,13 +646,13 @@ export function render(element: AirxElement, domRef: HTMLElement) {
 
       while (stack.length > 0) {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const currentStack = stack.pop()!
-        if (typeof currentStack === 'function') {
-          currentStack()
+        const stackLayer = stack.pop()!
+        if (typeof stackLayer === 'function') {
+          stackLayer()
           continue
         }
 
-        const [instance, node] = currentStack
+        const [instance, node] = stackLayer
         commitInstanceDom(instance, node)
 
         // stack 是先入后出
@@ -660,11 +660,7 @@ export function render(element: AirxElement, domRef: HTMLElement) {
         // 这里然后再渲染 sibling
 
         // 执行生命周期的 Mount
-        stack.push(() => {
-          if (instance.beforeElement == null) {
-            instance.context.triggerMount()
-          }
-        })
+        stack.push(() => instance.context.triggerMounted())
 
         // 更新下一个兄弟节点
         if (instance.sibling != null) {

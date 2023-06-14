@@ -1,5 +1,4 @@
-const logger = false
-
+const isDev = process.env.NODE_ENV === 'development'
 export function createLogger(name: string) {
   function getPrintPrefix() {
     const date = new Date().toLocaleString()
@@ -7,7 +6,7 @@ export function createLogger(name: string) {
   }
 
   function debug(...args: unknown[]) {
-    if (!logger) return
+    if (!isDev) return
     console.log(getPrintPrefix(), ...args)
   }
 
