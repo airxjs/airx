@@ -14,15 +14,27 @@ jobs:
           node-version: 16
       - run: npm ci
       - run: npm run build
+      - uses: actions/cache@v2
+        id: build-output
+        with:
+          path: ./*
+          key: ${{ github.sha }}
 
   publish:
     needs: build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/cache@v2
+        id: build-output
+        with:
+          path: ./*
+          key: ${{ github.sha }}
       - uses: actions/setup-node@v3
         with:
           node-version: 16
+          # This generates .npmrc //registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}
+          registry-url: 'https://registry.npmjs.org'
       - run: npm publish
         env:
-          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
