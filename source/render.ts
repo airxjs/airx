@@ -462,17 +462,20 @@ export function render(element: AirxElement, domRef: HTMLElement) {
       const oldStyle = prevProps?.style
       if (typeof oldStyle === 'object' && oldStyle != null) {
         Object.keys(oldStyle).forEach(key => {
-          dom.style.removeProperty(key)
+          /* eslint-disable @typescript-eslint/no-explicit-any */
+          delete dom.style[key as any]
+          /* eslint-enable @typescript-eslint/no-explicit-any */
         })
       }
 
       // add new style
       const newStyle = nextProps?.style
       if (typeof newStyle === 'object' && newStyle != null) {
-        Object.keys(newStyle).forEach(key => {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const value = (newStyle as any)[key]
-          dom.style.setProperty(key, value)
+        Object.keys(newStyle).forEach((key: unknown) => {
+          /* eslint-disable @typescript-eslint/no-explicit-any */
+          const value = (newStyle as any)?.[key as any]
+          dom.style[key as any] = value == null ? '' : value
+          /* eslint-enable @typescript-eslint/no-explicit-any */
         })
       }
 
