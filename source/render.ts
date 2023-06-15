@@ -615,32 +615,6 @@ export function render(element: AirxElement, domRef: HTMLElement) {
       }
     }
 
-    function commitWalkV1(nextInstance: Instance, oldNode?: ChildNode) {
-      commitInstanceDom(nextInstance, oldNode)
-      // 继续向下处理
-      if (nextInstance.child != null) {
-        const childNode = nextInstance.domRef
-          ? nextInstance.domRef.firstChild
-          : oldNode
-
-        commitWalkV1(nextInstance.child, childNode || undefined)
-      }
-
-      // 更新下一个兄弟节点
-      if (nextInstance.sibling != null) {
-        const siblingNode = nextInstance.domRef
-          ? nextInstance.domRef.nextSibling
-          : oldNode?.nextSibling
-
-        commitWalkV1(nextInstance.sibling, siblingNode || undefined)
-      }
-
-      // 如果没有 beforeElement 则说明该组件是首次渲染
-      if (nextInstance.beforeElement == null) {
-        nextInstance.context.triggerMounted()
-      }
-    }
-
     function commitWalkV2(initInstance: Instance, initNode?: ChildNode) {
       // 创建一个栈，将根节点压入栈中
 
