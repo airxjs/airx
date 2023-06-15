@@ -462,17 +462,20 @@ export function render(element: AirxElement, domRef: HTMLElement) {
       const oldStyle = prevProps?.style
       if (typeof oldStyle === 'object' && oldStyle != null) {
         Object.keys(oldStyle).forEach(key => {
-          dom.style.removeProperty(key)
+          /* eslint-disable @typescript-eslint/no-explicit-any */
+          delete dom.style[key as any]
+          /* eslint-enable @typescript-eslint/no-explicit-any */
         })
       }
 
       // add new style
       const newStyle = nextProps?.style
       if (typeof newStyle === 'object' && newStyle != null) {
-        Object.keys(newStyle).forEach(key => {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const value = (newStyle as any)[key]
-          dom.style.setProperty(key, value)
+        Object.keys(newStyle).forEach((key: unknown) => {
+          /* eslint-disable @typescript-eslint/no-explicit-any */
+          const value = (newStyle as any)?.[key as any]
+          dom.style[key as any] = value == null ? '' : value
+          /* eslint-enable @typescript-eslint/no-explicit-any */
         })
       }
 
@@ -609,32 +612,6 @@ export function render(element: AirxElement, domRef: HTMLElement) {
           const parentDom = getParentDom(nextInstance)
           parentDom.appendChild(nextInstance.domRef)
         }
-      }
-    }
-
-    function commitWalkV1(nextInstance: Instance, oldNode?: ChildNode) {
-      commitInstanceDom(nextInstance, oldNode)
-      // 继续向下处理
-      if (nextInstance.child != null) {
-        const childNode = nextInstance.domRef
-          ? nextInstance.domRef.firstChild
-          : oldNode
-
-        commitWalkV1(nextInstance.child, childNode || undefined)
-      }
-
-      // 更新下一个兄弟节点
-      if (nextInstance.sibling != null) {
-        const siblingNode = nextInstance.domRef
-          ? nextInstance.domRef.nextSibling
-          : oldNode?.nextSibling
-
-        commitWalkV1(nextInstance.sibling, siblingNode || undefined)
-      }
-
-      // 如果没有 beforeElement 则说明该组件是首次渲染
-      if (nextInstance.beforeElement == null) {
-        nextInstance.context.triggerMounted()
       }
     }
 
