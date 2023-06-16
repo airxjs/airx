@@ -1,4 +1,4 @@
-# airx
+# airx [![npm](https://img.shields.io/npm/v/airx.svg)](https://www.npmjs.com/package/airx) [![build status](https://github.com/airxjs/airx/actions/workflows/check.yml/badge.svg?branch=main)](https://github.com/airxjs/airx/actions/workflows/check.yml)
 
 Arix is a front-end framework based on JSX, but it doesn't have hooks like React.
 
