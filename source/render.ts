@@ -27,6 +27,14 @@ export function useContext(): AirxComponentContext {
   return globalContext.current
 }
 
+export const onMounted: AirxComponentContext['onMounted'] = (listener) => {
+  return useContext().onMounted(listener)
+}
+
+export const onUnmounted: AirxComponentContext['onUnmounted'] = (listener) => {
+  return useContext().onUnmounted(listener)
+}
+
 export type Disposer = () => void
 
 class InnerAirxComponentContext implements AirxComponentContext {
@@ -396,7 +404,7 @@ export function render(element: AirxElement, domRef: HTMLElement) {
         globalContext.current = instance.context.getSafeContext()
         instance.render = collector.collect(() => component(instance.memoProps))
         globalContext.current = beforeContext
-        
+
         const children = collector.collect(() => instance.render?.())
         reconcileChildren(instance, childrenAsElements(children))
       }
