@@ -159,8 +159,8 @@ export function render(element: AirxElement, domRef: HTMLElement) {
 
   const appInstance: Instance = {
     element,
-    memoProps: {},
     parent: context.rootInstance,
+    memoProps: { ...element.props },
     context: new InnerAirxComponentContext()
   }
 

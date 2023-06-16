@@ -11,7 +11,7 @@ type AirxElementType<P> = string | AirxComponent<P>
  */
 export interface AirxElement<P = unknown> {
   type: AirxElementType<P>
-  props: { [propKey: string]: unknown }
+  props: { [propKey: string]: unknown } & P
   [symbol.airxElementSymbol]: true
 }
 
@@ -22,7 +22,7 @@ export type AirxChildren =
   | boolean
   | undefined
   | AirxElement<never>
-  | Array<AirxElement<never>>
+  | Array<AirxChildren>
 
 /**
  * 函数式组件接收自己的 props，并返回一个 AirxElement
