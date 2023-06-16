@@ -11,6 +11,22 @@ import {
 } from './element'
 import { createLogger } from './logger'
 
+interface GlobalContext {
+  current: AirxComponentContext | null
+}
+
+const globalContext: GlobalContext = {
+  current: null
+}
+
+export function useContext(): AirxComponentContext {
+  if (globalContext.current == null) {
+    throw new Error('Unable to find a valid component context')
+  }
+
+  return globalContext.current
+}
+
 export type Disposer = () => void
 
 class InnerAirxComponentContext implements AirxComponentContext {
@@ -376,8 +392,11 @@ export function render(element: AirxElement, domRef: HTMLElement) {
 
       if (instance.render == null) {
         const component = element.type
-        const safeContext = instance.context.getSafeContext()
-        instance.render = collector.collect(() => component(instance.memoProps, safeContext))
+        const beforeContext = globalContext.current
+        globalContext.current = instance.context.getSafeContext()
+        instance.render = collector.collect(() => component(instance.memoProps))
+        globalContext.current = beforeContext
+        
         const children = collector.collect(() => instance.render?.())
         reconcileChildren(instance, childrenAsElements(children))
       }

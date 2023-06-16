@@ -4,7 +4,7 @@ import { render } from './render'
 
 export * from './types'
 
-export { render } from './render'
+export { render, useContext } from './render'
 export { createRef } from './reactive'
 export {
   Fragment,
