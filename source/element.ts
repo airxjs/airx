@@ -27,7 +27,7 @@ export type AirxChildren =
 /**
  * 函数式组件接收自己的 props，并返回一个 AirxElement
  */
-export type AirxComponent<P = unknown> = (props: P, ctx: AirxComponentContext) => AirxComponentRender
+export type AirxComponent<P = unknown> = (props: P) => AirxComponentRender
 export type AirxComponentRender = () => AirxChildren
 
 /**
