@@ -1,3 +1,4 @@
+import { Ref } from './reactive'
 import * as symbol from './symbol'
 
 type AirxElementType<P> = string | AirxComponent<P>
@@ -9,9 +10,10 @@ type AirxElementType<P> = string | AirxComponent<P>
  * props 表示元素的属性
  * children 表示元素的子元素
  */
-export interface AirxElement<P = unknown> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export interface AirxElement<P = any> {
   type: AirxElementType<P>
-  props: { [propKey: string]: unknown }
+  props: { [propKey: string]: unknown } & P
   [symbol.airxElementSymbol]: true
 }
 
@@ -21,8 +23,8 @@ export type AirxChildren =
   | number
   | boolean
   | undefined
-  | AirxElement<never>
-  | Array<AirxElement<never>>
+  | AirxElement
+  | Array<AirxChildren>
 
 /**
  * 函数式组件接收自己的 props，并返回一个 AirxElement
@@ -33,7 +35,8 @@ export type AirxComponentRender = () => AirxChildren
 /**
  * createElement 是用于创建 AirxElement 的工具函数
  */
-export function createElement<P = unknown>(
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function createElement<P = any>(
   type: AirxElementType<P>,
   props: { [key: string]: unknown } & P,
   ...children: AirxChildren[]
@@ -66,4 +69,9 @@ export interface AirxComponentLifecycle {
   onUnmounted: (listener: AirxComponentUnmountedListener) => void
 }
 
-export type AirxComponentContext = AirxComponentLifecycle
+export type AirxComponentContext = AirxComponentLifecycle & {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  provide: <T = any>(key: any, value: T) => (newValue: T) => void
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  inject: <T = any>(key: any) => Ref<T | null>
+}

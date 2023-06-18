@@ -16,6 +16,8 @@ export {
 
 export {
   useContext,
+  inject,
+  provide,
   onMounted,
   onUnmounted
 } from './render'
