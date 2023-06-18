@@ -408,8 +408,8 @@ export function render(element: AirxElement, domRef: HTMLElement) {
         updateMemoProps(instance)
 
         // 未标注更新的检查一下是否需要更新
-        if (instance.requiredUpdate !== true) {
-          // FIXME: 有问题，属实有问题
+        if (instance.requiredUpdate !== true && typeof element.type === 'function') {
+          // FIXME: 没必要让 child 都 requiredUpdate，最好时可以只通过 shouldUpdate 来判断是否需要更新
           instance.requiredUpdate = parentInstance.requiredUpdate || shouldUpdate(instance)
           console.log(instance.beforeElement?.props, element.props, instance.requiredUpdate)
         }
