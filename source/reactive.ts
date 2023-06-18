@@ -28,7 +28,7 @@ function triggerRef<T = unknown>(ref: Ref<T>) {
   })
 }
 
-interface Ref<T = unknown> {
+export interface Ref<T = unknown> {
   value: T
 }
 
@@ -64,18 +64,21 @@ export function createRef<T>(obj: T): Ref<T> {
     globalContext.dependencies.add(ref)
   }
 
-  return new Proxy(ref, {
-    get(target, key, receiver) {
-      const result = Reflect.get(target, key, receiver)
+  let value: T = ref.value
+
+  Reflect.defineProperty(ref, 'value', {
+    get() {
       if (!globalContext.dependencies.has(ref)) {
         globalContext.dependencies.add(ref)
       }
-      return result
+      return value
     },
-    set(target, key, value, receiver) {
-      const result = Reflect.set(target, key, value, receiver)
-      triggerRef(target)
-      return result
-    },
+    set(newValue) {
+      value = newValue
+      triggerRef(ref)
+      return value
+    }
   })
+
+  return ref
 }

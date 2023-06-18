@@ -1,4 +1,4 @@
-import { createCollector, watch } from './reactive'
+import { createCollector, createRef, Ref, watch } from './reactive'
 import {
   AirxElement,
   AirxChildren,
@@ -35,10 +35,21 @@ export const onUnmounted: AirxComponentContext['onUnmounted'] = (listener) => {
   return useContext().onUnmounted(listener)
 }
 
+export const inject: AirxComponentContext['inject'] = (key) => {
+  return useContext().inject(key)
+}
+
+export const provide: AirxComponentContext['provide'] = (key, value) => {
+  return useContext().provide(key, value)
+}
+
 export type Disposer = () => void
 
 class InnerAirxComponentContext implements AirxComponentContext {
+  public instance?: Instance
   private disposers = new Set<Disposer>()
+  private providedMap = new Map<unknown, Ref<unknown>>()
+  private injectedMap = new Map<unknown, Ref<unknown>>()
   private mountListeners = new Set<AirxComponentMountedListener>()
   private unmountedListeners = new Set<AirxComponentUnmountedListener>()
 
@@ -80,6 +91,62 @@ class InnerAirxComponentContext implements AirxComponentContext {
     this.unmountedListeners.add(listener)
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public provide<T = unknown>(key: any, value: any): (v: T) => void {
+    console.log('provide')
+    if (!this.providedMap.has(key)) {
+      this.providedMap.set(key, createRef(value))
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const ref = this.providedMap.get(key)!
+    ref.value = value
+    return newValue => ref.value = newValue
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public inject<T = unknown>(key: any): Ref<T | null> {
+    console.log('inject')
+
+    if (!this.injectedMap.has(key)) {
+      this.injectedMap.set(key, createRef(null))
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const resultRef = this.injectedMap.get(key)!
+
+    /**
+     * 从当前组件开始向上查找
+     * @returns 返回找到的值的 Ref 和提供该值的实例
+     */
+    const getResultOfContext = () => {
+      let provider: Instance | null = null
+      let result: Ref<unknown> | null = null
+      let nextParentInstance = this.instance
+      while (nextParentInstance != null) {
+        provider = nextParentInstance
+        result = nextParentInstance.context.providedMap.get(key) || null
+        if (result != null) break
+        nextParentInstance = nextParentInstance.parent
+      }
+
+      return { result, provider }
+    }
+
+    const { result, provider } = getResultOfContext()
+
+    if (result != null && provider != null) {
+      // 每当值发生变化，同步到当前的 Ref 上
+      this.addDisposer(watch(result, () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        resultRef.value = result.value as any
+      }))
+    }
+
+    resultRef.value = result?.value
+    return resultRef as Ref<T | null>
+  }
+
   addDisposer(...disposers: Disposer[]) {
     disposers.forEach(disposer => {
       this.disposers.add(disposer)
@@ -99,6 +166,8 @@ class InnerAirxComponentContext implements AirxComponentContext {
     )
 
     this.disposers.clear()
+    this.injectedMap.clear()
+    this.providedMap.clear()
     this.mountListeners.clear()
     this.unmountedListeners.clear()
   }
@@ -109,6 +178,8 @@ class InnerAirxComponentContext implements AirxComponentContext {
    */
   public getSafeContext(): AirxComponentContext {
     return {
+      inject: k => this.inject(k),
+      provide: (k, v) => this.provide(k, v),
       onMounted: listener => this.onMounted(listener),
       onUnmounted: listener => this.onUnmounted(listener)
     }
@@ -135,7 +206,8 @@ interface Instance {
   beforeElement?: AirxElement
   render?: AirxComponentRender
 
-  memoProps?: object // props 的引用
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  memoProps?: any // props 的引用
   requiredUpdate?: boolean
   context: InnerAirxComponentContext
 }
@@ -147,12 +219,14 @@ interface RenderContext {
 }
 
 export function render(element: AirxElement, domRef: HTMLElement) {
+  const rootInstance: Instance = {
+    domRef,
+    context: new InnerAirxComponentContext()
+  }
+  rootInstance.context.instance = rootInstance
+
   const context: RenderContext = {
-    rootInstance: {
-      domRef,
-      memoProps: {},
-      context: new InnerAirxComponentContext()
-    },
+    rootInstance,
     nextUnitOfWork: null,
     needCommitDom: false
   }
@@ -163,6 +237,8 @@ export function render(element: AirxElement, domRef: HTMLElement) {
     memoProps: { ...element.props },
     context: new InnerAirxComponentContext()
   }
+
+  appInstance.context.instance = appInstance
 
   context.rootInstance.child = appInstance
   context.nextUnitOfWork = appInstance
@@ -246,7 +322,7 @@ export function render(element: AirxElement, domRef: HTMLElement) {
       return true
     }
 
-    function updateProps(instance: Instance) {
+    function updateMemoProps(instance: Instance) {
       if (instance.element == null) return
       if (instance.memoProps == null) instance.memoProps = {}
       // 简单来说就是以下几件事情
@@ -255,17 +331,16 @@ export function render(element: AirxElement, domRef: HTMLElement) {
       // 2. 将新的 element 上的 props 引用设置为之前的 props
       // 3. 将新的 element 上的 props 更新到之前的 props 上去
 
-      // 清空原来的东西
-      if (instance.beforeElement != null) {
-        for (const key in instance.beforeElement.props) {
-          Reflect.deleteProperty(instance.memoProps, key)
+      if (instance.memoProps != null) {
+        for (const key in instance.memoProps) {
+          delete instance.memoProps[key]
         }
       }
 
       // 将新的 props 更新上去
       for (const key in instance.element.props) {
-        const value = Reflect.get(instance.element.props, key)
-        Reflect.set(instance.memoProps, key, value)
+        const value = instance.element.props[key]
+        instance.memoProps[key] = value
       }
     }
 
@@ -274,6 +349,7 @@ export function render(element: AirxElement, domRef: HTMLElement) {
       const preProps = instance.beforeElement?.props
 
       if (Object.is(nextProps, preProps)) {
+        console.log('ref is same', nextProps, preProps)
         return false
       }
 
@@ -329,17 +405,20 @@ export function render(element: AirxElement, domRef: HTMLElement) {
         newChildrenInstanceArray.push(instance)
         instance.beforeElement = instance.element
         instance.element = element
-        updateProps(instance)
+        updateMemoProps(instance)
 
         // 未标注更新的检查一下是否需要更新
-        if (!instance.requiredUpdate) {
-          instance.requiredUpdate = shouldUpdate(instance)
+        if (instance.requiredUpdate !== true) {
+          // FIXME: 有问题，属实有问题
+          instance.requiredUpdate = parentInstance.requiredUpdate || shouldUpdate(instance)
+          console.log(instance.beforeElement?.props, element.props, instance.requiredUpdate)
         }
       } else {
         const context = new InnerAirxComponentContext()
         const instance: Instance = { element, context }
         newChildrenInstanceArray.push(instance)
-        updateProps(instance)
+        context.instance = instance
+        updateMemoProps(instance)
       }
     }
 
@@ -412,6 +491,7 @@ export function render(element: AirxElement, domRef: HTMLElement) {
       if (instance.requiredUpdate) {
         const children = collector.collect(() => instance.render?.())
         reconcileChildren(instance, childrenAsElements(children))
+        console.log('requiredUpdate', instance.child)
         delete instance.requiredUpdate
       }
 
