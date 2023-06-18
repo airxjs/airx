@@ -72,6 +72,12 @@ class InnerAirxComponentContext implements AirxComponentContext {
   }
 
   public triggerUnmounted() {
+    // 递归的调用子 child 的 Unmounted
+    if (this.instance?.child != null) {
+      this.instance.child.context.triggerUnmounted()
+    }
+
+    // 处理自己
     this.unmountedListeners.forEach(listener => {
       try {
         listener()
@@ -79,8 +85,13 @@ class InnerAirxComponentContext implements AirxComponentContext {
         console.error(err, listener)
       }
     })
-    // 生命周期只会调用一次
-    this.mountListeners.clear()
+
+    // 处理兄弟节点
+    if (this.instance?.sibling != null) {
+      this.instance.sibling.context.triggerUnmounted()
+    }
+
+    this.dispose()
   }
 
   public onMounted(listener: AirxComponentMountedListener) {
@@ -93,7 +104,6 @@ class InnerAirxComponentContext implements AirxComponentContext {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public provide<T = unknown>(key: any, value: any): (v: T) => void {
-    console.log('provide')
     if (!this.providedMap.has(key)) {
       this.providedMap.set(key, createRef(value))
     }
@@ -106,8 +116,6 @@ class InnerAirxComponentContext implements AirxComponentContext {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public inject<T = unknown>(key: any): Ref<T | null> {
-    console.log('inject')
-
     if (!this.injectedMap.has(key)) {
       this.injectedMap.set(key, createRef(null))
     }
@@ -349,7 +357,6 @@ export function render(element: AirxElement, domRef: HTMLElement) {
       const preProps = instance.beforeElement?.props
 
       if (Object.is(nextProps, preProps)) {
-        console.log('ref is same', nextProps, preProps)
         return false
       }
 
@@ -411,7 +418,6 @@ export function render(element: AirxElement, domRef: HTMLElement) {
         if (instance.requiredUpdate !== true && typeof element.type === 'function') {
           // FIXME: 没必要让 child 都 requiredUpdate，最好时可以只通过 shouldUpdate 来判断是否需要更新
           instance.requiredUpdate = parentInstance.requiredUpdate || shouldUpdate(instance)
-          console.log(instance.beforeElement?.props, element.props, instance.requiredUpdate)
         }
       } else {
         const context = new InnerAirxComponentContext()
@@ -440,6 +446,8 @@ export function render(element: AirxElement, domRef: HTMLElement) {
       }
 
       childrenInstanceMap.forEach(instance => {
+        delete instance.parent
+        delete instance.sibling
         parentInstance.deletions?.add(instance)
       })
     }
@@ -491,7 +499,6 @@ export function render(element: AirxElement, domRef: HTMLElement) {
       if (instance.requiredUpdate) {
         const children = collector.collect(() => instance.render?.())
         reconcileChildren(instance, childrenAsElements(children))
-        console.log('requiredUpdate', instance.child)
         delete instance.requiredUpdate
       }
 
@@ -676,8 +683,8 @@ export function render(element: AirxElement, domRef: HTMLElement) {
           const dom = deletion.domRef || getChildDom(deletion)
           if (dom && dom.parentNode) dom.parentNode.removeChild(dom)
           deletion.context.triggerUnmounted()
-          deletion.context.dispose()
         }
+
         nextInstance.deletions.clear()
       }
 
