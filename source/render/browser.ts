@@ -33,7 +33,6 @@ export function render(element: AirxElement, domRef: HTMLElement) {
   context.rootInstance.child = appInstance
   context.nextUnitOfWork = appInstance
 
-
   /**
    * 提交 Dom 变化
    */

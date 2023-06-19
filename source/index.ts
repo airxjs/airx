@@ -15,7 +15,6 @@ export {
 } from './element'
 
 export {
-  useContext,
   inject,
   provide,
   onMounted,

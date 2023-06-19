@@ -11,7 +11,7 @@ const globalContext: GlobalContext = {
   current: null
 }
 
-export function useContext(): AirxComponentContext {
+function useContext(): AirxComponentContext {
   if (globalContext.current == null) {
     throw new Error('Unable to find a valid component context')
   }

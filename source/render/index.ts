@@ -1,5 +1,4 @@
 export {
-  useContext,
   inject,
   provide,
   onMounted,
