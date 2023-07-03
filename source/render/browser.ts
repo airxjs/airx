@@ -154,23 +154,48 @@ export function render(element: AirxElement, domRef: HTMLElement) {
       throw new Error('Cant find dom')
     }
 
-    function getChildDom(instance: Instance): HTMLElement | null {
-      if (instance.child?.domRef != null) {
-        return instance.child.domRef
-      }
-      if (instance.child) {
-        return getChildDom(instance.child)
+    /**
+     * 查找 instance 下所有的一级 dom
+     * @param instance 
+     * @returns 
+     */
+    function getChildDoms(instance: Instance): HTMLElement[] {
+      const domList: HTMLElement[] = []
+      const todoList: Instance[] = [instance]
+
+      while (todoList.length > 0) {
+        const current = todoList.pop()
+
+        // 找到真实 dom 直接提交
+        if (current?.domRef != null) {
+          domList.push(current.domRef)
+        }
+
+        // 有子节点但是无真实 dom，向下继续查找
+        if (current?.domRef == null) {
+          if (current?.child != null) {
+            todoList.push(current.child)
+          }
+        }
+
+        // 可能有兄弟节点，则需要继续查找
+        if (current?.sibling != null) {
+          todoList.push(current.sibling)
+        }
       }
 
-      return null
+      return domList
     }
 
     function commitInstanceDom(nextInstance: Instance, oldNode?: ChildNode) {
       // 移除标删元素
       if (nextInstance.deletions) {
         for (const deletion of nextInstance.deletions) {
-          const dom = deletion.domRef || getChildDom(deletion)
-          if (dom && dom.parentNode) dom.parentNode.removeChild(dom)
+          const domList = getChildDoms(deletion)
+          for (let index = 0; index < domList.length; index++) {
+            const dom = domList[index]
+            if (dom && dom.parentNode) dom.parentNode.removeChild(dom)
+          }
           deletion.context.triggerUnmounted()
         }
 

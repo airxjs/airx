@@ -408,8 +408,6 @@ export function reconcileChildren(parentInstance: Instance, childrenElementArray
     }
 
     childrenInstanceMap.forEach(instance => {
-      delete instance.parent
-      delete instance.sibling
       parentInstance.deletions?.add(instance)
     })
   }

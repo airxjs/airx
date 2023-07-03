@@ -3,7 +3,7 @@ import { render } from './render'
 
 export * from './types'
 
-export { createRef } from './reactive'
+export { createRef, Ref } from './reactive'
 
 export {
   Fragment,
