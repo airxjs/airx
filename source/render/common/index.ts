@@ -387,6 +387,16 @@ export function reconcileChildren(parentInstance: Instance, childrenElementArray
       newChildrenInstanceArray.push(instance)
       context.instance = instance
       updateMemoProps(instance)
+
+      // 添加 ref 处理
+      if ('ref' in instance.memoProps) {
+        context.onMounted(() => {
+          if (instance.domRef) { // 如果组件有自己的 dom
+            instance.memoProps.ref.value = instance.domRef
+            return () => instance.memoProps.ref.value = null
+          }
+        })
+      }
     }
   }
 
