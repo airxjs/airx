@@ -47,7 +47,7 @@ export class InnerAirxComponentContext implements AirxComponentContext {
 
   public triggerMounted() {
     this.mountListeners.forEach(listener => {
-      let disposer: Disposer | null = null
+      let disposer: Disposer | void = undefined
 
       try {
         disposer = listener()
