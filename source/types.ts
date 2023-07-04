@@ -1151,7 +1151,7 @@ interface IntrinsicElementAttributes {
 }
 
 export type HtmlRef<T extends HTMLElement = HTMLElement> = {
-  ref?: { value: T | null }
+  ref?: { value: T | null | undefined }
 }
 
 export type ReservedProps = {
