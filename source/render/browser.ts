@@ -44,13 +44,14 @@ export function render(element: AirxElement, domRef: HTMLElement) {
 
     function updateDomProperties(dom: HTMLElement, nextProps: PropsType, prevProps: PropsType = {}) {
       const isKey = (key: string) => key === 'key'
+      const isRef = (key: string) => key === 'ref'
       const isStyle = (key: string) => key === 'style'
       const isClass = (key: string) => key === 'class'
       const isEvent = (key: string) => key.startsWith("on")
       const isChildren = (key: string) => key === 'children'
       const isGone = (_prev: PropsType, next: PropsType) => (key: string) => !(key in next)
       const isNew = (prev: PropsType, next: PropsType) => (key: string) => prev[key] !== next[key]
-      const isProperty = (key: string) => !isChildren(key) && !isEvent(key) && !isStyle(key) && !isClass(key) && !isKey(key)
+      const isProperty = (key: string) => !isChildren(key) && !isEvent(key) && !isStyle(key) && !isClass(key) && !isKey(key) && !isRef(key)
 
       // https://developer.mozilla.org/zh-CN/docs/Web/API/Node
       if (dom.nodeName === '#text' || dom.nodeName === '#comment') {

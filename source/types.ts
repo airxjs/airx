@@ -1150,13 +1150,17 @@ interface IntrinsicElementAttributes {
   view: SVGAttributes
 }
 
+export type HtmlRef<T extends HTMLElement = HTMLElement> = {
+  ref?: { value: T | null | undefined }
+}
+
 export type ReservedProps = {
   children?: any
   key?: string | number | symbol
 }
 
 export type NativeElements = {
-  [K in keyof IntrinsicElementAttributes]: IntrinsicElementAttributes[K] & ReservedProps
+  [K in keyof IntrinsicElementAttributes]: IntrinsicElementAttributes[K] & ReservedProps & HtmlRef
 }
 
 declare global {

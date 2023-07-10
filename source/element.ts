@@ -62,7 +62,7 @@ export function Fragment(props: { children: AirxElement }) {
 }
 
 export type AirxComponentUnmountedListener = () => void
-export type AirxComponentMountedListener = () => () => void | void
+export type AirxComponentMountedListener = () => (() => void) | void
 
 export interface AirxComponentLifecycle {
   onMounted: (listener: AirxComponentMountedListener) => void
