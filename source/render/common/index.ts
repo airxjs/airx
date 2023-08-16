@@ -37,8 +37,8 @@ export const provide: AirxComponentContext['provide'] = (key, value) => {
 
 export type Disposer = () => void
 
-export class InnerAirxComponentContext implements AirxComponentContext {
-  public instance?: Instance
+export class InnerAirxComponentContext<DOM = HTMLElement | string> implements AirxComponentContext {
+  public instance?: Instance<DOM>
   private disposers = new Set<Disposer>()
   private providedMap = new Map<unknown, Ref<unknown>>()
   private injectedMap = new Map<unknown, Ref<unknown>>()
@@ -120,7 +120,7 @@ export class InnerAirxComponentContext implements AirxComponentContext {
      * @returns 返回找到的值的 Ref 和提供该值的实例
      */
     const getResultOfContext = () => {
-      let provider: Instance | null = null
+      let provider: Instance<DOM> | null = null
       let result: Ref<unknown> | null = null
       let nextParentInstance = this.instance
       while (nextParentInstance != null) {
@@ -194,13 +194,13 @@ export class InnerAirxComponentContext implements AirxComponentContext {
  *  ↓    |                 |
  * instance  -sibling→  instance...
  */
-export interface Instance {
-  domRef?: HTMLElement
+export interface Instance<DOM = HTMLElement | string> {
+  domRef?: DOM
 
-  child?: Instance // 子节点
-  parent?: Instance // 父节点
-  sibling?: Instance // 兄弟节点
-  deletions?: Set<Instance> // 需要移除的实例
+  child?: Instance<DOM> // 子节点
+  parent?: Instance<DOM> // 父节点
+  sibling?: Instance<DOM> // 兄弟节点
+  deletions?: Set<Instance<DOM>> // 需要移除的实例
 
   element?: AirxElement
   beforeElement?: AirxElement
@@ -209,7 +209,7 @@ export interface Instance {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   memoProps?: any // props 的引用
   requiredUpdate?: boolean
-  context: InnerAirxComponentContext
+  context: InnerAirxComponentContext<DOM>
 }
 
 

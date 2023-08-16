@@ -1,5 +1,5 @@
 import { AirxElement } from './element'
-import { render } from './render'
+import { render, renderToString, hydrate } from './render'
 
 export * from './types'
 
@@ -24,6 +24,8 @@ export {
 export interface AirxApp {
   // plugin: (plugins: Plugin[]) => AirxApp
   mount: (container: HTMLElement) => AirxApp
+  hydrate: (container: HTMLElement) => AirxApp
+  renderToString: () => string
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -37,6 +39,13 @@ export function createApp(element: AirxElement<any>): AirxApp {
     mount: (container: HTMLElement) => {
       render(element, container)
       return app
+    },
+    hydrate: (container: HTMLElement) => {
+      hydrate(element, container)
+      return app
+    },
+    renderToString: () => {
+      return renderToString(element) || ''
     }
   }
 

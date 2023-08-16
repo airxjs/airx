@@ -1,14 +1,21 @@
 import { AirxElement } from '../element'
 import { createLogger } from '../logger'
-import { InnerAirxComponentContext, Instance, performUnitOfWork } from './common'
+import { InnerAirxComponentContext, Instance as BaseInstance, performUnitOfWork } from './common'
+
+type Instance = BaseInstance<HTMLElement>
 
 interface RenderContext {
+  firstRendered: boolean
   rootInstance: Instance
   needCommitDom: boolean
   nextUnitOfWork: Instance | null
 }
 
-export function render(element: AirxElement, domRef: HTMLElement) {
+interface RenderOptions {
+  ensureRendered: boolean
+}
+
+export function innerRender(element: AirxElement, domRef: HTMLElement, options?: RenderOptions) {
   const rootInstance: Instance = {
     domRef,
     context: new InnerAirxComponentContext()
@@ -18,6 +25,7 @@ export function render(element: AirxElement, domRef: HTMLElement) {
   const context: RenderContext = {
     rootInstance,
     nextUnitOfWork: null,
+    firstRendered: false,
     needCommitDom: false
   }
 
@@ -305,9 +313,13 @@ export function render(element: AirxElement, domRef: HTMLElement) {
     const logger = createLogger('workLoop')
     while (context.nextUnitOfWork && !shouldYield) {
       logger.debug('nextUnitOfWork', context.nextUnitOfWork)
-      context.nextUnitOfWork = performUnitOfWork(context.nextUnitOfWork, onUpdateRequire)
+      context.nextUnitOfWork = performUnitOfWork(context.nextUnitOfWork, onUpdateRequire) as Instance
       if (context.nextUnitOfWork == null) context.needCommitDom = true
-      if (deadline) shouldYield = deadline.timeRemaining() < 1
+      
+      // 强制要求首次渲染完成的的情况下必须要等 firstRendered 为 true 再进入时间片剩余检查
+      if (options?.ensureRendered !== true && context.firstRendered != true) {
+        if (deadline) shouldYield = deadline.timeRemaining() < 1
+      }
     }
 
     if (context.needCommitDom && context.rootInstance.child) {
@@ -315,6 +327,7 @@ export function render(element: AirxElement, domRef: HTMLElement) {
         context.rootInstance.child,
         context.rootInstance.domRef?.firstChild || undefined
       )
+      context.firstRendered = true
       context.needCommitDom = false
     }
 
@@ -322,6 +335,11 @@ export function render(element: AirxElement, domRef: HTMLElement) {
   }
 
   // 开始调度
-  requestIdleCallback(workLoop)
+  workLoop()
   return context.rootInstance
+}
+
+
+export function render(element: AirxElement, domRef: HTMLElement) {
+  return innerRender(element, domRef)
 }
