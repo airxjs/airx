@@ -2,7 +2,7 @@ import { AirxElement } from '../element'
 import { createLogger } from '../logger'
 import { InnerAirxComponentContext, Instance as BaseInstance, performUnitOfWork } from './common'
 
-type Instance = BaseInstance<HTMLElement>
+type Instance = BaseInstance<Element>
 
 interface RenderContext {
   firstRendered: boolean
@@ -15,7 +15,7 @@ interface RenderOptions {
   ensureRendered: boolean
 }
 
-export function innerRender(element: AirxElement, domRef: HTMLElement, options?: RenderOptions) {
+export function innerRender(element: AirxElement, domRef: Element, options?: RenderOptions) {
   const rootInstance: Instance = {
     domRef,
     context: new InnerAirxComponentContext()
@@ -50,7 +50,7 @@ export function innerRender(element: AirxElement, domRef: HTMLElement, options?:
 
     type PropsType = Record<string, unknown>
 
-    function updateDomProperties(dom: HTMLElement, nextProps: PropsType, prevProps: PropsType = {}) {
+    function updateDomProperties(dom: Element, nextProps: PropsType, prevProps: PropsType = {}) {
       const isKey = (key: string) => key === 'key'
       const isRef = (key: string) => key === 'ref'
       const isStyle = (key: string) => key === 'style'
@@ -73,20 +73,24 @@ export function innerRender(element: AirxElement, domRef: HTMLElement, options?:
       // remove old style
       const oldStyle = prevProps?.style
       if (typeof oldStyle === 'object' && oldStyle != null) {
+        if (!('style' in dom) || !dom.style) return
         Object.keys(oldStyle).forEach(key => {
           /* eslint-disable @typescript-eslint/no-explicit-any */
-          delete dom.style[key as any]
-          /* eslint-enable @typescript-eslint/no-explicit-any */
+          if ('style' in dom && dom.style) {
+            delete (dom.style as any)[key as any]
+            /* eslint-enable @typescript-eslint/no-explicit-any */
+          }
         })
       }
 
       // add new style
       const newStyle = nextProps?.style
       if (typeof newStyle === 'object' && newStyle != null) {
+        if (!('style' in dom) || !dom.style) return
         Object.keys(newStyle).forEach((key: unknown) => {
           /* eslint-disable @typescript-eslint/no-explicit-any */
-          const value = (newStyle as any)?.[key as any]
-          dom.style[key as any] = value == null ? '' : value
+          const value = (newStyle as any)?.[key as any];
+          (dom.style as any)[key as any] = value == null ? '' : value
           /* eslint-enable @typescript-eslint/no-explicit-any */
         })
       }
@@ -152,7 +156,7 @@ export function innerRender(element: AirxElement, domRef: HTMLElement, options?:
         .forEach(name => dom.setAttribute(name, nextProps[name] as any))
     }
 
-    function getParentDom(instance: Instance): HTMLElement {
+    function getParentDom(instance: Instance): Element {
       if (instance.parent?.domRef != null) {
         return instance.parent.domRef
       }
@@ -168,8 +172,8 @@ export function innerRender(element: AirxElement, domRef: HTMLElement, options?:
      * @param instance 
      * @returns 
      */
-    function getChildDoms(instance: Instance): HTMLElement[] {
-      const domList: HTMLElement[] = []
+    function getChildDoms(instance: Instance): Element[] {
+      const domList: Element[] = []
       const todoList: Instance[] = [instance]
 
       while (todoList.length > 0) {
@@ -224,7 +228,14 @@ export function innerRender(element: AirxElement, domRef: HTMLElement, options?:
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             nextInstance.domRef = document.createComment(textContent as string) as any
           } else {
-            nextInstance.domRef = document.createElement(nextInstance.element.type)
+            nextInstance.domRef = nextInstance.elementNamespace
+              ? document.createElementNS(nextInstance.elementNamespace, nextInstance.element.type)
+              : document.createElement(nextInstance.element.type)
+          }
+
+          if (nextInstance.domRef) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (nextInstance.domRef as any).airxInstance = nextInstance
           }
         }
       }
@@ -315,7 +326,7 @@ export function innerRender(element: AirxElement, domRef: HTMLElement, options?:
       logger.debug('nextUnitOfWork', context.nextUnitOfWork)
       context.nextUnitOfWork = performUnitOfWork(context.nextUnitOfWork, onUpdateRequire) as Instance
       if (context.nextUnitOfWork == null) context.needCommitDom = true
-      
+
       // 强制要求首次渲染完成的的情况下必须要等 firstRendered 为 true 再进入时间片剩余检查
       if (options?.ensureRendered !== true && context.firstRendered != true) {
         if (deadline) shouldYield = deadline.timeRemaining() < 1
@@ -339,7 +350,6 @@ export function innerRender(element: AirxElement, domRef: HTMLElement, options?:
   return context.rootInstance
 }
 
-
-export function render(element: AirxElement, domRef: HTMLElement) {
+export function render(element: AirxElement, domRef: Element) {
   return innerRender(element, domRef)
 }

@@ -37,7 +37,7 @@ export const provide: AirxComponentContext['provide'] = (key, value) => {
 
 export type Disposer = () => void
 
-export class InnerAirxComponentContext<DOM = HTMLElement | string> implements AirxComponentContext {
+export class InnerAirxComponentContext<DOM = Element | string> implements AirxComponentContext {
   public instance?: Instance<DOM>
   private disposers = new Set<Disposer>()
   private providedMap = new Map<unknown, Ref<unknown>>()
@@ -194,7 +194,7 @@ export class InnerAirxComponentContext<DOM = HTMLElement | string> implements Ai
  *  ↓    |                 |
  * instance  -sibling→  instance...
  */
-export interface Instance<DOM = HTMLElement | string> {
+export interface Instance<DOM = Element | string> {
   domRef?: DOM
 
   child?: Instance<DOM> // 子节点
@@ -206,10 +206,12 @@ export interface Instance<DOM = HTMLElement | string> {
   beforeElement?: AirxElement
   render?: AirxComponentRender
 
+  requiredUpdate?: boolean
+  elementNamespace?: string
+  context: InnerAirxComponentContext<DOM>
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   memoProps?: any // props 的引用
-  requiredUpdate?: boolean
-  context: InnerAirxComponentContext<DOM>
 }
 
 
@@ -363,6 +365,25 @@ export function reconcileChildren(parentInstance: Instance, childrenElementArray
     return true
   }
 
+  function getElementNamespace(element: AirxElement): string {
+    const ns = Object.keys(element.props)
+      .filter(key => (key === 'xmlns' || key.startsWith('xmlns:')))
+      .sort((a, b) => a.length - b.length)
+
+    if (ns.length > 1) {
+      console.log('airx currently does not support setting multiple xmlns')
+      return ''
+    }
+
+    if (ns.some(i => i.startsWith('xmlns:'))) {
+      console.log('airx does not currently support setting named namespaces，only supports default')
+      return ''
+    }
+
+    // 原则上来说 html 仅支持设置默认的 namespace
+    return element.props[ns[0]]
+  }
+
   // 依次遍历 child 并和 instance 对比
   for (let index = 0; index < childrenElementArray.length; index++) {
     const element = childrenElementArray[index]
@@ -376,14 +397,14 @@ export function reconcileChildren(parentInstance: Instance, childrenElementArray
       instance.element = element
       updateMemoProps(instance)
 
-      // 未标注更新的检查一下是否需要更新
+      // 如果父组件更新了，子组件全部都要更新
       if (instance.requiredUpdate !== true && typeof element.type === 'function') {
-        // FIXME: 没必要让 child 都 requiredUpdate，最好时可以只通过 shouldUpdate 来判断是否需要更新
         instance.requiredUpdate = parentInstance.requiredUpdate || shouldUpdate(instance)
       }
     } else {
       const context = new InnerAirxComponentContext()
-      const instance: Instance = { element, context }
+      const elementNamespace = getElementNamespace(element)
+      const instance: Instance = { element, context, elementNamespace }
       newChildrenInstanceArray.push(instance)
       context.instance = instance
       updateMemoProps(instance)
@@ -409,6 +430,14 @@ export function reconcileChildren(parentInstance: Instance, childrenElementArray
     if (index === 0) parentInstance.child = instance
     if (index > 0) newChildrenInstanceArray[index - 1].sibling = instance
     if (index === newChildrenInstanceArray.length - 1) delete instance.sibling
+
+    // 处理 ElementNS: 继承父级 namespace
+    if (!instance.elementNamespace && instance.parent?.elementNamespace) {
+      // SVG 中 foreignObject 代表外来对象，起到隔离 namespace 的作用
+      if (instance.parent.element?.type !== 'foreignObject') {
+        instance.elementNamespace = instance.parent.elementNamespace
+      }
+    }
   }
 
   // 剩余的是需要移除的
