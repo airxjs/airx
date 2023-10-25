@@ -1,5 +1,5 @@
 import { AirxElement } from './element'
-import { render } from './render'
+import { renderToDom } from './render'
 
 export * from './types'
 
@@ -35,7 +35,7 @@ export function createApp(element: AirxElement<any>): AirxApp {
     // },
 
     mount: (container: HTMLElement) => {
-      render(element, container)
+      renderToDom(element, container)
       return app
     }
   }

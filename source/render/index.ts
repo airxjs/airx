@@ -5,5 +5,5 @@ export {
   onUnmounted
 } from './common'
 
-export { render } from './browser'
- 
+export { render as renderToDom } from './browser'
+export { render as renderToString } from './server'
