@@ -1,6 +1,6 @@
 {
   "name": "airx",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "a front framework with jsx",
   "types": "./output/index.d.ts",
   "exports": {
