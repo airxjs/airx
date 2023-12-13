@@ -45,12 +45,6 @@ function createRefObject<T = unknown>(value: T): Ref<T> {
   return object
 }
 
-function isRefObject<T = unknown>(obj: unknown): obj is Ref<T> {
-  return obj != null
-    && typeof obj === 'object'
-    && Reflect.has(obj, symbol.airxReactiveDependenciesSymbol)
-}
-
 export function watch<T = unknown>(ref: Ref<T>, listener: () => unknown) {
   const deps: Set<() => unknown> = Reflect.get(ref, symbol.airxReactiveDependenciesSymbol)
   deps.add(listener)
@@ -58,7 +52,7 @@ export function watch<T = unknown>(ref: Ref<T>, listener: () => unknown) {
 }
 
 export function createRef<T>(obj: T): Ref<T> {
-  const ref = isRefObject<T>(obj) ? obj : createRefObject(obj)
+  const ref = createRefObject(obj)
 
   if (!globalContext.dependencies.has(ref)) {
     globalContext.dependencies.add(ref)
