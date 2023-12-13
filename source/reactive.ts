@@ -58,7 +58,7 @@ export function watch<T = unknown>(ref: Ref<T>, listener: () => unknown) {
 }
 
 export function createRef<T>(obj: T): Ref<T> {
-  const ref = isRefObject<T>(obj) ? obj : createRefObject(obj)
+  const ref = createRefObject(obj)
 
   if (!globalContext.dependencies.has(ref)) {
     globalContext.dependencies.add(ref)
