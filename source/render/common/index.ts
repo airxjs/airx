@@ -2,38 +2,8 @@
 import { createLogger } from '../../logger'
 import { Ref, watch, createRef, createCollector } from '../../reactive'
 import { AirxChildren, AirxComponentContext, AirxComponentMountedListener, AirxComponentRender, AirxComponentUnmountedListener, AirxElement, createElement, isValidElement } from '../../element'
-
-interface GlobalContext {
-  current: AirxComponentContext | null
-}
-
-const globalContext: GlobalContext = {
-  current: null
-}
-
-function useContext(): AirxComponentContext {
-  if (globalContext.current == null) {
-    throw new Error('Unable to find a valid component context')
-  }
-
-  return globalContext.current
-}
-
-export const onMounted: AirxComponentContext['onMounted'] = (listener) => {
-  return useContext().onMounted(listener)
-}
-
-export const onUnmounted: AirxComponentContext['onUnmounted'] = (listener) => {
-  return useContext().onUnmounted(listener)
-}
-
-export const inject: AirxComponentContext['inject'] = (key) => {
-  return useContext().inject(key)
-}
-
-export const provide: AirxComponentContext['provide'] = (key, value) => {
-  return useContext().provide(key, value)
-}
+import { RenderContext } from './context'
+import { globalContext } from './hooks'
 
 export type Disposer = () => void
 
@@ -220,7 +190,7 @@ export interface Instance<DOM = Element | string> {
    * @param parentInstance  当前正在处理的组件的实例
    * @param children  当前组件的子节点
    */
-export function reconcileChildren(parentInstance: Instance, childrenElementArray: AirxElement[]) {
+export function reconcileChildren(appContext: RenderContext, parentInstance: Instance, childrenElementArray: AirxElement[]) {
   const logger = createLogger('reconcileChildren')
   logger.debug('reconcileChildren', parentInstance, childrenElementArray)
   // parentInstance ←-------- 
@@ -291,6 +261,12 @@ export function reconcileChildren(parentInstance: Instance, childrenElementArray
     if (instance == null) return false
     if (instance.element == null) return false
     if (instance.element.type !== nextElement.type) return false
+
+    for (const plugin of appContext.plugins) {
+      const reuse = plugin.shouldReuseDom(instance, nextElement)
+      if (reuse) return true
+    }
+
     return true
   }
 
@@ -461,7 +437,7 @@ type OnUpdateRequire = (instance: Instance) => void
  * @param instance 当前处理的实例
  * @returns 返回下一个需要处理的 instance
  */
-export function performUnitOfWork(instance: Instance, onUpdateRequire?: OnUpdateRequire): Instance | null {
+export function performUnitOfWork(renderContext: RenderContext, instance: Instance, onUpdateRequire?: OnUpdateRequire): Instance | null {
   const element = instance.element
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -494,12 +470,12 @@ export function performUnitOfWork(instance: Instance, onUpdateRequire?: OnUpdate
       globalContext.current = beforeContext
 
       const children = collector.collect(() => instance.render?.())
-      reconcileChildren(instance, childrenAsElements(children))
+      reconcileChildren(renderContext, instance, childrenAsElements(children))
     }
 
     if (instance.requiredUpdate) {
       const children = collector.collect(() => instance.render?.())
-      reconcileChildren(instance, childrenAsElements(children))
+      reconcileChildren(renderContext, instance, childrenAsElements(children))
       delete instance.requiredUpdate
     }
 
@@ -515,7 +491,7 @@ export function performUnitOfWork(instance: Instance, onUpdateRequire?: OnUpdate
   // 浏览器组件/标签
   if (typeof element?.type === 'string') {
     if ('children' in element.props && Array.isArray(element.props.children)) {
-      reconcileChildren(instance, childrenAsElements(element.props.children))
+      reconcileChildren(renderContext, instance, childrenAsElements(element.props.children))
     }
   }
 

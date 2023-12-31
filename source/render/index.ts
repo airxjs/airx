@@ -3,7 +3,6 @@ export {
   provide,
   onMounted,
   onUnmounted
-} from './common'
+} from './common/hooks'
 
-export { render as renderToDom } from './browser'
-export { render as renderToString } from './server'
+export { render } from './browser'
