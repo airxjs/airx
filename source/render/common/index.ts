@@ -1,17 +1,17 @@
 
 import { createLogger } from '../../logger'
-import { Ref, watch, createRef, createCollector } from '../../reactive'
+import { watch, createCollector } from '../../reactive'
 import { AirxChildren, AirxComponentContext, AirxComponentMountedListener, AirxComponentRender, AirxComponentUnmountedListener, AirxElement, createElement, isValidElement } from '../../element'
-import { RenderContext } from './context'
+import { PluginContext } from './plugins'
 import { globalContext } from './hooks'
 
 export type Disposer = () => void
 
-export class InnerAirxComponentContext<DOM = Element | string> implements AirxComponentContext {
-  public instance?: Instance<DOM>
+export class InnerAirxComponentContext implements AirxComponentContext {
+  public instance!: Instance
   private disposers = new Set<Disposer>()
-  private providedMap = new Map<unknown, Ref<unknown>>()
-  private injectedMap = new Map<unknown, Ref<unknown>>()
+  public providedMap = new Map<unknown, unknown>()
+  public injectedMap = new Map<unknown, unknown>()
   private mountListeners = new Set<AirxComponentMountedListener>()
   private unmountedListeners = new Set<AirxComponentUnmountedListener>()
 
@@ -66,55 +66,25 @@ export class InnerAirxComponentContext<DOM = Element | string> implements AirxCo
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public provide<T = unknown>(key: any, value: any): (v: T) => void {
-    if (!this.providedMap.has(key)) {
-      this.providedMap.set(key, createRef(value))
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const ref = this.providedMap.get(key)!
-    ref.value = value
-    return newValue => ref.value = newValue
+    this.providedMap.set(key, value)
+    return v => this.providedMap.set(key, v)
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public inject<T = unknown>(key: any): Ref<T | null> {
-    if (!this.injectedMap.has(key)) {
-      this.injectedMap.set(key, createRef(null))
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const resultRef = this.injectedMap.get(key)!
-
-    /**
-     * 从当前组件开始向上查找
-     * @returns 返回找到的值的 Ref 和提供该值的实例
-     */
-    const getResultOfContext = () => {
-      let provider: Instance<DOM> | null = null
-      let result: Ref<unknown> | null = null
-      let nextParentInstance = this.instance
-      while (nextParentInstance != null) {
-        provider = nextParentInstance
-        result = nextParentInstance.context.providedMap.get(key) || null
-        if (result != null) break
-        nextParentInstance = nextParentInstance.parent
+  public inject<T = unknown>(key: any): T | undefined {
+    const getProvideValueForParent = (instance: Instance | undefined, key: unknown): unknown => {
+      if (instance && instance.context) {
+        const value = instance.context.providedMap.get(key)
+        if (value != undefined) return value
+        if (instance.parent) return getProvideValueForParent(instance.parent, key)
       }
 
-      return { result, provider }
+      return undefined
     }
 
-    const { result, provider } = getResultOfContext()
-
-    if (result != null && provider != null) {
-      // 每当值发生变化，同步到当前的 Ref 上
-      this.addDisposer(watch(result, () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        resultRef.value = result.value as any
-      }))
-    }
-
-    resultRef.value = result?.value
-    return resultRef as Ref<T | null>
+    const currentParentValue = getProvideValueForParent(this.instance.parent, key)
+    this.injectedMap.set(key, currentParentValue) // 更新本地值
+    return this.injectedMap.get(key) as T
   }
 
   addDisposer(...disposers: Disposer[]) {
@@ -164,21 +134,21 @@ export class InnerAirxComponentContext<DOM = Element | string> implements AirxCo
  *  ↓    |                 |
  * instance  -sibling→  instance...
  */
-export interface Instance<DOM = Element | string> {
-  domRef?: DOM
+export interface Instance {
+  domRef?: Element
 
-  child?: Instance<DOM> // 子节点
-  parent?: Instance<DOM> // 父节点
-  sibling?: Instance<DOM> // 兄弟节点
-  deletions?: Set<Instance<DOM>> // 需要移除的实例
+  child?: Instance // 子节点
+  parent?: Instance // 父节点
+  sibling?: Instance // 兄弟节点
+  deletions?: Set<Instance> // 需要移除的实例
 
   element?: AirxElement
   beforeElement?: AirxElement
   render?: AirxComponentRender
 
-  requiredUpdate?: boolean
+  needReRender?: boolean
   elementNamespace?: string
-  context: InnerAirxComponentContext<DOM>
+  context: InnerAirxComponentContext
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   memoProps?: any // props 的引用
@@ -190,7 +160,7 @@ export interface Instance<DOM = Element | string> {
    * @param parentInstance  当前正在处理的组件的实例
    * @param children  当前组件的子节点
    */
-export function reconcileChildren(appContext: RenderContext, parentInstance: Instance, childrenElementArray: AirxElement[]) {
+export function reconcileChildren(appContext: PluginContext, parentInstance: Instance, childrenElementArray: AirxElement[]) {
   const logger = createLogger('reconcileChildren')
   logger.debug('reconcileChildren', parentInstance, childrenElementArray)
   // parentInstance ←-------- 
@@ -252,21 +222,15 @@ export function reconcileChildren(appContext: RenderContext, parentInstance: Ins
     return [instance, () => childrenInstanceMap.delete(innerKey)]
   }
 
-  /**
-   * 浅比较 props 是否相等
-   * @param prev  之前的 props
-   * @param next  下一个 props
-   */
-  function isSameElementType(instance: Instance, nextElement: AirxElement): boolean {
-    if (instance == null) return false
-    if (instance.element == null) return false
-    if (instance.element.type !== nextElement.type) return false
-
+  /** 是否复用实例 */
+  function isReuseInstance(instance: Instance, nextElement: AirxElement): boolean {
     for (const plugin of appContext.plugins) {
-      const reuse = plugin.shouldReuseDom(instance, nextElement)
-      if (reuse) return true
+      if (typeof plugin.isReuseInstance === 'function') {
+        const result = plugin.isReuseInstance(instance, nextElement)
+        // 任意一个插件要求不复用就不复用
+        if (result === false) return false
+      }
     }
-
     return true
   }
 
@@ -292,53 +256,16 @@ export function reconcileChildren(appContext: RenderContext, parentInstance: Ins
     }
   }
 
-  function shouldUpdate(instance: Instance): boolean {
-    const nextProps = instance.element?.props
-    const preProps = instance.beforeElement?.props
-
-    if (Object.is(nextProps, preProps)) {
-      return false
-    }
-
-    if (
-      typeof preProps !== 'object'
-      || typeof nextProps !== 'object'
-      || preProps === null
-      || nextProps === null
-    ) {
-      logger.debug('props must be an object')
-      return true
-    }
-
-    // 对应 key 的值不相同返回 false
-    const prevKeys = Object.keys(preProps)
-    for (let index = 0; index < prevKeys.length; index++) {
-      const key = prevKeys[index]
-      if (key !== 'children' && key !== 'key') {
-        if (!Object.hasOwn(nextProps, key)) return true
-        if (!Object.is(preProps[key], nextProps[key])) return true
+  function isNeedReRender(instance: Instance): boolean {
+    for (const plugin of appContext.plugins) {
+      if (typeof plugin.isReRender === 'function') {
+        const result = plugin.isReRender(instance)
+        // 任意一个插件要求重新渲染就重新渲染
+        if (result === true) return true
       }
-
-      if (key === 'children') {
-        const prevChildren = preProps['children'] as AirxChildren[]
-        const nextChildren = nextProps['children'] as AirxChildren[]
-        // children 都是空的，则无需更新
-        if (prevChildren.length === 0 && nextChildren.length === 0) return false
-
-        // 简单比较一下 child 的引用
-        for (let index = 0; index < prevChildren.length; index++) {
-          const prevChild = prevChildren[index]
-          const nextChild = nextChildren[index]
-
-          if (prevChild !== nextChild) return true
-          if (typeof prevChild !== typeof nextChild) return true
-        }
-      }
-
-      return false
     }
 
-    return true
+    return false
   }
 
   function getElementNamespace(element: AirxElement): string {
@@ -364,9 +291,8 @@ export function reconcileChildren(appContext: RenderContext, parentInstance: Ins
   for (let index = 0; index < childrenElementArray.length; index++) {
     const element = childrenElementArray[index]
     const [instance, seize] = getChildInstance(element, index)
-    const isSameType = instance && isSameElementType(instance, element)
 
-    if (isSameType) {
+    if (instance && isReuseInstance(instance, element)) {
       seize() // 从 childrenInstanceMap 中释放
       newChildrenInstanceArray.push(instance)
       instance.beforeElement = instance.element
@@ -374,8 +300,8 @@ export function reconcileChildren(appContext: RenderContext, parentInstance: Ins
       updateMemoProps(instance)
 
       // 如果父组件更新了，子组件全部都要更新
-      if (instance.requiredUpdate !== true && typeof element.type === 'function') {
-        instance.requiredUpdate = parentInstance.requiredUpdate || shouldUpdate(instance)
+      if (instance.needReRender !== true && typeof element.type === 'function') {
+        instance.needReRender = parentInstance.needReRender || isNeedReRender(instance)
       }
     } else {
       const context = new InnerAirxComponentContext()
@@ -437,7 +363,7 @@ type OnUpdateRequire = (instance: Instance) => void
  * @param instance 当前处理的实例
  * @returns 返回下一个需要处理的 instance
  */
-export function performUnitOfWork(renderContext: RenderContext, instance: Instance, onUpdateRequire?: OnUpdateRequire): Instance | null {
+export function performUnitOfWork(pluginContext: PluginContext, instance: Instance, onUpdateRequire?: OnUpdateRequire): Instance | null {
   const element = instance.element
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -470,19 +396,19 @@ export function performUnitOfWork(renderContext: RenderContext, instance: Instan
       globalContext.current = beforeContext
 
       const children = collector.collect(() => instance.render?.())
-      reconcileChildren(renderContext, instance, childrenAsElements(children))
+      reconcileChildren(pluginContext, instance, childrenAsElements(children))
     }
 
-    if (instance.requiredUpdate) {
+    if (instance.needReRender) {
       const children = collector.collect(() => instance.render?.())
-      reconcileChildren(renderContext, instance, childrenAsElements(children))
-      delete instance.requiredUpdate
+      reconcileChildren(pluginContext, instance, childrenAsElements(children))
+      delete instance.needReRender
     }
 
     // 处理依赖触发的更新
     collector.complete().forEach(ref => {
       instance.context.addDisposer(watch(ref, () => {
-        instance.requiredUpdate = true
+        instance.needReRender = true
         onUpdateRequire?.(instance)
       }))
     })
@@ -491,7 +417,7 @@ export function performUnitOfWork(renderContext: RenderContext, instance: Instan
   // 浏览器组件/标签
   if (typeof element?.type === 'string') {
     if ('children' in element.props && Array.isArray(element.props.children)) {
-      reconcileChildren(renderContext, instance, childrenAsElements(element.props.children))
+      reconcileChildren(pluginContext, instance, childrenAsElements(element.props.children))
     }
   }
 

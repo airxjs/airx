@@ -6,3 +6,4 @@ export {
 } from './common/hooks'
 
 export { render } from './browser'
+export { Plugin, PluginContext } from './common/plugins'

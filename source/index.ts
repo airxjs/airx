@@ -1,10 +1,8 @@
-import { render } from './render'
-import { Plugin } from './render/common/plugin'
-import { RenderContext } from './render/common/context'
 import { AirxElement } from './element'
+import { Plugin, PluginContext, render } from './render'
 
 export * from './types'
-
+export { Plugin } from './render'
 export { createRef, Ref, watch } from './reactive'
 
 export {
@@ -30,7 +28,7 @@ export interface AirxApp {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function createApp(element: AirxElement<any>): AirxApp {
-  const appContext = new RenderContext()
+  const appContext = new PluginContext()
   const app: AirxApp = {
     plugin: (...plugins: Plugin[]) => {
       appContext.registerPlugin(...plugins)

@@ -3,6 +3,8 @@ import * as symbol from './symbol'
 
 type AirxElementType<P> = string | AirxComponent<P>
 
+export type Props = { [propKey: string]: unknown }
+
 /**
  * AirxElement 表示一个 Airx 元素
  * type 表示元素的类型，可能是一个 html 标签，
@@ -13,7 +15,7 @@ type AirxElementType<P> = string | AirxComponent<P>
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface AirxElement<P = any> {
   type: AirxElementType<P>
-  props: { [propKey: string]: unknown } & P
+  props: Props & P
   [symbol.airxElementSymbol]: true
 }
 
@@ -73,5 +75,5 @@ export type AirxComponentContext = AirxComponentLifecycle & {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   provide: <T = any>(key: any, value: T) => (newValue: T) => void
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  inject: <T = any>(key: any) => Ref<T | null>
+  inject: <T = any>(key: any) => T | undefined
 }

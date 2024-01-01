@@ -1,9 +1,7 @@
 import { AirxElement } from '../element'
 import { createLogger } from '../logger'
-import { RenderContext } from './common/context'
-import { InnerAirxComponentContext, Instance as BaseInstance, performUnitOfWork } from './common'
-
-type Instance = BaseInstance<Element>
+import { PluginContext } from './common/plugins'
+import { InnerAirxComponentContext, Instance, performUnitOfWork } from './common'
 
 interface RenderContext {
   rootInstance: Instance
@@ -11,7 +9,7 @@ interface RenderContext {
   nextUnitOfWork: Instance | null
 }
 
-export function render(renderContext: RenderContext, element: AirxElement, domRef: Element) {
+export function render(pluginContext: PluginContext, element: AirxElement, domRef: Element) {
   const rootInstance: Instance = {
     domRef,
     context: new InnerAirxComponentContext()
@@ -46,109 +44,9 @@ export function render(renderContext: RenderContext, element: AirxElement, domRe
     type PropsType = Record<string, unknown>
 
     function updateDomProperties(dom: Element, nextProps: PropsType, prevProps: PropsType = {}) {
-      const isKey = (key: string) => key === 'key'
-      const isRef = (key: string) => key === 'ref'
-      const isStyle = (key: string) => key === 'style'
-      const isClass = (key: string) => key === 'class'
-      const isEvent = (key: string) => key.startsWith("on")
-      const isChildren = (key: string) => key === 'children'
-      const isGone = (_prev: PropsType, next: PropsType) => (key: string) => !(key in next)
-      const isNew = (prev: PropsType, next: PropsType) => (key: string) => prev[key] !== next[key]
-      const isProperty = (key: string) => !isChildren(key) && !isEvent(key) && !isStyle(key) && !isClass(key) && !isKey(key) && !isRef(key)
-
-      // https://developer.mozilla.org/zh-CN/docs/Web/API/Node
-      if (dom.nodeName === '#text' || dom.nodeName === '#comment') {
-        const textNode = (dom as unknown as Text | Comment)
-        if (textNode.nodeValue !== nextProps.textContent) {
-          textNode.nodeValue = String(nextProps.textContent)
-        }
-        return
+      for (const plugin of pluginContext.plugins) {
+        if (plugin.updateDom) plugin.updateDom(dom, nextProps, prevProps)
       }
-
-      // remove old style
-      const oldStyle = prevProps?.style
-      if (typeof oldStyle === 'object' && oldStyle != null) {
-        if (!('style' in dom) || !dom.style) return
-        Object.keys(oldStyle).forEach(key => {
-          /* eslint-disable @typescript-eslint/no-explicit-any */
-          if ('style' in dom && dom.style) {
-            delete (dom.style as any)[key as any]
-            /* eslint-enable @typescript-eslint/no-explicit-any */
-          }
-        })
-      }
-
-      // add new style
-      const newStyle = nextProps?.style
-      if (typeof newStyle === 'object' && newStyle != null) {
-        if (!('style' in dom) || !dom.style) return
-        Object.keys(newStyle).forEach((key: unknown) => {
-          /* eslint-disable @typescript-eslint/no-explicit-any */
-          const value = (newStyle as any)?.[key as any];
-          (dom.style as any)[key as any] = value == null ? '' : value
-          /* eslint-enable @typescript-eslint/no-explicit-any */
-        })
-      }
-
-      if (dom.className !== nextProps?.class) {
-        if (!nextProps?.class) {
-          dom.removeAttribute('class')
-        } else if (typeof nextProps?.class === 'string') {
-          dom.setAttribute('class', nextProps?.class)
-        }
-      }
-
-      //Remove old or changed event listeners
-      Object.keys(prevProps)
-        .filter(isEvent)
-        .filter(
-          key =>
-            !(key in nextProps) ||
-            isNew(prevProps, nextProps)(key)
-        )
-        .forEach(name => {
-          const eventType = name
-            .toLowerCase()
-            .substring(2)
-
-          if (prevProps[name] == null) return
-          if (typeof prevProps[name] !== 'function') {
-            console.error('EventListener is not a function')
-          } else {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            dom.removeEventListener(eventType as any, prevProps[name] as any)
-          }
-        })
-
-      // Add event listeners
-      Object.keys(nextProps)
-        .filter(isEvent)
-        .filter(isNew(prevProps, nextProps))
-        .forEach(name => {
-          const eventType = name
-            .toLowerCase()
-            .substring(2)
-          if (nextProps[name] == null) return
-          if (typeof nextProps[name] !== 'function') {
-            console.error('EventListener is not a function')
-          } else {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            dom.addEventListener(eventType as any, nextProps[name] as any)
-          }
-        })
-
-      // Remove old properties
-      Object.keys(prevProps)
-        .filter(isProperty)
-        .filter(isGone(prevProps, nextProps))
-        .forEach(name => dom.setAttribute(name, ''))
-
-      // Set new or changed properties
-      Object.keys(nextProps)
-        .filter(isProperty)
-        .filter(isNew(prevProps, nextProps))
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .forEach(name => dom.setAttribute(name, nextProps[name] as any))
     }
 
     function getParentDom(instance: Instance): Element {
@@ -319,7 +217,7 @@ export function render(renderContext: RenderContext, element: AirxElement, domRe
     const logger = createLogger('workLoop')
     while (context.nextUnitOfWork && !shouldYield) {
       logger.debug('nextUnitOfWork', context.nextUnitOfWork)
-      context.nextUnitOfWork = performUnitOfWork(renderContext, context.nextUnitOfWork, onUpdateRequire) as Instance
+      context.nextUnitOfWork = performUnitOfWork(pluginContext, context.nextUnitOfWork, onUpdateRequire) as Instance
       if (context.nextUnitOfWork == null) context.needCommitDom = true
       if (deadline) shouldYield = deadline.timeRemaining() < 1
     }
