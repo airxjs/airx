@@ -73,7 +73,7 @@ export interface AirxComponentLifecycle {
 
 export type AirxComponentContext = AirxComponentLifecycle & {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  provide: <T = any>(key: any, value: T) => (newValue: T) => void
+  provide: <T = unknown>(key: unknown, value: T) => (newValue: T) => void
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  inject: <T = any>(key: any) => T | undefined
+  inject: <T = unknown>(key: unknown) => T | undefined
 }

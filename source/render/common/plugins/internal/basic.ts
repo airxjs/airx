@@ -59,6 +59,7 @@ export class BasicLogic implements Plugin {
   }
 
   updateDom(dom: Element, nextProps: Props, prevProps: Props = {}): void {
+    this.logger.debug('updateDom', dom, nextProps, prevProps)
     const isKey = (key: string) => key === 'key'
     const isRef = (key: string) => key === 'ref'
     const isStyle = (key: string) => key === 'style'
