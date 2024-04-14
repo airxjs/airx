@@ -30,8 +30,10 @@ export type AirxChildren =
 /**
  * 函数式组件接收自己的 props，并返回一个 AirxElement
  */
-export type AirxComponent<P = unknown> = (props: P) => AirxComponentRender
-export type AirxComponentRender = () => AirxChildren | AirxChildren
+export type AirxComponentRender = () => AirxChildren
+export type StaticComponent<P = unknown> = (props: P) => AirxChildren
+export type ReactiveComponent<P = unknown> = (props: P) => AirxComponentRender
+export type AirxComponent<P = unknown> = StaticComponent<P> | StaticComponent<P>
 
 /**
  * createElement 是用于创建 AirxElement 的工具函数
@@ -75,4 +77,8 @@ export type AirxComponentContext = AirxComponentLifecycle & {
   provide: <T = unknown>(key: unknown, value: T) => (newValue: T) => void
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   inject: <T = unknown>(key: unknown) => T | undefined
+}
+
+export function component<P = unknown>(comp: AirxComponent<P>): AirxComponent<P> {
+  return comp
 }

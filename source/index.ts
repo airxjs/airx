@@ -7,6 +7,7 @@ export { createRef, Ref, watch } from './reactive'
 
 export {
   Fragment,
+  component,
   createElement,
   AirxComponent,
   AirxElement,
