@@ -1,6 +1,6 @@
 
 import { createLogger } from '../../logger'
-import { watch, createCollector } from '../../reactive'
+import { watchSignal, createCollector } from '../../reactive'
 import { AirxChildren, AirxComponentContext, AirxComponentMountedListener, AirxComponentRender, AirxComponentUnmountedListener, AirxElement, createElement, isValidElement } from '../../element'
 import { PluginContext } from './plugins'
 import { globalContext } from './hooks'
@@ -413,7 +413,7 @@ export function performUnitOfWork(pluginContext: PluginContext, instance: Instan
 
     // 处理依赖触发的更新
     collector.complete().forEach(ref => {
-      instance.context.addDisposer(watch(ref, () => {
+      instance.context.addDisposer(watchSignal(ref, () => {
         instance.needReRender = true
         onUpdateRequire?.(instance)
       }))

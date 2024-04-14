@@ -1,12 +1,12 @@
 import * as symbol from './symbol'
 
-/** TODO: 污染全局总是不好的 */
+/** FIXME: 污染全局总是不好的 */
 const globalContext = {
-  dependencies: new Set<Ref<unknown>>()
+  dependencies: new Set<Signal<unknown>>()
 }
 
 export function createCollector() {
-  const newDependencies = new Set<Ref<unknown>>()
+  const newDependencies = new Set<Signal<unknown>>()
   return {
     clear: () => newDependencies.clear(),
     complete: () => [...newDependencies.values()],
@@ -20,7 +20,7 @@ export function createCollector() {
   }
 }
 
-function triggerRef<T = unknown>(ref: Ref<T>) {
+function triggerRef<T = unknown>(ref: Signal<T>) {
   requestAnimationFrame(() => {
     const deps = Reflect.get(ref, symbol.airxReactiveDependenciesSymbol)
     for (const dep of deps) {
@@ -29,11 +29,11 @@ function triggerRef<T = unknown>(ref: Ref<T>) {
   })
 }
 
-export interface Ref<T = unknown> {
+export interface Signal<T = unknown> {
   value: T
 }
 
-function createRefObject<T = unknown>(value: T): Ref<T> {
+function createRefObject<T = unknown>(value: T): Signal<T> {
   const object = Object.create({ value })
 
   Reflect.defineProperty(object, symbol.airxReactiveDependenciesSymbol, {
@@ -46,13 +46,13 @@ function createRefObject<T = unknown>(value: T): Ref<T> {
   return object
 }
 
-export function watch<T = unknown>(ref: Ref<T>, listener: () => unknown) {
+export function watchSignal<T = unknown>(ref: Signal<T>, listener: () => unknown) {
   const deps: Set<() => unknown> = Reflect.get(ref, symbol.airxReactiveDependenciesSymbol)
   deps.add(listener)
   return () => { deps.delete(listener) }
 }
 
-export function createRef<T>(obj: T): Ref<T> {
+export function createSignal<T>(obj: T): Signal<T> {
   const ref = createRefObject(obj)
 
   if (!globalContext.dependencies.has(ref)) {

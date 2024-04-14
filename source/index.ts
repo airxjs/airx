@@ -3,7 +3,7 @@ import { Plugin, PluginContext, render } from './render'
 
 export * from './types'
 export { Plugin } from './render'
-export { createRef, Ref, watch } from './reactive'
+export { createSignal, Signal, watchSignal } from './reactive'
 
 export {
   Fragment,
