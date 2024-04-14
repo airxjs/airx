@@ -31,9 +31,8 @@ export type AirxChildren =
  * 函数式组件接收自己的 props，并返回一个 AirxElement
  */
 export type AirxComponentRender = () => AirxChildren
-export type StaticComponent<P = unknown> = (props: P) => AirxChildren
+export type AirxComponent<P = unknown> = ReactiveComponent<P>
 export type ReactiveComponent<P = unknown> = (props: P) => AirxComponentRender
-export type AirxComponent<P = unknown> = StaticComponent<P> | StaticComponent<P>
 
 /**
  * createElement 是用于创建 AirxElement 的工具函数

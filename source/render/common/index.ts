@@ -394,15 +394,14 @@ export function performUnitOfWork(pluginContext: PluginContext, instance: Instan
       globalContext.current = instance.context.getSafeContext()
       const componentReturnValue = collector.collect(() => component(instance.memoProps))
 
-      if (typeof componentReturnValue === 'function') {
-        globalContext.current = beforeContext
-        instance.render = componentReturnValue
-        const children = collector.collect(() => instance.render?.())
-        reconcileChildren(pluginContext, instance, childrenAsElements(children))
-      } else {
-        collector.clear() // 静态函数不做任何的依赖处理，所以这里将收集到的依赖清理掉
-        reconcileChildren(pluginContext, instance, childrenAsElements(componentReturnValue))
+      if (typeof componentReturnValue !== 'function') {
+        throw new Error('Component must return a render function')
       }
+
+      globalContext.current = beforeContext
+      instance.render = componentReturnValue
+      const children = collector.collect(() => instance.render?.())
+      reconcileChildren(pluginContext, instance, childrenAsElements(children))
     }
 
     if (instance.needReRender) {
