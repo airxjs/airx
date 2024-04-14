@@ -1,6 +1,5 @@
-import type { Instance } from '..'
 import { AirxElement, Props } from '../../../element'
-
+import type { Instance } from '../index'
 export { PluginContext } from './context'
 
 export interface Plugin {

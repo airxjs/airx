@@ -8,6 +8,7 @@ const globalContext = {
 export function createCollector() {
   const newDependencies = new Set<Ref<unknown>>()
   return {
+    clear: () => newDependencies.clear(),
     complete: () => [...newDependencies.values()],
     collect: <R = unknown>(process: () => R) => {
       const beforeDeps = globalContext.dependencies

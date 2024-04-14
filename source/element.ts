@@ -1,4 +1,3 @@
-import { Ref } from './reactive'
 import * as symbol from './symbol'
 
 type AirxElementType<P> = string | AirxComponent<P>
@@ -32,7 +31,7 @@ export type AirxChildren =
  * 函数式组件接收自己的 props，并返回一个 AirxElement
  */
 export type AirxComponent<P = unknown> = (props: P) => AirxComponentRender
-export type AirxComponentRender = () => AirxChildren
+export type AirxComponentRender = () => AirxChildren | AirxChildren
 
 /**
  * createElement 是用于创建 AirxElement 的工具函数

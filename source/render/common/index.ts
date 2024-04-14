@@ -392,11 +392,17 @@ export function performUnitOfWork(pluginContext: PluginContext, instance: Instan
       const component = element.type
       const beforeContext = globalContext.current
       globalContext.current = instance.context.getSafeContext()
-      instance.render = collector.collect(() => component(instance.memoProps))
-      globalContext.current = beforeContext
+      const componentReturnValue = collector.collect(() => component(instance.memoProps))
 
-      const children = collector.collect(() => instance.render?.())
-      reconcileChildren(pluginContext, instance, childrenAsElements(children))
+      if (typeof componentReturnValue === 'function') {
+        globalContext.current = beforeContext
+        instance.render = componentReturnValue
+        const children = collector.collect(() => instance.render?.())
+        reconcileChildren(pluginContext, instance, childrenAsElements(children))
+      } else {
+        collector.clear() // 静态函数不做任何的依赖处理，所以这里将收集到的依赖清理掉
+        reconcileChildren(pluginContext, instance, childrenAsElements(componentReturnValue))
+      }
     }
 
     if (instance.needReRender) {

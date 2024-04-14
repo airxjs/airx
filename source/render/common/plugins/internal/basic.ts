@@ -52,7 +52,7 @@ export class BasicLogic implements Plugin {
     return false
   }
 
-  isReRender(instance: Instance): true | void  {
+  isReRender(instance: Instance): true | void {
     const nextProps = instance.element?.props
     const preProps = instance.beforeElement?.props
     if (!this.isSameProps(preProps, nextProps)) return true
