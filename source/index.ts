@@ -1,12 +1,13 @@
 import { AirxElement } from './element'
-import { renderToDom } from './render'
+import { Plugin, PluginContext, render } from './render'
 
 export * from './types'
-
-export { createRef, Ref, watch } from './reactive'
+export { Plugin } from './render'
+export { createSignal, Signal, watchSignal } from './reactive'
 
 export {
   Fragment,
+  component,
   createElement,
   AirxComponent,
   AirxElement,
@@ -22,20 +23,21 @@ export {
 } from './render'
 
 export interface AirxApp {
-  // plugin: (plugins: Plugin[]) => AirxApp
+  plugin: (...plugins: Plugin[]) => AirxApp
   mount: (container: HTMLElement) => AirxApp
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function createApp(element: AirxElement<any>): AirxApp {
+  const appContext = new PluginContext()
   const app: AirxApp = {
-    // plugin: (plugins) => {
-    //   console.log(plugins)
-    //   return app
-    // },
+    plugin: (...plugins: Plugin[]) => {
+      appContext.registerPlugin(...plugins)
+      return app
+    },
 
     mount: (container: HTMLElement) => {
-      renderToDom(element, container)
+      render(appContext, element, container)
       return app
     }
   }

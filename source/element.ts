@@ -1,7 +1,8 @@
-import { Ref } from './reactive'
 import * as symbol from './symbol'
 
 type AirxElementType<P> = string | AirxComponent<P>
+
+export type Props = { [propKey: string]: unknown }
 
 /**
  * AirxElement 表示一个 Airx 元素
@@ -13,7 +14,7 @@ type AirxElementType<P> = string | AirxComponent<P>
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface AirxElement<P = any> {
   type: AirxElementType<P>
-  props: { [propKey: string]: unknown } & P
+  props: Props & P
   [symbol.airxElementSymbol]: true
 }
 
@@ -29,8 +30,9 @@ export type AirxChildren =
 /**
  * 函数式组件接收自己的 props，并返回一个 AirxElement
  */
-export type AirxComponent<P = unknown> = (props: P) => AirxComponentRender
 export type AirxComponentRender = () => AirxChildren
+export type AirxComponent<P = unknown> = ReactiveComponent<P>
+export type ReactiveComponent<P = unknown> = (props: P) => AirxComponentRender
 
 /**
  * createElement 是用于创建 AirxElement 的工具函数
@@ -71,7 +73,11 @@ export interface AirxComponentLifecycle {
 
 export type AirxComponentContext = AirxComponentLifecycle & {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  provide: <T = any>(key: any, value: T) => (newValue: T) => void
+  provide: <T = unknown>(key: unknown, value: T) => (newValue: T) => void
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  inject: <T = any>(key: any) => Ref<T | null>
+  inject: <T = unknown>(key: unknown) => T | undefined
+}
+
+export function component<P = unknown>(comp: AirxComponent<P>): AirxComponent<P> {
+  return comp
 }
