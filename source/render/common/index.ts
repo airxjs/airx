@@ -7,8 +7,8 @@ import { globalContext } from './hooks'
 
 export type Disposer = () => void
 
-export class InnerAirxComponentContext implements AirxComponentContext {
-  public instance!: Instance
+export class InnerAirxComponentContext<E extends AbstractElement> implements AirxComponentContext {
+  public instance!: Instance<E>
   private disposers = new Set<Disposer>()
   public providedMap = new Map<unknown, unknown>()
   public injectedMap = new Map<unknown, unknown>()
@@ -72,7 +72,7 @@ export class InnerAirxComponentContext implements AirxComponentContext {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public inject<T = unknown>(key: any): T | undefined {
-    const getProvideValueForParent = (instance: Instance | undefined, key: unknown): unknown => {
+    const getProvideValueForParent = (instance: Instance<E> | undefined, key: unknown): unknown => {
       if (instance && instance.context) {
         const value = instance.context.providedMap.get(key)
         if (value != undefined) return value
@@ -126,6 +126,11 @@ export class InnerAirxComponentContext implements AirxComponentContext {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface AbstractElement {
+
+}
+
 /**
  * 树结构
  * instance ←--------------
@@ -134,13 +139,13 @@ export class InnerAirxComponentContext implements AirxComponentContext {
  *  ↓    |                 |
  * instance  -sibling→  instance...
  */
-export interface Instance {
-  domRef?: Element
+export interface Instance<E extends AbstractElement = AbstractElement> {
+  domRef?: E
 
-  child?: Instance // 子节点
-  parent?: Instance // 父节点
-  sibling?: Instance // 兄弟节点
-  deletions?: Set<Instance> // 需要移除的实例
+  child?: Instance<E> // 子节点
+  parent?: Instance<E> // 父节点
+  sibling?: Instance<E> // 兄弟节点
+  deletions?: Set<Instance<E>> // 需要移除的实例
 
   element?: AirxElement
   beforeElement?: AirxElement
@@ -148,7 +153,7 @@ export interface Instance {
 
   needReRender?: boolean
   elementNamespace?: string
-  context: InnerAirxComponentContext
+  context: InnerAirxComponentContext<E>
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   memoProps?: any // props 的引用
@@ -160,7 +165,7 @@ export interface Instance {
    * @param parentInstance  当前正在处理的组件的实例
    * @param children  当前组件的子节点
    */
-export function reconcileChildren(appContext: PluginContext, parentInstance: Instance, childrenElementArray: AirxElement[]) {
+export function reconcileChildren<E extends AbstractElement>(appContext: PluginContext, parentInstance: Instance<E>, childrenElementArray: AirxElement[]) {
   const logger = createLogger('reconcileChildren')
   logger.debug('reconcileChildren', parentInstance, childrenElementArray)
   // parentInstance ←-------- 
@@ -185,12 +190,12 @@ export function reconcileChildren(appContext: PluginContext, parentInstance: Ins
    * @returns 从 firstChild 开始之后的所有 sibling 实例组成的 Map
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  function getChildrenInstanceMap(firstChild?: Instance): Map<any, Instance> {
+  function getChildrenInstanceMap(firstChild?: Instance<E>): Map<any, Instance<E>> {
     // 不使用递归是因为递归容易爆栈
     let nextIndex = 0
     let nextChild = firstChild
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const map = new Map<any, Instance>()
+    const map = new Map<any, Instance<E>>()
 
     while (nextChild) {
       /* 如果有 key，则将 key 作为 map key，否则将 index 作为 key */
@@ -207,10 +212,10 @@ export function reconcileChildren(appContext: PluginContext, parentInstance: Ins
     return map
   }
 
-  const newChildrenInstanceArray: Instance[] = []
+  const newChildrenInstanceArray: Instance<E>[] = []
   const childrenInstanceMap = getChildrenInstanceMap(parentInstance.child)
 
-  function getChildInstance(child: AirxElement, index: number): [Instance | null, () => void] {
+  function getChildInstance(child: AirxElement, index: number): [Instance<E> | null, () => void] {
     if (child.props.key != null) {
       const key = child.props.key
       const instance = childrenInstanceMap.get(key) || null
@@ -223,7 +228,7 @@ export function reconcileChildren(appContext: PluginContext, parentInstance: Ins
   }
 
   /** 是否复用实例 */
-  function isReuseInstance(instance: Instance, nextElement: AirxElement): boolean {
+  function isReuseInstance(instance: Instance<E>, nextElement: AirxElement): boolean {
     for (const plugin of appContext.plugins) {
       if (typeof plugin.isReuseInstance === 'function') {
         const result = plugin.isReuseInstance(instance, nextElement)
@@ -234,7 +239,7 @@ export function reconcileChildren(appContext: PluginContext, parentInstance: Ins
     return true
   }
 
-  function updateMemoProps(instance: Instance) {
+  function updateMemoProps(instance: Instance<E>) {
     if (instance.element == null) return
     if (instance.memoProps == null) instance.memoProps = {}
     // 简单来说就是以下几件事情
@@ -256,7 +261,7 @@ export function reconcileChildren(appContext: PluginContext, parentInstance: Ins
     }
   }
 
-  function isNeedReRender(instance: Instance): boolean {
+  function isNeedReRender(instance: Instance<E>): boolean {
     for (const plugin of appContext.plugins) {
       if (typeof plugin.isReRender === 'function') {
         const result = plugin.isReRender(instance)
@@ -304,9 +309,9 @@ export function reconcileChildren(appContext: PluginContext, parentInstance: Ins
         instance.needReRender = parentInstance.needReRender || isNeedReRender(instance)
       }
     } else {
-      const context = new InnerAirxComponentContext()
+      const context = new InnerAirxComponentContext<E>()
       const elementNamespace = getElementNamespace(element)
-      const instance: Instance = { element, context, elementNamespace }
+      const instance: Instance<E> = { element, context, elementNamespace }
       newChildrenInstanceArray.push(instance)
       context.instance = instance
       updateMemoProps(instance)
@@ -356,14 +361,14 @@ export function reconcileChildren(appContext: PluginContext, parentInstance: Ins
   logger.debug('parentInstance', parentInstance)
 }
 
-type OnUpdateRequire = (instance: Instance) => void
+type OnUpdateRequire<E extends AbstractElement> = (instance: Instance<E>) => void
 
 /**
  * 处理单个 instance
  * @param instance 当前处理的实例
  * @returns 返回下一个需要处理的 instance
  */
-export function performUnitOfWork(pluginContext: PluginContext, instance: Instance, onUpdateRequire?: OnUpdateRequire): Instance | null {
+export function performUnitOfWork<E extends AbstractElement>(pluginContext: PluginContext, instance: Instance<E>, onUpdateRequire?: OnUpdateRequire<E>): Instance<E> | null {
   const element = instance.element
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -436,7 +441,7 @@ export function performUnitOfWork(pluginContext: PluginContext, instance: Instan
    * @param instance 
    * @returns 返回下一个需要处理的兄弟 instance
    */
-  function returnSibling(instance: Instance): Instance | null {
+  function returnSibling(instance: Instance<E>): Instance<E> | null {
     if (instance.sibling) {
       return instance.sibling
     }

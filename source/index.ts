@@ -1,5 +1,6 @@
 import { AirxElement } from './element'
-import { Plugin, PluginContext, render } from './render'
+import { Plugin, PluginContext } from './render'
+import { browserRender, serverRender } from './render'
 
 export * from './types'
 export { Plugin } from './render'
@@ -25,6 +26,7 @@ export {
 export interface AirxApp {
   plugin: (...plugins: Plugin[]) => AirxApp
   mount: (container: HTMLElement) => AirxApp
+  renderToHTML: () => Promise<string>
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -37,8 +39,13 @@ export function createApp(element: AirxElement<any>): AirxApp {
     },
 
     mount: (container: HTMLElement) => {
-      render(appContext, element, container)
+      browserRender(appContext, element, container)
       return app
+    },
+    renderToHTML: (): Promise<string> => {
+      return new Promise<string>(resolve => {
+        serverRender(appContext, element, resolve)
+      })
     }
   }
 
