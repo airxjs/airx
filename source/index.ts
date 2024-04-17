@@ -1,4 +1,4 @@
-import { AirxElement } from './element'
+import { AirxComponent, AirxElement, createElement } from './element'
 import { Plugin, PluginContext } from './render'
 import { browserRender, serverRender } from './render'
 
@@ -30,8 +30,17 @@ export interface AirxApp {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function createApp(element: AirxElement<any>): AirxApp {
+export function createApp(element: AirxElement<any> | AirxComponent): AirxApp {
   const appContext = new PluginContext()
+
+  const ensureAsElement = (element: AirxElement | AirxComponent): AirxElement => {
+    if (typeof element === 'function') {
+      return createElement(element, {})
+    }
+
+    return element
+  }
+
   const app: AirxApp = {
     plugin: (...plugins: Plugin[]) => {
       appContext.registerPlugin(...plugins)
@@ -39,12 +48,13 @@ export function createApp(element: AirxElement<any>): AirxApp {
     },
 
     mount: (container: HTMLElement) => {
-      browserRender(appContext, element, container)
+      browserRender(appContext, ensureAsElement(element), container)
       return app
     },
+
     renderToHTML: (): Promise<string> => {
       return new Promise<string>(resolve => {
-        serverRender(appContext, element, resolve)
+        serverRender(appContext, ensureAsElement(element), resolve)
       })
     }
   }
