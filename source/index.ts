@@ -48,6 +48,7 @@ export function createApp(element: AirxElement<any> | AirxComponent): AirxApp {
     },
 
     mount: (container: HTMLElement) => {
+      container.innerHTML = '' // 先清空再说
       browserRender(appContext, ensureAsElement(element), container)
       return app
     },
