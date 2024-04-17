@@ -2,8 +2,9 @@
   "name": "airx",
   "version": "0.2.1",
   "description": "a front framework with jsx",
-  "main": "./output/index.js",
-  "types": "./output/index.d.ts",
+  "main": "./output/umd/index.js",
+  "module": "./output/esm/index.js",
+  "types": "./output/esm/index.d.ts",
   "files": [
     "output/*"
   ],

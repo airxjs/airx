@@ -17,6 +17,13 @@ const umdOutputOptions = {
 	name: pkg.name
 }
 
+const moduleOutputOptions = {
+	...baseOutputOptions,
+	file: pkg.module,
+	format: 'module',
+	name: pkg.name
+}
+
 export default [
 	{
 		input: 'source/index.ts',
@@ -27,7 +34,8 @@ export default [
 			babel({ babelHelpers: 'bundled' })
 		],
 		output: [
-			umdOutputOptions
+			umdOutputOptions,
+			moduleOutputOptions,
 		]
 	}
 ]
