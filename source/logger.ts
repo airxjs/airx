@@ -1,4 +1,6 @@
-const isDev = localStorage.getItem('airx-dev')
+declare const process: { env?: { NODE_ENV?: string } } | undefined
+const isDev = typeof process != 'undefined' && process?.env?.NODE_ENV === 'development'
+
 export function createLogger(name: string) {
   function getPrintPrefix() {
     const date = new Date().toLocaleString()
