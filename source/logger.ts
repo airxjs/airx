@@ -1,5 +1,7 @@
-declare const process: { env?: { NODE_ENV?: string } } | undefined
-const isDev = typeof process != 'undefined' && process?.env?.NODE_ENV === 'development'
+declare const process: { env?: { NODE_ENV?: string, AIRX_DEBUG?: string } } | undefined
+const isPrintLogs = typeof process != 'undefined'
+  && process?.env?.NODE_ENV === 'development'
+  && process?.env?.AIRX_DEBUG === 'true'
 
 export function createLogger(name: string) {
   function getPrintPrefix() {
@@ -8,7 +10,7 @@ export function createLogger(name: string) {
   }
 
   function debug(...args: unknown[]) {
-    if (isDev) console.log(getPrintPrefix(), ...args)
+    if (isPrintLogs) console.log(getPrintPrefix(), ...args)
   }
 
   return { debug }
