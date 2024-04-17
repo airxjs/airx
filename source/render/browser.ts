@@ -1,16 +1,19 @@
 import { AirxElement } from '../element'
 import { createLogger } from '../logger'
 import { PluginContext } from './common/plugins'
-import { InnerAirxComponentContext, Instance, performUnitOfWork } from './common'
+import { AbstractElement, InnerAirxComponentContext, Instance, performUnitOfWork } from './common'
+
+class BrowserElement extends Element implements AbstractElement {}
+
 
 interface RenderContext {
-  rootInstance: Instance
+  rootInstance: Instance<BrowserElement>
   needCommitDom: boolean
-  nextUnitOfWork: Instance | null
+  nextUnitOfWork: Instance<BrowserElement> | null
 }
 
-export function render(pluginContext: PluginContext, element: AirxElement, domRef: Element) {
-  const rootInstance: Instance = {
+export function render(pluginContext: PluginContext, element: AirxElement, domRef: BrowserElement) {
+  const rootInstance: Instance<BrowserElement> = {
     domRef,
     context: new InnerAirxComponentContext()
   }
@@ -22,7 +25,7 @@ export function render(pluginContext: PluginContext, element: AirxElement, domRe
     needCommitDom: false
   }
 
-  const appInstance: Instance = {
+  const appInstance: Instance<BrowserElement> = {
     element,
     parent: context.rootInstance,
     memoProps: { ...element.props },
@@ -37,19 +40,19 @@ export function render(pluginContext: PluginContext, element: AirxElement, domRe
   /**
    * 提交 Dom 变化
    */
-  function commitDom(rootInstance: Instance, rootNode?: ChildNode) {
+  function commitDom(rootInstance: Instance<BrowserElement>, rootNode?: ChildNode) {
     const logger = createLogger('commitDom')
     logger.debug('commitDom', rootInstance)
 
     type PropsType = Record<string, unknown>
 
-    function updateDomProperties(dom: Element, nextProps: PropsType, prevProps: PropsType = {}) {
+    function updateDomProperties(dom: BrowserElement, nextProps: PropsType, prevProps: PropsType = {}) {
       for (const plugin of pluginContext.plugins) {
         if (plugin.updateDom) plugin.updateDom(dom, nextProps, prevProps)
       }
     }
 
-    function getParentDom(instance: Instance): Element {
+    function getParentDom(instance: Instance<BrowserElement>): BrowserElement {
       if (instance.parent?.domRef != null) {
         return instance.parent.domRef
       }
@@ -65,9 +68,9 @@ export function render(pluginContext: PluginContext, element: AirxElement, domRe
      * @param instance 
      * @returns 
      */
-    function getChildDoms(instance: Instance): Element[] {
-      const domList: Element[] = []
-      const todoList: Instance[] = [instance]
+    function getChildDoms(instance: Instance<BrowserElement>): BrowserElement[] {
+      const domList: BrowserElement[] = []
+      const todoList: Instance<BrowserElement>[] = [instance]
 
       while (todoList.length > 0) {
         const current = todoList.pop()
@@ -93,7 +96,7 @@ export function render(pluginContext: PluginContext, element: AirxElement, domRe
       return domList
     }
 
-    function commitInstanceDom(nextInstance: Instance, oldNode?: ChildNode) {
+    function commitInstanceDom(nextInstance: Instance<BrowserElement>, oldNode?: ChildNode) {
       // 移除标删元素
       if (nextInstance.deletions) {
         for (const deletion of nextInstance.deletions) {
@@ -156,10 +159,10 @@ export function render(pluginContext: PluginContext, element: AirxElement, domRe
       }
     }
 
-    function commitWalkV2(initInstance: Instance, initNode?: ChildNode) {
+    function commitWalkV2(initInstance: Instance<BrowserElement>, initNode?: ChildNode) {
       // 创建一个栈，将根节点压入栈中
 
-      type StackLayer = [Instance, ChildNode | undefined] | (() => void)
+      type StackLayer = [Instance<BrowserElement>, ChildNode | undefined] | (() => void)
       const stack: StackLayer[] = [[initInstance, initNode]]
 
       while (stack.length > 0) {
@@ -217,7 +220,7 @@ export function render(pluginContext: PluginContext, element: AirxElement, domRe
     const logger = createLogger('workLoop')
     while (context.nextUnitOfWork && !shouldYield) {
       logger.debug('nextUnitOfWork', context.nextUnitOfWork)
-      context.nextUnitOfWork = performUnitOfWork(pluginContext, context.nextUnitOfWork, onUpdateRequire) as Instance
+      context.nextUnitOfWork = performUnitOfWork(pluginContext, context.nextUnitOfWork, onUpdateRequire) as Instance<BrowserElement>
       if (context.nextUnitOfWork == null) context.needCommitDom = true
       if (deadline) shouldYield = deadline.timeRemaining() < 1
     }
@@ -229,6 +232,7 @@ export function render(pluginContext: PluginContext, element: AirxElement, domRe
       context.needCommitDom = false
     }
 
+    // TODO: 兼容性
     requestIdleCallback(workLoop)
   }
 
