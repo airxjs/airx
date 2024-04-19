@@ -71,10 +71,10 @@ export interface AirxComponentLifecycle {
   onUnmounted: (listener: AirxComponentUnmountedListener) => void
 }
 
+type ProvideUpdater<T = unknown> = (newValue: T | ((old: T) => T)) => void
+
 export type AirxComponentContext = AirxComponentLifecycle & {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  provide: <T = unknown>(key: unknown, value: T) => (newValue: T | ((old: T) => T)) => void
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  provide: <T = unknown>(key: unknown, value: T) => ProvideUpdater<T>
   inject: <T = unknown>(key: unknown) => T | undefined
 }
 

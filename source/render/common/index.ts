@@ -74,6 +74,7 @@ export class InnerAirxComponentContext<E extends AbstractElement> implements Air
         this.providedMap.set(key, func(old as T))
         return
       }
+
       this.providedMap.set(key, v)
     }
   }
