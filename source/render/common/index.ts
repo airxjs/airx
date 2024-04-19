@@ -65,9 +65,17 @@ export class InnerAirxComponentContext<E extends AbstractElement> implements Air
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public provide<T = unknown>(key: any, value: any): (v: T) => void {
+  public provide<T = unknown>(key: any, value: any): (v: T | ((old: T) => T)) => void {
     this.providedMap.set(key, value)
-    return v => this.providedMap.set(key, v)
+    return v => {
+      if (typeof v === 'function') {
+        const old = this.providedMap.get(key)
+        const func = v as (old: T) => T
+        this.providedMap.set(key, func(old as T))
+        return
+      }
+      this.providedMap.set(key, v)
+    }
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
