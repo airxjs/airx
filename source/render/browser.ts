@@ -5,7 +5,6 @@ import { AbstractElement, InnerAirxComponentContext, Instance, performUnitOfWork
 
 class BrowserElement extends Element implements AbstractElement {}
 
-
 interface RenderContext {
   rootInstance: Instance<BrowserElement>
   needCommitDom: boolean

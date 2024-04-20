@@ -155,7 +155,7 @@ export class BasicLogic implements Plugin {
     Object.keys(prevProps)
       .filter(isProperty)
       .filter(isGone(prevProps, nextProps))
-      .forEach(name => dom.setAttribute(name, ''))
+      .forEach(name => dom.removeAttribute(name))
 
     // Set new or changed properties
     Object.keys(nextProps)

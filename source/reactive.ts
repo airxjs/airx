@@ -24,7 +24,8 @@ function triggerRef<T = unknown>(ref: Signal<T>) {
   requestAnimationFrame(() => {
     const deps = Reflect.get(ref, symbol.airxReactiveDependenciesSymbol)
     for (const dep of deps) {
-      dep()
+      try { dep() }
+      catch (error) { console.log(error) }
     }
   })
 }
@@ -71,7 +72,6 @@ export function createSignal<T>(obj: T): Signal<T> {
     set(newValue) {
       value = newValue
       triggerRef(ref)
-      return value
     }
   })
 
