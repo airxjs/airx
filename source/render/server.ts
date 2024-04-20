@@ -206,7 +206,7 @@ export function render(pluginContext: PluginContext, element: AirxElement, onCom
       Object.keys(prevProps)
         .filter(isProperty)
         .filter(isGone(prevProps, nextProps))
-        .forEach(name => dom.setAttribute(name, ''))
+        .forEach(name => dom.removeAttribute(name))
 
       // Set new or changed properties
       Object.keys(nextProps)
