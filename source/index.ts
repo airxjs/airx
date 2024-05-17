@@ -3,7 +3,7 @@ import { AirxComponent, AirxElement, createElement } from './element'
 
 export * from './types'
 export { Plugin } from './render'
-export { Signal } from './signal'
+export { Signal, effect, reaction } from './signal'
 
 export {
   Fragment,
