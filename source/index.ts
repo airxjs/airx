@@ -1,10 +1,9 @@
+import { browserRender, serverRender, Plugin, PluginContext } from './render'
 import { AirxComponent, AirxElement, createElement } from './element'
-import { Plugin, PluginContext } from './render'
-import { browserRender, serverRender } from './render'
 
 export * from './types'
 export { Plugin } from './render'
-export { createSignal, Signal, watchSignal } from './reactive'
+export { Signal } from './signal'
 
 export {
   Fragment,
