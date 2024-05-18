@@ -20,13 +20,6 @@ const globalNS: any = (function () {
 
 export const globalSignal: typeof Polyfill = globalNS['Signal'] || Polyfill
 
-// eslint-disable-next-line @typescript-eslint/no-namespace
-export namespace Signal {
-  export class State<T> extends globalSignal.State<T> {}
-  export class Computed<T> extends globalSignal.Computed<T> {}
-
-  // eslint-disable-next-line @typescript-eslint/no-namespace
-  export namespace subtle {
-    export class Watcher extends globalSignal.subtle.Watcher {}
-  }
-}
+export class State<T> extends globalSignal.State<T> {}
+export class Watcher extends globalSignal.subtle.Watcher {}
+export class Computed<T> extends globalSignal.Computed<T> {}

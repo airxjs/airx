@@ -1,4 +1,4 @@
-import { Signal } from '../../signal'
+import { State, Computed, Watcher } from '../../signal'
 
 import { createLogger } from '../../logger'
 import {
@@ -166,9 +166,9 @@ export interface Instance<E extends AbstractElement = AbstractElement> {
   deletions?: Set<Instance<E>> // 需要移除的实例
 
   element?: AirxElement
+  signalWatcher?: Watcher
   beforeElement?: AirxElement
   childrenRender?: AirxComponentRender
-  signalWatcher?: Signal.subtle.Watcher
 
   needReRender?: boolean
   elementNamespace?: string
@@ -340,7 +340,7 @@ export function reconcileChildren<E extends AbstractElement>(appContext: PluginC
         context.onMounted(() => {
           const ref = instance.memoProps.ref
           // 如果组件有自己的 dom 并且 ref 为 state
-          if (instance.domRef && ref instanceof Signal.State) {
+          if (instance.domRef && ref instanceof State) {
             ref.set(instance.domRef)
             return () => ref.set(undefined)
           }
@@ -414,7 +414,7 @@ export function performUnitOfWork<E extends AbstractElement>(pluginContext: Plug
   if (typeof element?.type === 'function') {
     if (instance.signalWatcher == null) {
       // Watch 是惰性的，只有当 Signal 被读取时才会触发 --！
-      const signalWatcher = new Signal.subtle.Watcher(async () => {
+      const signalWatcher = new Watcher(async () => {
         instance.needReRender = true
         onUpdateRequire?.(instance)
 
@@ -442,7 +442,7 @@ export function performUnitOfWork<E extends AbstractElement>(pluginContext: Plug
 
       globalContext.current = beforeContext
       instance.childrenRender = componentReturnValue
-      const childrenComputed = new Signal.Computed(() => componentReturnValue())
+      const childrenComputed = new Computed(() => componentReturnValue())
       instance.signalWatcher.watch(childrenComputed)
       const children = childrenComputed.get()
 

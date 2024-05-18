@@ -2,7 +2,6 @@ import { browserRender, serverRender, Plugin, PluginContext } from './render'
 import { AirxComponent, AirxElement, createElement } from './element'
 
 export * from './types'
-export { Signal } from './signal'
 export { Plugin } from './render'
 
 export {
