@@ -18,8 +18,29 @@ const globalNS: any = (function () {
   throw new Error('unable to locate global object')
 })()
 
-export const globalSignal: typeof Polyfill = globalNS['Signal'] || Polyfill
+function getSignal() {
+  const globalSignal: typeof Polyfill = globalNS['Signal']
+  if (globalSignal == null) throw new Error('Signal is undefined')
+  return globalSignal
+}
 
-export class State<T> extends globalSignal.State<T> {}
-export class Watcher extends globalSignal.subtle.Watcher {}
-export class Computed<T> extends globalSignal.Computed<T> {}
+export declare type Watcher = Polyfill.subtle.Watcher
+
+export function createWatch(notify: (this: Polyfill.subtle.Watcher) => void): Polyfill.subtle.Watcher {
+  const signal = getSignal()
+  return new signal.subtle.Watcher(notify)
+}
+
+export function createState<T>(initial: T, options?: Polyfill.Options<T> | undefined): Polyfill.State<T> {
+  const signal = getSignal()
+  return new signal.State(initial, options)
+}
+
+export function createComputed<T>(computation: () => T, options?: Polyfill.Options<T> | undefined): Polyfill.Computed<T> {
+  const signal = getSignal()
+  return new signal.Computed(computation, options)
+}
+
+export function isState<T>(target: unknown): target is Polyfill.State<T> {
+  return target instanceof Polyfill.State
+}
