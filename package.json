@@ -1,6 +1,6 @@
 {
   "name": "airx",
-  "version": "0.3.0",
+  "version": "0.3.0-alpha.1",
   "description": "a front framework with jsx",
   "main": "./output/umd/index.js",
   "module": "./output/esm/index.js",
