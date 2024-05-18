@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as CSS from 'csstype'
+import { Signal } from 'signal-polyfill'
 
 export interface Events {
   onCopy: ClipboardEvent
@@ -1152,7 +1153,7 @@ interface IntrinsicElementAttributes {
 }
 
 export type HtmlRef<T extends HTMLElement = HTMLElement> = {
-  ref?: { value: T | null | undefined }
+  ref?: Signal.State<T | undefined>
 }
 
 export type ReservedProps = {
