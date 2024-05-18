@@ -22,6 +22,8 @@ const globalNS: any = (function () {
   throw new Error('unable to locate global object')
 })()
 
+// 通过函数包装来延迟加载 Signal
+// 这对使用 Polyfill 的应用来说更友好
 function getSignal() {
   const globalSignal: typeof Polyfill = globalNS['Signal']
   if (globalSignal == null) throw new Error('Signal is undefined')
