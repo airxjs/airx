@@ -1,3 +1,4 @@
+import { Signal } from '../../signal'
 
 import { createLogger } from '../../logger'
 import {
@@ -12,7 +13,6 @@ import {
 } from '../../element'
 import { PluginContext } from './plugins'
 import { globalContext } from './hooks'
-import { Signal } from 'signal-polyfill'
 
 export type Disposer = () => void
 
@@ -451,7 +451,7 @@ export function performUnitOfWork<E extends AbstractElement>(pluginContext: Plug
 
     if (instance.needReRender) {
       // 这里有个问题，如果是由于父组件导致的子组件渲染
-      // 则直接使用 childrenComputed.get 将读取到缓存值
+      // 直接使用 childrenComputed.get() 将读取到缓存值
       // const children = instance.childrenRender?.()
       const children = instance.childrenRender!()
       reconcileChildren(pluginContext, instance, childrenAsElements(children))
