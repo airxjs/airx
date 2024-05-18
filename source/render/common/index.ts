@@ -338,11 +338,11 @@ export function reconcileChildren<E extends AbstractElement>(appContext: PluginC
       // 添加 ref 处理
       if ('ref' in instance.memoProps) {
         context.onMounted(() => {
-          const { ref } = instance.memoProps
+          const ref = instance.memoProps.ref
           // 如果组件有自己的 dom 并且 ref 为 state
           if (instance.domRef && ref instanceof Signal.State) {
             ref.set(instance.domRef)
-            return () => instance.memoProps.ref.value = null
+            return () => ref.set(undefined)
           }
         })
       }
