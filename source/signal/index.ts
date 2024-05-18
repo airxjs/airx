@@ -5,11 +5,16 @@ export declare type Watcher = Polyfill.subtle.Watcher
 
 let firstSignal: typeof Polyfill | undefined = undefined
 
+declare let self: unknown
+declare let window: unknown
+declare let global: unknown
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const globalNS: any = (function () {
   // the only reliable means to get the global object is
   // `Function('return this')()`
   // However, this causes CSP violations in Chrome apps.
+
   if (typeof self !== 'undefined') {
     return self
   }
