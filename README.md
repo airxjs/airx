@@ -1,50 +1,52 @@
-# airx 
+# airx
 
 [![npm](https://img.shields.io/npm/v/airx.svg)](https://www.npmjs.com/package/airx) [![build status](https://github.com/airxjs/airx/actions/workflows/check.yml/badge.svg?branch=main)](https://github.com/airxjs/airx/actions/workflows/check.yml)
 
 ☁️ Airx is a lightweight JSX web application framework.
 
-Airx is a front-end framework based on JSX, designed to provide a simple and straightforward solution for building web applications. While it does not include hooks like React, it offers a range of features to manage state and handle user interactions efficiently.
+Airx is a frontend development framework based on `JSX` and `Signal`, aimed at providing a simple and direct solution for building web applications.
 
 ## Features
 
-- Create reaction values for managing dynamic data
-- Define components using JSX syntax
-- Lightweight and easy to learn
+- Seamlessly integrates with [Signal](https://github.com/tc39/proposal-signals) and its ecosystem!
+- Developed entirely using TypeScript, TypeScript-friendly
+- Defines components using JSX functional syntax
+- No hooks like React 😊
+- Minimal API for easy learning
 
 ## Getting Started
 
-To get started with Airx, follow these steps:
+To begin using Airx, follow these steps:
 
 1. Install Airx using npm or yarn:
 
- ```shell
- npm install airx
- ```
+```shell
+npm install airx
+```
 
-2. Import the necessary functions and components in your project:
+2. Import necessary functions and components into your project:
 
 ```javascript
 import * as airx from 'airx'
 
-// create a reaction value
-const outsideCount = airx.createSignal(1)
+// All values based on Signal automatically trigger updates
+const state = new Signal.State(1)
+const computed = new Signal.Computed(() => state.get() + 100)
 
-// define a component
 function App() {
-  // create a reaction value
-  const innerCount = airx.createSignal(1)
+  const innerState = new Signal.State(1)
 
   const handleClick = () => {
-    innerCount.value += 1
-    outsideCount.value +=1
+    state.set(state.get() + 1)
+    innerState.set(innerState.get() + 1)
   }
 
-  // return a render function
+  // Return a rendering function
   return () => (
     <button onClick={handleClick}>
-      {innerCount.value}
-      {outsideCount.value}
+      {state.get()}
+      {computed.get()}
+      {innerState.get()}
     </button>
   )
 }
@@ -53,18 +55,60 @@ const app = airx.createApp(<App />);
 app.mount(document.getElementById('app'));
 ```
 
+## API
+
+We have only a few APIs because we pursue a minimal core design. In the future, we will also open up a plugin system.
+
+### createApp
+
+Create an application instance.
+
+### provide
+
+```ts
+function provide: <T = unknown>(key: unknown, value: T): ProvideUpdater<T>
+```
+
+Inject a value downwards through the `context`, must be called synchronously directly or indirectly within a component.
+
+### inject
+
+```ts
+function inject<T = unknown>(key: unknown): T | undefined
+```
+
+Look up a specified value upwards through the `context`, must be called synchronously directly or indirectly within a component.
+
+### onMounted
+
+```ts
+type MountedListener = () => (() => void) | void
+function onMounted(listener: MountedListener): void
+```
+
+Register a callback for when the DOM is mounted, must be called synchronously directly or indirectly within a component.
+
+### onUnmounted
+
+```ts
+type UnmountedListener = () => void
+function onUnmounted(listener: UnmountedListener): void
+```
+
+Register a callback for when the DOM is unmounted, must be called synchronously directly or indirectly within a component.
+
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This project uses the MIT License. For detailed information, please refer to the [LICENSE](LICENSE) file.
 
-## Contributing
+## Contribution
 
 Contributions are welcome! If you have any ideas, suggestions, or bug reports, please open an issue or submit a pull request.
 
-## Acknowledgments
+## Acknowledgements
 
-We would like to thank all the contributors and supporters of the Airx project.
+We want to thank all contributors and supporters of the Airx project.
 
 ---
 
-For more information, check out the [official documentation](https://github.com/airxjs/airx).
+For more information, please refer to the [official documentation](https://github.com/airxjs/airx)
