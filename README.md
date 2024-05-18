@@ -4,6 +4,10 @@
 
 ☁️ Airx is a lightweight JSX web application framework.
 
+[中文文档](https://github.com/airxjs/airx/blob/main/README_CN.md)
+|
+[English Document](https://github.com/airxjs/airx/blob/main/README.md)
+
 Airx is a frontend development framework based on `JSX` and `Signal`, aimed at providing a simple and direct solution for building web applications.
 
 ## Features

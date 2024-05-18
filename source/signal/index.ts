@@ -1,5 +1,9 @@
 // https://github.com/proposal-signals/signal-polyfill/issues/10
-import { Signal as Polyfill } from 'signal-polyfill'
+import type { Signal as Polyfill } from 'signal-polyfill'
+
+export declare type Watcher = Polyfill.subtle.Watcher
+
+let firstSignal: typeof Polyfill | undefined = undefined
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const globalNS: any = (function () {
@@ -21,10 +25,11 @@ const globalNS: any = (function () {
 function getSignal() {
   const globalSignal: typeof Polyfill = globalNS['Signal']
   if (globalSignal == null) throw new Error('Signal is undefined')
+  if (firstSignal == null) firstSignal = globalSignal
+  if (firstSignal !== globalSignal) throw new Error('Signal have multiple instances')
+
   return globalSignal
 }
-
-export declare type Watcher = Polyfill.subtle.Watcher
 
 export function createWatch(notify: (this: Polyfill.subtle.Watcher) => void): Polyfill.subtle.Watcher {
   const signal = getSignal()
@@ -42,5 +47,6 @@ export function createComputed<T>(computation: () => T, options?: Polyfill.Optio
 }
 
 export function isState<T>(target: unknown): target is Polyfill.State<T> {
-  return target instanceof Polyfill.State
+  const signal = getSignal()
+  return target instanceof signal.State
 }
