@@ -84,8 +84,16 @@ export function component<P = unknown>(comp: AirxComponent<P>): AirxComponent<P>
 }
 
 export function createErrorRender(error: unknown): AirxComponentRender {
-  const formattingError = (): string => {
+  console.error(error)
+
+  const handleClick = () => {
+    // 点击输出错误是为了避免
+    // 页面上多个组件同时出错时
+    // 无法定位错误与之对应的组件
     console.error(error)
+  }
+
+  const formattingError = (): string => {
     if (error == null) return 'Unknown rendering error'
     if (error instanceof Error) return error.message
     return JSON.stringify(error)
@@ -98,5 +106,5 @@ export function createErrorRender(error: unknown): AirxComponentRender {
     backgroundColor: 'rgb(255, 0, 0)',
   }
 
-  return () => createElement('div', { style: errorBlockStyle }, formattingError())
+  return () => createElement('div', { style: errorBlockStyle, onClick: handleClick }, formattingError())
 }
