@@ -1,4 +1,5 @@
 import * as symbol from './symbol'
+import { CSSProperties } from './types'
 
 type AirxElementType<P> = string | AirxComponent<P>
 
@@ -84,19 +85,18 @@ export function component<P = unknown>(comp: AirxComponent<P>): AirxComponent<P>
 
 export function createErrorRender(error: unknown): AirxComponentRender {
   const formattingError = (): string => {
+    console.error(error)
     if (error == null) return 'Unknown rendering error'
     if (error instanceof Error) return error.message
     return JSON.stringify(error)
   }
 
-  return () => createElement('div',
-    {
-      style: {
-        padding: '20px',
-        fontSize: '20px',
-        color: 'rgba(255,0,0,1)'
-      }
-    },
-    formattingError()
-  )
+  const errorBlockStyle: CSSProperties = {
+    padding: '8px',
+    fontSize: '20px',
+    color: 'rgb(255,255,255)',
+    backgroundColor: 'rgb(255, 0, 0)',
+  }
+
+  return () => createElement('div', { style: errorBlockStyle }, formattingError())
 }
