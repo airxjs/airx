@@ -10,6 +10,7 @@ import {
   AirxComponentMountedListener,
   AirxComponentUnmountedListener,
   AirxComponentRender,
+  createErrorRender,
 } from '../../element'
 import { PluginContext } from './plugins'
 import { globalContext } from './hooks'
@@ -434,15 +435,29 @@ export function performUnitOfWork<E extends AbstractElement>(pluginContext: Plug
       const beforeContext = globalContext.current
       globalContext.current = instance.context.getSafeContext()
 
-      const componentReturnValue = component(instance.memoProps)
+      let componentReturnValue: AirxComponentRender | undefined = undefined
 
-      if (typeof componentReturnValue !== 'function') {
-        throw new Error('Component must return a render function')
+      try {
+        componentReturnValue = component(instance.memoProps)
+      } catch (error) {
+        componentReturnValue = createErrorRender(error)
       }
 
+      if (typeof componentReturnValue !== 'function') {
+        const error = new Error('Component must return a render function')
+        componentReturnValue = createErrorRender(error.message)
+      }
+
+      // restore context
       globalContext.current = beforeContext
       instance.childrenRender = componentReturnValue
-      const childrenComputed = signal.createComputed(() => componentReturnValue())
+      const childrenComputed = signal.createComputed(() => {
+        try {
+          return instance.childrenRender!()
+        } catch (error) {
+          return createErrorRender(error)()
+        }
+      })
       instance.signalWatcher.watch(childrenComputed)
       const children = childrenComputed.get()
 
@@ -450,10 +465,17 @@ export function performUnitOfWork<E extends AbstractElement>(pluginContext: Plug
     }
 
     if (instance.needReRender) {
-      // 这里有个问题，如果是由于父组件导致的子组件渲染
-      // 直接使用 childrenComputed.get() 将读取到缓存值
-      // const children = instance.childrenRender?.()
-      const children = instance.childrenRender!()
+      let children: AirxChildren
+
+      try {
+        // 如果是由于父组件导致的子组件渲染
+        // 直接使用 childrenComputed.get() 将读取到缓存值
+        // 因此这里使用 childrenRender 来更新 children 的值
+        children = instance.childrenRender!()
+      } catch (error) {
+        children = createErrorRender(error)()
+      }
+
       reconcileChildren(pluginContext, instance, childrenAsElements(children))
       delete instance.needReRender
     }
