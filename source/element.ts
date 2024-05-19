@@ -81,3 +81,22 @@ export type AirxComponentContext = AirxComponentLifecycle & {
 export function component<P = unknown>(comp: AirxComponent<P>): AirxComponent<P> {
   return comp
 }
+
+export function createErrorRender(error: unknown): AirxComponentRender {
+  const formattingError = (): string => {
+    if (error == null) return 'Unknown rendering error'
+    if (error instanceof Error) return error.message
+    return JSON.stringify(error)
+  }
+
+  return () => createElement('div',
+    {
+      style: {
+        padding: '20px',
+        fontSize: '20px',
+        color: 'rgba(255,0,0,1)'
+      }
+    },
+    formattingError()
+  )
+}
