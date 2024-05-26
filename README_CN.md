@@ -71,6 +71,14 @@ app.mount(document.getElementById('app'));
 
 创建一个应用实例。
 
+```ts
+interface AirxApp {
+  mount: (container: HTMLElement) => AirxApp
+}
+
+function createApp(element: AirxElement<any> | AirxComponent): AirxApp
+```
+
 ### provide
 
 ```ts
@@ -104,6 +112,10 @@ function onUnmounted(listener: UnmountedListener): void
 ```
 
 注册 DOM 卸载回调，必须直接或间接在组件内部同步调用。
+
+## React 开发者注意
+
+- Css 属性没有任何隐式大小写转换（与 HTML 规范保持一致）
 
 ## 许可证
 

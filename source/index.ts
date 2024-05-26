@@ -22,8 +22,11 @@ export {
 } from './render'
 
 export interface AirxApp {
-  plugin: (...plugins: Plugin[]) => AirxApp
   mount: (container: HTMLElement) => AirxApp
+
+  /** @deprecated WIP */
+  plugin: (...plugins: Plugin[]) => AirxApp
+  /** @deprecated WIP */
   renderToHTML: () => Promise<string>
 }
 
