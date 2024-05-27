@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as CSS from 'csstype'
 import { Signal } from 'signal-polyfill'
+import { AirxChildren } from './element'
 
 export interface Events {
   onCopy: ClipboardEvent
@@ -298,7 +299,6 @@ export interface HTMLAttributes extends AriaAttributes, EventHandlers<Events> {
   innerHTML?: string
   class?: string
   style?: StyleValue
-  children?: any
   accesskey?: string
   contenteditable?: Booleanish | 'inherit'
   contextmenu?: string
@@ -724,8 +724,8 @@ export interface SVGAttributes extends AriaAttributes, EventHandlers<Events> {
    * SVG Styling Attributes
    * @see https://www.w3.org/TR/SVG/styling.html#ElementSpecificStyling
    */
-  class?: any
-  style?: string | CSSProperties
+  class?: string
+  style?: StyleValue
   color?: string
   height?: Numberish
   id?: string
@@ -1157,7 +1157,7 @@ export type HtmlRef<T extends HTMLElement = HTMLElement> = {
 }
 
 export type ReservedProps = {
-  children?: any
+  children?: AirxChildren
   key?: string | number | symbol
 }
 
@@ -1168,16 +1168,13 @@ export type NativeElements = {
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace JSX {
-    /* eslint-disable-next-line @typescript-eslint/no-empty-interface */
     export interface ElementAttributesProperty {}
 
     export interface ElementChildrenAttribute {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      children: any
+      children: AirxChildren
     }
 
     export interface IntrinsicElements extends NativeElements {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       [name: string]: any
     }
 
