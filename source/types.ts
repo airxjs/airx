@@ -699,6 +699,7 @@ export interface VideoHTMLAttributes extends MediaHTMLAttributes {
   width?: Numberish
   disablePictureInPicture?: Booleanish
 }
+
 export interface WebViewHTMLAttributes extends HTMLAttributes {
   allowfullscreen?: Booleanish
   allowpopups?: Booleanish
@@ -718,6 +719,7 @@ export interface WebViewHTMLAttributes extends HTMLAttributes {
   useragent?: string
   webpreferences?: string
 }
+
 export interface SVGAttributes extends AriaAttributes, EventHandlers<Events> {
   innerHTML?: string
   /**
@@ -977,7 +979,8 @@ export interface SVGAttributes extends AriaAttributes, EventHandlers<Events> {
   z?: Numberish
   zoomAndPan?: string
 }
-interface IntrinsicElementAttributes {
+
+interface IntrinsicElementAttributesMap {
   a: AnchorHTMLAttributes
   abbr: HTMLAttributes
   address: HTMLAttributes
@@ -1152,17 +1155,16 @@ interface IntrinsicElementAttributes {
   view: SVGAttributes
 }
 
-export type HtmlRef<T extends HTMLElement = HTMLElement> = {
-  ref?: Signal.State<T | undefined>
-}
-
 export type ReservedProps = {
   children?: AirxChildren
   key?: string | number | symbol
+  ref?: Signal.State<unknown | undefined>
 }
 
 export type NativeElements = {
-  [K in keyof IntrinsicElementAttributes]: IntrinsicElementAttributes[K] & ReservedProps & HtmlRef
+  [K in keyof IntrinsicElementAttributesMap]:
+  IntrinsicElementAttributesMap[K]
+  & ReservedProps
 }
 
 declare global {
