@@ -1158,7 +1158,7 @@ interface IntrinsicElementAttributesMap {
 export type ReservedProps = {
   children?: AirxChildren
   key?: string | number | symbol
-  ref?: Signal.State<unknown | undefined>
+  ref?: Signal.State<any | undefined>
 }
 
 export type NativeElements = {
