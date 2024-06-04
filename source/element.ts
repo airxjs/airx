@@ -44,11 +44,15 @@ export function createElement<P = any>(
   props: { [key: string]: unknown } & P,
   ...children: AirxChildren[]
 ): AirxElement<P> {
+  const localChildren = children.length > 0
+    ? children
+    : props.children
+
   return {
     type,
     props: {
       ...props,
-      children
+      children: localChildren
     },
     [symbol.airxElementSymbol]: true
   }
