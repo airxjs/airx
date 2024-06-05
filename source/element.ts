@@ -27,6 +27,7 @@ export type AirxChildren =
   | undefined
   | AirxElement
   | Array<AirxChildren>
+  | AirxComponentRender // allow function component return type
 
 /**
  * 函数式组件接收自己的 props，并返回一个 AirxElement
@@ -44,9 +45,13 @@ export function createElement<P = any>(
   props: { [key: string]: unknown } & P,
   ...children: AirxChildren[]
 ): AirxElement<P> {
-  const localChildren = children.length > 0
-    ? children
-    : props.children
+  const localChildren: AirxChildren[] = []
+
+  if (children.length > 0) {
+    localChildren.push(...children)
+  } else if (props && props.children) {
+    localChildren.push(props.children as AirxChildren)
+  }
 
   return {
     type,
