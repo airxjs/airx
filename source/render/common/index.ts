@@ -169,7 +169,7 @@ export interface Instance<E extends AbstractElement = AbstractElement> {
   element?: AirxElement
   beforeElement?: AirxElement
   signalWatcher?: signal.Watcher
-  childrenRender?: AirxComponentRender
+  componentReturnValue?: AirxComponentRender | AirxElement
 
   needReRender?: boolean
   elementNamespace?: string
@@ -340,10 +340,16 @@ export function reconcileChildren<E extends AbstractElement>(appContext: PluginC
       if ('ref' in instance.memoProps) {
         context.onMounted(() => {
           const ref = instance.memoProps.ref
-          // 如果组件有自己的 dom 并且 ref 为 state
-          if (instance.domRef && signal.isState(ref)) {
-            ref.set(instance.domRef)
-            return () => ref.set(undefined)
+          // 如果组件有自己的 dom
+          if (instance.domRef) {
+            if (signal.isState(ref)) {
+              ref.set(instance.domRef)
+              return () => ref.set(undefined)
+            }
+            if (typeof ref === 'function') {
+              ref(instance.domRef)
+              return () => ref(undefined)
+            }
           }
         })
       }
@@ -413,24 +419,7 @@ export function performUnitOfWork<E extends AbstractElement>(pluginContext: Plug
 
   // airx 组件
   if (typeof element?.type === 'function') {
-    if (instance.signalWatcher == null) {
-      // Watch 是惰性的，只有当 Signal 被读取时才会触发 --！
-      const signalWatcher = signal.createWatch(async () => {
-        instance.needReRender = true
-        onUpdateRequire?.(instance)
-
-        queueMicrotask(() => {
-          signalWatcher.watch()
-          const paddings = signalWatcher.getPending()
-          for (const padding of paddings) padding.get()
-        })
-      })
-
-      instance.signalWatcher = signalWatcher
-      instance.context.addDisposer(() => signalWatcher.unwatch())
-    }
-
-    if (instance.childrenRender == null) {
+    if (instance.componentReturnValue == null) {
       const component = element.type
       const beforeContext = globalContext.current
       globalContext.current = instance.context.getSafeContext()
@@ -443,35 +432,63 @@ export function performUnitOfWork<E extends AbstractElement>(pluginContext: Plug
         componentReturnValue = createErrorRender(error)
       }
 
-      if (typeof componentReturnValue !== 'function') {
-        const error = new Error('Component must return a render function')
-        componentReturnValue = createErrorRender(error.message)
-      }
-
       // restore context
       globalContext.current = beforeContext
-      instance.childrenRender = componentReturnValue
-      const childrenComputed = signal.createComputed(() => {
-        try {
-          return instance.childrenRender!()
-        } catch (error) {
-          return createErrorRender(error)()
-        }
-      })
-      instance.signalWatcher.watch(childrenComputed)
-      const children = childrenComputed.get()
+      instance.componentReturnValue = componentReturnValue
 
-      reconcileChildren(pluginContext, instance, childrenAsElements(children))
+      // static function component
+      if (isValidElement(componentReturnValue)) {
+        const elements = childrenAsElements(componentReturnValue)
+        reconcileChildren(pluginContext, instance, elements)
+      }
+
+      // reaction function component
+      if (typeof componentReturnValue === 'function') {
+        if (instance.signalWatcher == null) {
+          // Watch 是惰性的，只有当 Signal 被读取时才会触发 --！
+          const signalWatcher = signal.createWatch(async () => {
+            instance.needReRender = true
+            onUpdateRequire?.(instance)
+
+            queueMicrotask(() => {
+              signalWatcher.watch()
+              const paddings = signalWatcher.getPending()
+              for (const padding of paddings) padding.get()
+            })
+          })
+
+          instance.signalWatcher = signalWatcher
+          instance.context.addDisposer(() => signalWatcher.unwatch())
+        }
+
+        const childrenComputed = signal.createComputed(() => {
+          try {
+            if (typeof componentReturnValue === 'function') {
+              return componentReturnValue()
+            }
+          } catch (error) {
+            return createErrorRender(error)()
+          }
+        })
+        instance.signalWatcher.watch(childrenComputed)
+        const children = childrenComputed.get()
+
+        reconcileChildren(pluginContext, instance, childrenAsElements(children))
+      }
     }
 
     if (instance.needReRender) {
       let children: AirxChildren
 
       try {
-        // 如果是由于父组件导致的子组件渲染
-        // 直接使用 childrenComputed.get() 将读取到缓存值
-        // 因此这里使用 childrenRender 来更新 children 的值
-        children = instance.childrenRender!()
+        if (isValidElement(instance.componentReturnValue)) {
+          children = instance.componentReturnValue
+        } else {
+          // 如果是由于父组件导致的子组件渲染
+          // 直接使用 childrenComputed.get() 将读取到缓存值
+          // 因此这里使用 childrenRender 来更新 children 的值
+          children = instance.componentReturnValue!()
+        }
       } catch (error) {
         children = createErrorRender(error)()
       }

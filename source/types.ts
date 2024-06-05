@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import * as CSS from 'csstype'
-import { Signal } from 'signal-polyfill'
-import { AirxChildren } from './element'
+import type * as CSS from 'csstype'
+import type { Signal } from 'signal-polyfill'
+import type { AirxComponentRender, AirxChildren } from './element'
 
 export interface Events {
   onCopy: ClipboardEvent
@@ -1095,6 +1095,7 @@ interface IntrinsicElementAttributesMap {
   video: VideoHTMLAttributes
   wbr: HTMLAttributes
   webview: WebViewHTMLAttributes
+
   svg: SVGAttributes
   animate: SVGAttributes
   animateMotion: SVGAttributes
@@ -1155,31 +1156,35 @@ interface IntrinsicElementAttributesMap {
   view: SVGAttributes
 }
 
-export type ReservedProps = {
-  children?: AirxChildren
+export interface RefAttributes {
+  ref?: Signal.State<any | undefined> | ((ele: any) => void)
+}
+
+export interface ReservedAttributes {
   key?: string | number | symbol
-  ref?: Signal.State<any | undefined>
+  children?: AirxChildren
 }
 
 export type NativeElements = {
   [K in keyof IntrinsicElementAttributesMap]:
   IntrinsicElementAttributesMap[K]
-  & ReservedProps
+  & ReservedAttributes
+  & RefAttributes
 }
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace JSX {
-    export interface ElementAttributesProperty {}
+    type ElementClass = never
+    interface Element extends AirxComponentRender {}
 
-    export interface ElementChildrenAttribute {
-      children: AirxChildren
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    interface ElementChildrenAttribute { children: {} }
+
+    interface IntrinsicElements extends NativeElements {}
+
+    interface IntrinsicAttributes {
+      key?: string | number | symbol
     }
-
-    export interface IntrinsicElements extends NativeElements {
-      [name: string]: any
-    }
-
-    export type IntrinsicAttributes = ReservedProps
   }
 }
