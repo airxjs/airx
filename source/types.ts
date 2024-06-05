@@ -1095,6 +1095,7 @@ interface IntrinsicElementAttributesMap {
   video: VideoHTMLAttributes
   wbr: HTMLAttributes
   webview: WebViewHTMLAttributes
+  
   svg: SVGAttributes
   animate: SVGAttributes
   animateMotion: SVGAttributes
@@ -1155,10 +1156,12 @@ interface IntrinsicElementAttributesMap {
   view: SVGAttributes
 }
 
+export type ElementRef = Signal.State<any | undefined> | ((ele: any) => void)
+
 export type ReservedProps = {
-  children?: AirxChildren
   key?: string | number | symbol
-  ref?: Signal.State<any | undefined>
+  children?: AirxChildren
+  ref?: ElementRef
 }
 
 export type NativeElements = {

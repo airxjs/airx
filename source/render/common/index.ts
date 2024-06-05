@@ -340,10 +340,16 @@ export function reconcileChildren<E extends AbstractElement>(appContext: PluginC
       if ('ref' in instance.memoProps) {
         context.onMounted(() => {
           const ref = instance.memoProps.ref
-          // 如果组件有自己的 dom 并且 ref 为 state
-          if (instance.domRef && signal.isState(ref)) {
-            ref.set(instance.domRef)
-            return () => ref.set(undefined)
+          // 如果组件有自己的 dom
+          if (instance.domRef) {
+            if (signal.isState(ref)) {
+              ref.set(instance.domRef)
+              return () => ref.set(undefined)
+            }
+            if (typeof ref === 'function') {
+              ref(instance.domRef)
+              return () => ref(undefined)
+            }
           }
         })
       }
