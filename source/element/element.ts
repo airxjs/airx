@@ -1,5 +1,5 @@
-import * as symbol from './symbol'
-import { CSSProperties } from './types'
+import * as symbol from '../symbol'
+import { CSSProperties } from '../types'
 
 type AirxElementType<P> = string | AirxComponent<P>
 
@@ -66,7 +66,7 @@ export function createElement<P = any>(
 export function isValidElement(element: unknown): element is AirxElement {
   return typeof element === 'object'
     && element !== null
-    && Reflect.get(element, symbol.airxElementSymbol)
+    && Reflect.get(element, symbol.airxElementSymbol) === true
 }
 
 export function Fragment(props: { children: AirxElement }) {

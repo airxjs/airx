@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type * as CSS from 'csstype'
 import type { Signal } from 'signal-polyfill'
-import type { AirxComponentRender, AirxChildren } from './element'
+import type { AirxComponentRender, AirxChildren } from '../element'
 
 export interface Events {
   onCopy: ClipboardEvent
@@ -1175,12 +1175,16 @@ export type NativeElements = {
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace JSX {
+    /** Disable Class Component */
     type ElementClass = never
+
+    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
     interface Element extends AirxComponentRender {}
 
-    // eslint-disable-next-line @typescript-eslint/ban-types
+    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
     interface ElementChildrenAttribute { children: {} }
 
+    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
     interface IntrinsicElements extends NativeElements {}
 
     interface IntrinsicAttributes {

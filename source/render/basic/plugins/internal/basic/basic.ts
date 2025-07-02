@@ -1,7 +1,7 @@
-import { AirxChildren, AirxElement, Props } from '../../../../element'
-import { createLogger } from '../../../../logger'
-import { Instance } from '../../index'
-import { Plugin } from '../index'
+import { AirxChildren, AirxElement, Props } from '../../../../../element'
+import { createLogger } from '../../../../../logger'
+import { Instance } from '../../../common'
+import { Plugin } from '../../index'
 
 export class BasicLogic implements Plugin {
   private logger = createLogger('basicLogicPlugin')

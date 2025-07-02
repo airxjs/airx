@@ -13,7 +13,7 @@ import {
   createErrorRender,
 } from '../../element'
 import { PluginContext } from './plugins'
-import { globalContext } from './hooks'
+import { globalContext } from './hooks/hooks'
 
 export type Disposer = () => void
 
@@ -101,6 +101,11 @@ export class InnerAirxComponentContext<E extends AbstractElement> implements Air
       return undefined
     }
 
+    // 如果 instance 还没有初始化，直接返回本地缓存的值
+    if (!this.instance || !this.instance.parent) {
+      return this.injectedMap.get(key) as T
+    }
+
     const currentParentValue = getProvideValueForParent(this.instance.parent, key)
     this.injectedMap.set(key, currentParentValue) // 更新本地值
     return this.injectedMap.get(key) as T
@@ -145,10 +150,8 @@ export class InnerAirxComponentContext<E extends AbstractElement> implements Air
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface AbstractElement {
-
-}
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface AbstractElement { }
 
 /**
  * 树结构
