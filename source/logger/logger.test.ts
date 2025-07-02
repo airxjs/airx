@@ -3,16 +3,18 @@ import { createLogger } from './logger'
 
 describe('Logger Module', () => {
   let consoleSpy: ReturnType<typeof vi.spyOn>
-  let originalProcess: typeof globalThis.process
+  let originalProcess: unknown
 
   beforeEach(() => {
-    consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
-    originalProcess = globalThis.process
+    consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    originalProcess = (globalThis as any).process
   })
 
   afterEach(() => {
-    consoleSpy.mockRestore()
-    globalThis.process = originalProcess
+    consoleSpy.mockRestore();
+       // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (globalThis as any).process = originalProcess
   })
 
   describe('createLogger', () => {
@@ -111,7 +113,7 @@ describe('Logger Module', () => {
       const logger = createLogger('test')
       const obj = { key: 'value' }
       const arr = [1, 2, 3]
-      
+
       logger.debug('message', obj, arr, 42, true)
 
       expect(consoleSpy).toHaveBeenCalledTimes(1)

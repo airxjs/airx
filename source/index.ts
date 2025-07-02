@@ -1,15 +1,15 @@
 export * from './types'
-export { Plugin } from './render'
-export { AirxApp, createApp } from './app'
+export { type Plugin } from './render'
+export { type AirxApp, createApp } from './app'
 
 export {
   Fragment,
   component,
   createElement,
-  AirxComponent,
-  AirxElement,
-  AirxChildren,
-  AirxComponentContext
+  type AirxComponent,
+  type AirxElement,
+  type AirxChildren,
+  type AirxComponentContext
 } from './element'
 
 export {

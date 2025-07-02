@@ -1,7 +1,7 @@
-import { describe, it, expect, vi } from 'vitest'
-import { Plugin } from './plugin'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { AirxElement, Props } from '../../../element'
 import { Instance } from '../common'
+import { Plugin } from './plugin'
 
 describe('Plugin Interface', () => {
   let mockInstance: Instance

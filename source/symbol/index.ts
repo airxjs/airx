@@ -1,1 +1,1 @@
-export * from './symbol'
+export const airxElementSymbol = Symbol('airx-element')

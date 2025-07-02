@@ -1,17 +1,25 @@
 {
   "name": "airx",
-  "version": "0.4.0",
+  "version": "0.6.0-beta.1",
   "description": "a front framework with jsx",
-  "main": "./output/umd/index.js",
-  "module": "./output/esm/index.js",
-  "types": "./output/esm/index.d.ts",
+  "type": "module",
+  "main": "./output/index.umd.cjs",
+  "module": "./output/index.js",
+  "exports": {
+    ".": {
+      "import": "./output/index.js",
+      "types": "./output/index.d.ts",
+      "require": "./output/index.umd.cjs"
+    }
+  },
   "files": [
     "output/*"
   ],
   "scripts": {
-    "dev": "rollup -c -w",
-    "build": "rollup -c",
+    "dev": "vite build -w",
+    "build": "vite build",
     "lint": "eslint source",
+    "prepublishOnly": "vite build",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage"
@@ -23,14 +31,18 @@
     "@rollup/plugin-babel": "^6.0.4",
     "@rollup/plugin-commonjs": "^25.0.7",
     "@rollup/plugin-node-resolve": "^15.2.3",
+    "@types/node": "^24.0.10",
     "@typescript-eslint/eslint-plugin": "^7.7.0",
     "@typescript-eslint/parser": "^7.7.0",
+    "@vitest/coverage-v8": "^3.2.4",
     "@vitest/ui": "^3.2.4",
     "eslint": "^8.57.0",
     "jsdom": "^26.1.0",
     "rollup-plugin-typescript2": "^0.36.0",
-    "signal-polyfill": "^0.1.1",
+    "signal-polyfill": "^0.2.2",
     "typescript": "^5.4.5",
+    "vite": "^7.0.0",
+    "vite-plugin-dts": "^4.5.4",
     "vitest": "^3.2.4"
   },
   "author": "yinxulai",

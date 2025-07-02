@@ -1,118 +1,302 @@
-# airx
+# Airx ☁️
 
-[![npm](https://img.shields.io/npm/v/airx.svg)](https://www.npmjs.com/package/airx) [![build status](https://github.com/airxjs/airx/actions/workflows/check.yml/badge.svg?branch=main)](https://github.com/airxjs/airx/actions/workflows/check.yml)
+[![npm](https://img.shields.io/npm/v/airx.svg)](https://www.npmjs.com/package/airx)
+[![build status](https://github.com/airxjs/airx/actions/workflows/check.yml/badge.svg?branch=main)](https://github.com/airxjs/airx/actions/workflows/check.yml)
+[![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue.svg)](https://www.typescriptlang.org/)
+[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 
-☁️ Airx is a lightweight JSX web application framework.
+> A lightweight, Signal-driven JSX web application framework
 
-[中文文档](https://github.com/airxjs/airx/blob/main/README_CN.md)
-|
-[English Document](https://github.com/airxjs/airx/blob/main/README.md)
+[中文文档](./README_CN.md) • [English Documentation](./README.md)
 
-Airx is a frontend development framework based on `JSX` and `Signal`, aimed at providing a simple and direct solution for building web applications.
+Airx is a modern frontend framework built on **JSX** and **Signal** primitives, designed to provide a simple, performant, and intuitive solution for building reactive web applications.
 
-## Features
+## ✨ Features
 
-- Seamlessly integrates with [Signal](https://github.com/tc39/proposal-signals) and its ecosystem!
-- Developed entirely using TypeScript, TypeScript-friendly
-- Defines components using JSX functional syntax
-- No hooks like React 😊
-- Minimal API for easy learning
+- 🔄 **Signal-driven reactivity**: Seamlessly integrates with [TC39 Signal proposal](https://github.com/tc39/proposal-signals)
+- 📝 **TypeScript-first**: Developed entirely in TypeScript with excellent type safety
+- ⚡ **Functional components**: Define components using clean JSX functional syntax
+- 🚫 **No hooks complexity**: Simple and straightforward API without React-style hooks
+- 🪶 **Lightweight**: Minimal bundle size with zero dependencies
+- 🔌 **Extensible**: Plugin system for advanced functionality
+- 🌐 **Universal**: Works in both browser and server environments
 
-## Getting Started
+## 🚀 Quick Start
 
-To begin using Airx, follow these steps:
+### Installation
 
-1. Install Airx using npm or yarn:
-
-```shell
+```bash
 npm install airx
+# or
+yarn add airx
+# or
+pnpm add airx
 ```
 
-2. Import necessary functions and components into your project:
+### Basic Usage
 
-```javascript
+```tsx
 import * as airx from 'airx'
 
-// All values based on Signal automatically trigger updates
-const state = new Signal.State(1)
-const computed = new Signal.Computed(() => state.get() + 100)
+// Create reactive state using Signal
+const count = new Signal.State(0)
+const doubleCount = new Signal.Computed(() => count.get() * 2)
 
-function App() {
-  const innerState = new Signal.State(1)
+function Counter() {
+  const localState = new Signal.State(0)
 
-  const handleClick = () => {
-    state.set(state.get() + 1)
-    innerState.set(innerState.get() + 1)
+  const increment = () => {
+    count.set(count.get() + 1)
+    localState.set(localState.get() + 1)
   }
 
-  // Return a rendering function
+  // Return a render function
   return () => (
-    <button onClick={handleClick}>
-      {state.get()}
-      {computed.get()}
-      {innerState.get()}
-    </button>
+    <div>
+      <h1>Counter App</h1>
+      <p>Global count: {count.get()}</p>
+      <p>Double count: {doubleCount.get()}</p>
+      <p>Local count: {localState.get()}</p>
+      <button onClick={increment}>
+        Click me!
+      </button>
+    </div>
   )
 }
 
-const app = airx.createApp(<App />);
-app.mount(document.getElementById('app'));
+// Create and mount the app
+const app = airx.createApp(<Counter />)
+app.mount(document.getElementById('app'))
 ```
 
-## API
+## 📖 Core Concepts
 
-We have only a few APIs because we pursue a minimal core design. In the future, we will also open up a plugin system.
+### Components
 
-### createApp
+Components in Airx are simple functions that return a render function:
 
-Create an application instance.
-
-### provide
-
-```ts
-function provide: <T = unknown>(key: unknown, value: T): ProvideUpdater<T>
+```tsx
+function MyComponent() {
+  const state = new Signal.State('Hello')
+  
+  return () => (
+    <div>{state.get()} World!</div>
+  )
+}
 ```
 
-Inject a value downwards through the `context`, must be called synchronously directly or indirectly within a component.
+### State Management
 
-### inject
+Airx leverages the Signal primitive for reactive state management:
 
-```ts
-function inject<T = unknown>(key: unknown): T | undefined
+```tsx
+// State
+const count = new Signal.State(0)
+
+// Computed values
+const isEven = new Signal.Computed(() => count.get() % 2 === 0)
+
+// Effects
+const effect = new Signal.Effect(() => {
+  console.log('Count changed:', count.get())
+})
 ```
 
-Look up a specified value upwards through the `context`, must be called synchronously directly or indirectly within a component.
+### Context & Dependency Injection
 
-### onMounted
+```tsx
+const ThemeContext = Symbol('theme')
 
-```ts
+function App() {
+  // Provide values down the component tree
+  airx.provide(ThemeContext, 'dark')
+  
+  return () => <Child />
+}
+
+function Child() {
+  // Inject values from parent components
+  const theme = airx.inject(ThemeContext)
+  
+  return () => (
+    <div className={`theme-${theme}`}>
+      Current theme: {theme}
+    </div>
+  )
+}
+```
+
+### Lifecycle Hooks
+
+```tsx
+function Component() {
+  airx.onMounted(() => {
+    console.log('Component mounted')
+    
+    // Return cleanup function
+    return () => {
+      console.log('Component unmounted')
+    }
+  })
+
+  airx.onUnmounted(() => {
+    console.log('Component will unmount')
+  })
+  
+  return () => <div>My Component</div>
+}
+
+## 📚 API Reference
+
+Airx follows a minimal API design philosophy. Here are the core APIs:
+
+### `createApp(element)`
+
+Creates an application instance.
+
+```tsx
+const app = airx.createApp(<App />)
+app.mount(document.getElementById('root'))
+```
+
+### `provide<T>(key, value): ProvideUpdater<T>`
+
+Provides a value down the component tree through context. Must be called synchronously within a component.
+
+```tsx
+function Parent() {
+  airx.provide('theme', 'dark')
+  return () => <Child />
+}
+```
+
+### `inject<T>(key): T | undefined`
+
+Retrieves a provided value from the component tree. Must be called synchronously within a component.
+
+```tsx
+function Child() {
+  const theme = airx.inject('theme')
+  return () => <div>Theme: {theme}</div>
+}
+```
+
+### `onMounted(listener): void`
+
+Registers a callback for when the component is mounted to the DOM.
+
+```tsx
 type MountedListener = () => (() => void) | void
-function onMounted(listener: MountedListener): void
+
+airx.onMounted(() => {
+  console.log('Mounted!')
+  return () => console.log('Cleanup')
+})
 ```
 
-Register a callback for when the DOM is mounted, must be called synchronously directly or indirectly within a component.
+### `onUnmounted(listener): void`
 
-### onUnmounted
+Registers a callback for when the component is unmounted from the DOM.
 
-```ts
+```tsx
 type UnmountedListener = () => void
-function onUnmounted(listener: UnmountedListener): void
+
+airx.onUnmounted(() => {
+  console.log('Unmounted!')
+})
 ```
 
-Register a callback for when the DOM is unmounted, must be called synchronously directly or indirectly within a component.
+### `createElement(type, props, ...children)`
 
-## License
+Creates virtual DOM elements (usually handled by JSX transpiler).
 
-This project uses the MIT License. For detailed information, please refer to the [LICENSE](LICENSE) file.
+### `Fragment`
 
-## Contribution
+A component for grouping multiple elements without adding extra DOM nodes.
 
-Contributions are welcome! If you have any ideas, suggestions, or bug reports, please open an issue or submit a pull request.
+```tsx
+function App() {
+  return () => (
+    <airx.Fragment>
+      <div>First</div>
+      <div>Second</div>
+    </airx.Fragment>
+  )
+}
+```
 
-## Acknowledgements
+## 🔧 Development
 
-We want to thank all contributors and supporters of the Airx project.
+### Building from Source
+
+```bash
+# Clone the repository
+git clone https://github.com/airxjs/airx.git
+cd airx
+
+# Install dependencies
+npm install
+
+# Build the project
+npm run build
+
+# Run tests
+npm test
+
+# Run tests with UI
+npm run test:ui
+
+# Run tests with coverage
+npm run test:coverage
+```
+
+### Project Structure
+
+```text
+source/
+├── app/           # Application creation and management
+├── element/       # Virtual DOM and JSX handling
+├── logger/        # Internal logging utilities
+├── render/        # Rendering engine
+│   ├── basic/     # Core rendering logic
+│   ├── browser/   # Browser-specific rendering
+│   └── server/    # Server-side rendering
+├── signal/        # Signal integration
+├── symbol/        # Internal symbols
+└── types/         # TypeScript type definitions
+```
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+
+### Development Workflow
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes
+4. Add tests for your changes
+5. Ensure all tests pass (`npm test`)
+6. Commit your changes (`git commit -m 'Add amazing feature'`)
+7. Push to the branch (`git push origin feature/amazing-feature`)
+8. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- Thanks to all contributors and supporters of the Airx project
+- Inspired by the [TC39 Signal proposal](https://github.com/tc39/proposal-signals)
+- Built with ❤️ by the Airx community
+
+## 📞 Support
+
+- 📖 [Documentation](https://github.com/airxjs/airx)
+- 🐛 [Issue Tracker](https://github.com/airxjs/airx/issues)
+- 💬 [Discussions](https://github.com/airxjs/airx/discussions)
 
 ---
 
-For more information, please refer to the [official documentation](https://github.com/airxjs/airx)
+Made with ☁️ by the Airx team
