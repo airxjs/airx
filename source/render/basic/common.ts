@@ -150,10 +150,8 @@ export class InnerAirxComponentContext<E extends AbstractElement> implements Air
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface AbstractElement {
-
-}
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface AbstractElement { }
 
 /**
  * 树结构
