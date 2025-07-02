@@ -1,7 +1,7 @@
 import { AirxElement } from '../../element'
 import { createLogger } from '../../logger'
-import { PluginContext } from '../common/plugins'
-import { AbstractElement, InnerAirxComponentContext, Instance, performUnitOfWork } from '../common'
+import { PluginContext } from '../basic/plugins'
+import { AbstractElement, InnerAirxComponentContext, Instance, performUnitOfWork } from '../basic/common'
 
 class BrowserElement extends Element implements AbstractElement {}
 

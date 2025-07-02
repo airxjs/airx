@@ -1,0 +1,1 @@
+export { InjectSystem } from './inject'
