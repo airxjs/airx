@@ -1,4 +1,4 @@
-import { AirxComponentContext } from '../../element'
+import { AirxComponentContext } from '../../../element'
 
 interface GlobalContext {
   current: AirxComponentContext | null

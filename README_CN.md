@@ -1,134 +1,303 @@
-# airx
+# Airx ☁️
 
-[![npm](https://img.shields.io/npm/v/airx.svg)](https://www.npmjs.com/package/airx) [![build status](https://github.com/airxjs/airx/actions/workflows/check.yml/badge.svg?branch=main)](https://github.com/airxjs/airx/actions/workflows/check.yml)
+[![npm](h- 🔌 **可扩展**: 插件系统支持高级功能tps://img.shields.io/npm/v/airx.svg)](https://www.npmjs.com/package/airx)
+[![build status](https://github.com/airxjs/airx/actions/workflows/check.yml/badge.svg?branch=main)](https://github.com/airxjs/airx/actions/workflows/check.yml)
+[![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue.svg)](https://www.typescriptlang.org/)
+[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 
-☁️ Airx 是一个轻量级的 JSX 网页应用框架。
+> 一个轻量级、Signal 驱动的 JSX Web 应用程序框架
 
-Airx 是基于 `JSX` 和 `Signal` 的前端开发框架，旨在为构建网页应用提供简单直接的解决方案。
+[中文文档](./README_CN.md) • [English Documentation](./README.md)
 
-## 特点
+Airx 是一个基于 **JSX** 和 **Signal** 原语构建的现代前端框架，旨在为构建响应式 Web 应用程序提供简单、高性能且直观的解决方案。
 
-- 与 [Signal](https://github.com/tc39/proposal-signals) 及其生态系统无缝配合！
-- 完全使用 TypeScript 开发，对类型友好
-- 使用 JSX 函数式语法定义组件
-- 没有像 React 一样的 hooks 😊
-- 极少的 API，且易于学习
+## ✨ 特性
 
-## 入门指南
+- 🔄 **Signal 驱动的响应式**: 无缝集成 [TC39 Signal 提案](https://github.com/tc39/proposal-signals)
+- 📝 **TypeScript 优先**: 完全使用 TypeScript 开发，具有出色的类型安全性
+- ⚡ **函数式组件**: 使用简洁的 JSX 函数式语法定义组件
+- 🚫 **无复杂 Hooks**: 简单直观的 API，无需 React 风格的 hooks
+- 🪶 **轻量级**: 最小的包体积，零依赖
+- � **可扩展**: 插件系统支持高级功能
+- 🌐 **通用性**: 同时支持浏览器和服务器环境
 
-### 准备工作
+## 🚀 快速开始
 
-由于 `Signal` 目前为提案阶段，尚未正式进入标准，因此你需要通过 [`Polyfill`](https://github.com/proposal-signals/signal-polyfill) 来使用，关于 `Polyfill` 的安装请查阅相关文档。
+### 安装
 
-**注意！你需要将 Signal 添加到全局空间，并且确保所有应用代码使用相同的 Signal 实例**
-
-### 安装使用
-
-要开始使用 Airx，请按照以下步骤进行操作：
-
-1. 使用 npm 或 yarn 安装 Airx：
-
-```shell
+```bash
 npm install airx
+# 或者
+yarn add airx
+# 或者
+pnpm add airx
 ```
 
-2. 在项目中导入必要的函数和组件：
+### 基本用法
 
-```javascript
+```tsx
 import * as airx from 'airx'
 
-// 所有基于 Signal 的值都可以自动触发更新
-const state = new Signal.State(1)
-const computed = new Signal.Computed(() => state.get() + 100)
+// 使用 Signal 创建响应式状态
+const count = new Signal.State(0)
+const doubleCount = new Signal.Computed(() => count.get() * 2)
 
-function App() {
-  const innerState = new Signal.State(1)
+function Counter() {
+  const localState = new Signal.State(0)
 
-  const handleClick = () => {
-    state.set(state.get() + 1)
-    innerState.set(innerState.get() + 1)
+  const increment = () => {
+    count.set(count.get() + 1)
+    localState.set(localState.get() + 1)
   }
 
   // 返回一个渲染函数
   return () => (
-    <button onClick={handleClick}>
-      {state.get()}
-      {computed.get()}
-      {innerState.get()}
-    </button>
+    <div>
+      <h1>Counter App</h1>
+      <p>Global count: {count.get()}</p>
+      <p>Double count: {doubleCount.get()}</p>
+      <p>Local count: {localState.get()}</p>
+      <button onClick={increment}>
+        Click me!
+      </button>
+    </div>
   )
 }
 
-const app = airx.createApp(<App />);
-app.mount(document.getElementById('app'));
+// 创建并挂载应用
+const app = airx.createApp(<Counter />)
+app.mount(document.getElementById('app'))
 ```
 
-## API
+## 📖 核心概念
 
-我们只有很少的几个 API，因为我们追求最小内核的设计。将来，我们还将开放插件系统。
+### 组件
 
-### createApp
+Airx 中的组件是返回渲染函数的简单函数：
 
-创建一个应用实例。
+```tsx
+function MyComponent() {
+  const state = new Signal.State('Hello')
+  
+  return () => (
+    <div>{state.get()} World!</div>
+  )
+}
+```
 
-```ts
-interface AirxApp {
-  mount: (container: HTMLElement) => AirxApp
+### 状态管理
+
+Airx 利用 Signal 原语进行响应式状态管理：
+
+```tsx
+// 状态
+const count = new Signal.State(0)
+
+// 计算值
+const isEven = new Signal.Computed(() => count.get() % 2 === 0)
+
+// 副作用
+const effect = new Signal.Effect(() => {
+  console.log('Count changed:', count.get())
+})
+```
+
+### 上下文与依赖注入
+
+```tsx
+const ThemeContext = Symbol('theme')
+
+function App() {
+  // 向组件树下层提供值
+  airx.provide(ThemeContext, 'dark')
+  
+  return () => <Child />
 }
 
-function createApp(element: AirxElement<any> | AirxComponent): AirxApp
+function Child() {
+  // 从父组件注入值
+  const theme = airx.inject(ThemeContext)
+  
+  return () => (
+    <div className={`theme-${theme}`}>
+      Current theme: {theme}
+    </div>
+  )
+}
 ```
 
-### provide
+### 生命周期钩子
 
-```ts
-function provide: <T = unknown>(key: unknown, value: T): ProvideUpdater<T>
+```tsx
+function Component() {
+  airx.onMounted(() => {
+    console.log('Component mounted')
+    
+    // 返回清理函数
+    return () => {
+      console.log('Component unmounted')
+    }
+  })
+
+  airx.onUnmounted(() => {
+    console.log('Component will unmount')
+  })
+  
+  return () => <div>My Component</div>
+}
 ```
 
-通过 `context` 向下注入值，必须直接或间接在组件内部同步调用。
+## 📚 API 参考
 
-### inject
+Airx 遵循最小化 API 设计理念。以下是核心 API：
 
-```ts
-function inject<T = unknown>(key: unknown): T | undefined
+### `createApp(element)`
+
+创建应用程序实例。
+
+```tsx
+const app = airx.createApp(<App />)
+app.mount(document.getElementById('root'))
 ```
 
-通过 `context` 向上查找指定值，必须直接或间接在组件内部同步调用。
+### `provide<T>(key, value): ProvideUpdater<T>`
 
-### onMounted
+通过上下文向组件树下层提供值。必须在组件内同步调用。
 
-```ts
+```tsx
+function Parent() {
+  airx.provide('theme', 'dark')
+  return () => <Child />
+}
+```
+
+### `inject<T>(key): T | undefined`
+
+从组件树中获取提供的值。必须在组件内同步调用。
+
+```tsx
+function Child() {
+  const theme = airx.inject('theme')
+  return () => <div>Theme: {theme}</div>
+}
+```
+
+### `onMounted(listener): void`
+
+注册组件挂载到 DOM 时的回调。
+
+```tsx
 type MountedListener = () => (() => void) | void
-function onMounted(listener: MountedListener): void
+
+airx.onMounted(() => {
+  console.log('Mounted!')
+  return () => console.log('Cleanup')
+})
 ```
 
-注册 DOM 挂载回调，必须直接或间接在组件内部同步调用。
+### `onUnmounted(listener): void`
 
-### onUnmounted
+注册组件从 DOM 卸载时的回调。
 
-```ts
+```tsx
 type UnmountedListener = () => void
-function onUnmounted(listener: UnmountedListener): void
+
+airx.onUnmounted(() => {
+  console.log('Unmounted!')
+})
 ```
 
-注册 DOM 卸载回调，必须直接或间接在组件内部同步调用。
+### `createElement(type, props, ...children)`
 
-## React 开发者注意
+创建虚拟 DOM 元素（通常由 JSX 转译器处理）。
 
-- Css 属性没有任何隐式大小写转换（与 HTML 规范保持一致）
+### `Fragment`
 
-## 许可证
+用于分组多个元素而不添加额外 DOM 节点的组件。
 
-该项目使用 MIT 许可证。详细信息请参阅 [LICENSE](LICENSE) 文件。
+```tsx
+function App() {
+  return () => (
+    <airx.Fragment>
+      <div>First</div>
+      <div>Second</div>
+    </airx.Fragment>
+  )
+}
+```
 
-## 贡献
+## 🔧 开发
 
-欢迎贡献！如果您有任何想法、建议或错误报告，请打开一个 issue 或提交一个 pull request。
+### 从源码构建
 
-## 鸣谢
+```bash
+# 克隆仓库
+git clone https://github.com/airxjs/airx.git
+cd airx
 
-我们要感谢 Airx 项目的所有贡献者和支持者。
+# 安装依赖
+npm install
+
+# 构建项目
+npm run build
+
+# 运行测试
+npm test
+
+# 运行测试 UI
+npm run test:ui
+
+# 运行测试覆盖率
+npm run test:coverage
+```
+
+### 项目结构
+
+```text
+source/
+├── app/           # 应用程序创建和管理
+├── element/       # 虚拟 DOM 和 JSX 处理
+├── logger/        # 内部日志工具
+├── render/        # 渲染引擎
+│   ├── basic/     # 核心渲染逻辑
+│   ├── browser/   # 浏览器特定渲染
+│   └── server/    # 服务器端渲染
+├── signal/        # Signal 集成
+├── symbol/        # 内部符号
+└── types/         # TypeScript 类型定义
+```
+
+## 🤝 贡献
+
+我们欢迎贡献！请查看我们的[贡献指南](CONTRIBUTING.md)了解详情。
+
+### 开发工作流
+
+1. Fork 仓库
+2. 创建你的功能分支 (`git checkout -b feature/amazing-feature`)
+3. 进行更改
+4. 为你的更改添加测试
+5. 确保所有测试通过 (`npm test`)
+6. 提交你的更改 (`git commit -m 'Add amazing feature'`)
+7. 推送到分支 (`git push origin feature/amazing-feature`)
+8. 打开一个 Pull Request
+
+## 📄 许可证
+
+此项目使用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
+
+## 🙏 致谢
+
+- 感谢 Airx 项目的所有贡献者和支持者
+- 受到 [TC39 Signal 提案](https://github.com/tc39/proposal-signals)的启发
+- 由 Airx 社区用 ❤️ 构建
+
+## 📞 支持
+
+- 📖 [文档](https://github.com/airxjs/airx)
+- 🐛 [问题跟踪](https://github.com/airxjs/airx/issues)
+- 💬 [讨论](https://github.com/airxjs/airx/discussions)
 
 ---
 
-欲了解更多信息，请查阅[官方文档](https://github.com/airxjs/airx)
+Made with ☁️ by the Airx team

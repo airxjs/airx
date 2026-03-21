@@ -3,8 +3,8 @@ export {
   provide,
   onMounted,
   onUnmounted
-} from './common/hooks'
+} from './basic/hooks/hooks'
 
 export { render as serverRender } from './server'
 export { render as browserRender } from './browser'
-export { Plugin, PluginContext } from './common/plugins'
+export { type Plugin, PluginContext } from './basic/plugins'
