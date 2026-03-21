@@ -1,132 +1,152 @@
-# Airx 设计与风格指南
+# Airx 代码风格指南
 
-## 1. 技术栈
+> 定义项目代码风格、命名规范与 UI 一致性规则。
 
-- **语言**: TypeScript 5.4.5
-- **Lint**: ESLint + `@typescript-eslint`
-- **构建**: Rollup + `rollup-plugin-typescript2`
-- **包管理**: npm
+## 1. TypeScript 风格
 
-## 2. TypeScript 风格规范
+### 1.1 类型定义
 
-### 2.1 类型注解
+- 使用 `interface` 定义公开 API 类型
+- 使用 `type` 定义联合类型、映射类型
+- 始终使用严格类型，避免 `any`
+- 导出类型用 `export type` 优化 Tree-shaking
 
-- **必须**使用严格的类型注解，避免 `any`
-- eslint 配置了 `@typescript-eslint/no-explicit-any: error`，如需绕过必须加 `// eslint-disable-next-line @typescript-eslint/no-explicit-any` 注释
+```typescript
+// ✅ 正确
+export interface AirxApp {
+  mount(container: Element): void
+}
 
-### 2.2 接口与类型别名
+// ❌ 避免
+export type AirxApp = { mount: (container: Element) => void }
+```
 
-- 使用 `type` 定义简单类型别名和函数类型
-- 使用 `interface` 定义有扩展需求的对象结构
-- 组件 props 使用 `interface` 或 `type`，按场景选择
+### 1.2 空对象类型
 
-### 2.3 泛型
+**禁止**使用 `{}` 作为类型（等价于 `object` 且不符合意图）。如因 JSX 类型扩展需要，必须用 eslint-disable 注释：
 
-- 合理使用泛型提升可复用性
-- Signal 相关 API 使用泛型约束类型安全
+```typescript
+/* eslint-disable @typescript-eslint/no-empty-object-type */
+interface IntrinsicElements {}
+/* eslint-enable @typescript-eslint/no-empty-object-type */
+```
 
-### 2.4 Symbol
+## 2. 命名规范
 
-- 内部实现使用 `symbol.ts` 中定义的 Symbol，避免外部污染
-- 对外不暴露内部 Symbol
-
-## 3. ESLint 规则重点
-
-| 规则 | 级别 | 说明 |
+| 类别 | 规范 | 示例 |
 |------|------|------|
-| `@typescript-eslint/no-explicit-any` | error | 禁止隐式 any |
-| `@typescript-eslint/no-unused-vars` | (默认) | 未使用变量需清理 |
-| `no-debugger` | error | 禁止 debugger |
-| `no-console` | off | 生产环境注意控制台输出 |
+| 文件 | kebab-case | `airx-app.ts` |
+| 类/接口 | PascalCase | `AirxComponent` |
+| 函数/变量 | camelCase | `createElement` |
+| 常量 | UPPER_SNAKE | `MAX_RETRIES` |
+| 内部 Symbol | `__` 前缀 | `__INTERNAL_KEY__` |
 
-## 4. 组件编写规范
+## 3. JSX 规范
+
+### 3.1 createElement 调用
+
+```typescript
+// ✅ 使用 createElement 而非 h()
+createElement('div', { className: 'container' }, children)
+
+// ❌ 避免
+h('div', { className: 'container' }, children)
+```
+
+### 3.2 Fragment 使用
+
+```typescript
+import { Fragment } from 'airx'
+
+// ✅ Fragment 用于多节点返回
+component(() => [
+  Fragment,
+  null,
+  child1,
+  child2
+])
+```
+
+## 4. 组件规范
 
 ### 4.1 组件定义
 
 ```typescript
-// 使用 component() 包装函数组件
-export const MyComponent = component(function MyComponent(props: MyProps) {
-  return () => createElement('div', { className: 'my' }, 'Hello')
+import { component } from 'airx'
+
+export const MyComponent = component(() => {
+  // 组件逻辑
+  return createElement('div', null, 'Hello')
 })
 ```
 
-### 4.2 Props 类型
+### 4.2 生命周期
 
 ```typescript
-interface MyProps {
-  name: string
-  age?: number
-}
-```
+import { onMounted, onUnmounted } from 'airx'
 
-### 4.3 错误边界
-
-使用 `createErrorRender(error)` 生成错误展示组件，错误时显示红色块并点击输出详情。
-
-## 5. Signal 使用规范
-
-### 5.1 创建 State
-
-```typescript
-const [count, setCount] = createState(0)
-// setCount 新值或 updater
-```
-
-### 5.2 创建 Computed
-
-```typescript
-const doubled = createComputed(() => count.get() * 2)
-```
-
-### 5.3 Watch 响应变化
-
-```typescript
-const watcher = createWatch((...changed) => {
-  // 响应变化
+component(() => {
+  onMounted(() => {
+    // 挂载时执行
+  })
+  
+  onUnmounted(() => {
+    // 卸载时清理
+  })
+  
+  return createElement('div', null, 'content')
 })
 ```
 
-### 5.4 全局唯一性
+## 5. 依赖注入规范
 
-**强制**：同一全局对象只能有一个 Signal 实例。`source/signal/index.ts` 中有运行时检查。
-
-## 6. 命名规范
-
-| 场景 | 规范 | 示例 |
-|------|------|------|
-| 文件 | kebab-case | `browser.ts`, `hooks.ts` |
-| 类/类型 | PascalCase | `AirxElement`, `AirxComponent` |
-| 函数/变量 | camelCase | `createElement`, `isValidElement` |
-| 常量 | UPPER_SNAKE_CASE（模块级） | `firstSignal`（虽然是 camelCase，但它是模块级可变变量） |
-| 内部变量 | 以 `_` 开头（可选） | `_internalState` |
-
-## 7. 注释规范
-
-- 使用 JSDoc 注释公开 API 的参数和返回值
-- 内部实现注释用 `//` 单行注释
-- eslint-disable 注释需标注原因
-
-## 8. CSS 样式内联
-
-当需要内联样式时，使用 `CSSProperties` 类型：
+### 5.1 provide/inject 配对
 
 ```typescript
-const style: CSSProperties = {
-  padding: '8px',
-  fontSize: '20px',
-  color: 'rgb(255,255,255)',
-  backgroundColor: 'rgb(255, 0, 0)',
+// Provider
+provide('theme', 'dark')
+
+// Consumer
+const theme = inject<string>('theme')
+```
+
+### 5.2 命名约定
+
+- 使用字符串 key（而非 Symbol）
+- key 格式：`${scope}:${name}`，如 `'airx:app-context'`
+
+## 6. Signal 规范
+
+对齐 TC39 proposal-signals：
+- 变更通过 `batch()` 收集
+- 避免在 getter 中副作用
+- 清理时使用 `cleanup()`
+
+## 7. 测试规范
+
+- 测试文件：`*.[name].test.ts`
+- 放在同目录下
+- 使用 Vitest + jsdom 环境
+
+## 8. Git 提交规范
+
+```
+<type>(<scope>): <subject>
+
+types: chore | docs | feat | fix | refactor | test
+```
+
+## 9. ESLint 规则
+
+```json
+{
+  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
+  "rules": {}
 }
 ```
 
-颜色值使用 `rgb()` 格式，避免 CSS 变量（框架本身不依赖 CSS 预处理器）。
+## 10. 构建产物
 
-## 9. 测试规范（待建立）
-
-**当前状态**: 无测试脚本
-
-**待建立规范**:
-- 测试框架选择（Vitest / Jest）
-- 单测覆盖率门槛
-- 关键模块必须覆盖：Signal 封装、Element 创建、生命周期钩子
-- 集成测试：browserRender / serverRender
+- `output/index.js` — ESM
+- `output/index.umd.cjs` — UMD for CJS
+- `output/index.d.ts` — 类型声明

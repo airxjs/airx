@@ -18,3 +18,9 @@ export {
   onMounted,
   onUnmounted
 } from './render'
+
+export {
+  createRef,
+  watch,
+  type Ref
+} from './legacy'

@@ -1,119 +1,108 @@
-# Airx 核心架构文档
+# Airx Architecture
 
-## 1. 概述
+> 项目架构文档，定义核心模块边界与职责。
 
-Airx 是一个基于 JSX 和 Signals 的前端框架，核心定位：轻量、快速、响应式。
+## 1. 项目定位
 
-**当前版本**: 0.4.0
-**代码入口**: `source/index.ts`
-**构建工具**: Rollup
-**信号库**: `signal-polyfill` (对应 TC39 Signals 提案实现)
+**airx** 是一个基于 JSX 的前端框架，核心提供：
+- 声明式组件化（JSX）
+- 响应式状态（Signal）
+- 依赖注入（provide/inject）
+- 跨环境渲染（Browser/Server）
 
-## 2. 模块结构
+**不提供**：路由、状态管理、打包工具。专注于视图层抽象。
+
+## 2. 技术栈
+
+| 类别 | 技术 |
+|------|------|
+| 语言 | TypeScript (strict mode) |
+| 构建 | Vite + Rollup + vite-plugin-dts |
+| 测试 | Vitest |
+| 包格式 | ESM + UMD + CJS |
+
+## 3. 核心模块
 
 ```
 source/
-├── index.ts          # 主入口，导出所有公开 API
-├── element.ts        # JSX 元素模型（AirxElement, createElement, component）
-├── types.ts          # 类型定义
-├── symbol.ts         # 内部 Symbol 定义
-├── logger.ts         # 日志工具
-├── render/           # 渲染层
-│   ├── index.ts      # 导出 inject/provide/onMounted/onUnmounted + Plugin 系统
-│   ├── browser.ts    # 浏览器渲染
-│   ├── server.ts     # 服务端渲染
-│   └── common/
-│       ├── hooks.ts  # 生命周期钩子（provide/inject/onMounted/onUnmounted）
-│       ├── plugins.ts # 插件系统（Plugin/PluginContext）
-│       └── index.ts
-└── signal/           # Signals 集成层
-    └── index.ts      # 封装 signal-polyfill，对齐 TC39 提案语义
+├── app/           # App 根容器与生命周期
+├── element/       # JSX 元素创建与渲染
+├── render/
+│   ├── basic/     # 通用渲染逻辑（Browser/Server 共用）
+│   ├── browser/   # 浏览器环境渲染
+│   └── server/   # SSR 渲染
+├── signal/       # Signal 响应式实现（对齐 TC39 proposal-signals）
+├── logger/        # 日志基础设施
+├── symbol/        # 内部 Symbol 定义
+├── types/         # 全局类型扩展（JSX 类型）
+└── index.ts       # 公开 API 导出
 ```
 
-## 3. 核心模块职责
+## 4. API 边界
 
-### 3.1 Signal 层 (`source/signal/`)
+### 4.1 公开 API（source/index.ts）
 
-**职责**: 封装 `signal-polyfill`，提供响应式状态管理。
+```typescript
+// App API
+export type { AirxApp, Plugin }
+export { createApp } from './app'
 
-**导出**:
-- `createWatch(notify)` → 创建 Watcher
-- `createState<T>(initial, options?)` → 创建 State Signal
-- `createComputed<T>(computation, options?)` → 创建 Computed Signal
-- `isState<T>(target)` → 类型守卫
+// Element API
+export { Fragment, component, createElement }
+export type { AirxComponent, AirxElement, AirxChildren, AirxComponentContext }
 
-**实现要点**:
-- 延迟加载 `Signal`（通过全局对象 `globalNS['Signal']` 获取）
-- 确保全局只有一个 Signal 实例
-- 异常情况：若 Signal 未定义或存在多实例则抛出错误
+// Render API（provide/inject、生命周期）
+export { inject, provide, onMounted, onUnmounted }
 
-**关键文件**: `source/signal/index.ts#L1-L30`
+// Legacy API
+export { createRef, watch }
+export type { Ref }
+```
 
-### 3.2 Element 层 (`source/element.ts`)
+### 4.2 内部模块（不公开）
 
-**职责**: 定义 JSX 元素模型和组件抽象。
+- `source/render/basic/plugins/internal/` — 内部插件系统
+- `source/symbol` — 内部 Symbol，仅框架内部使用
+- `source/logger` — 日志实现
 
-**核心类型**:
-- `AirxElement<P>`: 虚拟 DOM 元素 `{ type, props, [symbol]: true }`
-- `AirxComponent<P>`: 函数式组件 `(props: P) => AirxComponentRender`
-- `AirxChildren`: 合法的子节点类型（null/string/number/boolean/AirxElement/Array）
+## 5. Signal 对齐策略
 
-**导出**:
-- `createElement(type, props, ...children)` → 创建 AirxElement
-- `isValidElement(element)` → 元素校验
-- `Fragment` → 片段组件
-- `component(comp)` → 组件包装器（identity 函数）
-- `createErrorRender(error)` → 错误边界渲染
+airx Signal 对齐 TC39 proposal-signals：
+- 使用 `signal-polyfill` 兼容实现
+- 核心：`source/signal/index.ts` 对齐标准
+- 变更收集：依赖 `signal-polyfill` 的 batch 机制
+- 测试覆盖：见 `signals-alignment-test-plan.md`
 
-**关键文件**: `source/element.ts#L1-L100`
+## 6. 渲染架构
 
-### 3.3 Render 层 (`source/render/`)
+### Browser 渲染
 
-#### 浏览器渲染 (`browser.ts`)
+```
+component() → createElement() → AirxElement
+    ↓
+render(element, container) → BrowserRenderer
+    ↓
+Fiber 风格的增量更新（待实现）
+```
 
-- 通过 `browserRender(appContext, element, container)` 挂载到 DOM
-- 每次 mount 先清空容器内容
+### Server 渲染
 
-#### 服务端渲染 (`server.ts`)
+```
+render(element) → ServerRenderer
+    ↓
+同步遍历 VDOM → HTML 字符串
+```
 
-- 通过 `serverRender(appContext, element, resolve)` 生成 HTML 字符串
+## 7. 版本策略
 
-#### 生命周期钩子 (`common/hooks.ts`)
+- **dev 分支**：开发中版本（当前 0.6.0-beta.1）
+- **main 分支**：稳定发布版本
+- **发布流程**：dev → main → npm publish
+- **semver**：遵循 semver 规范
 
-- `provide(key, value)` / `inject(key)` — 依赖注入
-- `onMounted(listener)` / `onUnmounted(listener)` — 生命周期
+## 8. 相关文档
 
-#### 插件系统 (`common/plugins.ts`)
-
-- `Plugin` — 插件接口
-- `PluginContext` — 插件注册与执行上下文
-
-### 3.4 应用入口 (`source/index.ts`)
-
-`createApp(element)` 返回 `AirxApp`:
-- `mount(container)` — 浏览器渲染
-- `plugin(...plugins)` — 注册插件 **[deprecated WIP]**
-- `renderToHTML()` — 服务端渲染 **[deprecated WIP]**
-
-## 4. API 公开面（按 category）
-
-| Category | APIs |
-|----------|------|
-| App | `createApp` |
-| JSX/Component | `Fragment`, `component`, `createElement`, `AirxComponent`, `AirxElement`, `AirxChildren`, `AirxComponentContext` |
-| Context/Lifecycle | `provide`, `inject`, `onMounted`, `onUnmounted` |
-| Plugin/Types | `Plugin`, types 集合 |
-| Signal | `createWatch`, `createState`, `createComputed`, `isState` |
-
-## 5. 版本与构建
-
-- **构建输出**: UMD + ESM + Types
-- **主文件**: `output/umd/index.js`, `output/esm/index.js`, `output/esm/index.d.ts`
-- **包名**: `airx`
-
-## 6. 技术约束
-
-1. **Signal 必须全局唯一**：不允许同一全局环境存在多个 Signal 实例
-2. **Signal 延迟加载**：用于支持 polyfill 的按需加载场景
-3. **插件系统 WIP**：`plugin()` 和 `renderToHTML()` 接口尚未稳定
-4. **无内置测试框架**：当前 `package.json` 无 test 脚本，测试覆盖为 0
+- [发布门禁清单](../designs/release-quality-gates.md)
+- [功能正确性矩阵](../designs/functional-correctness-matrix.md)
+- [Signals 对齐计划](../designs/signals-alignment-test-plan.md)
+- [升级指南 0.3](../designs/upgrade-guide-0.3.md)

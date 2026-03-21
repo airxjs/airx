@@ -1182,9 +1182,14 @@ declare global {
     interface Element extends AirxComponentRender {}
 
     // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-    interface ElementChildrenAttribute { children: {} }
+    interface ElementChildrenAttribute {
+      // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+      children: {}
+    }
 
+    /* eslint-disable @typescript-eslint/no-empty-object-type */
     interface IntrinsicElements extends NativeElements {}
+    /* eslint-enable @typescript-eslint/no-empty-object-type */
 
     interface IntrinsicAttributes {
       key?: string | number | symbol
