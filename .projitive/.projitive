@@ -1,0 +1,174 @@
+{
+  "schema": "projitive-json-store",
+  "tasks": [
+    {
+      "id": "TASK-0001",
+      "title": "Bootstrap governance workspace",
+      "status": "DONE",
+      "owner": "GitHub Copilot",
+      "summary": "初始化 airx 项目治理骨架，并补充项目定位、技术栈和治理重点说明。",
+      "updatedAt": "2026-03-21T13:50:22.753Z",
+      "links": [
+        ".projitive/README.md",
+        ".projitive/tasks.md",
+        ".projitive/roadmap.md"
+      ],
+      "roadmapRefs": [
+        "ROADMAP-0001"
+      ],
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0004",
+      "title": "沉淀 0.3.x 演进与迁移说明",
+      "status": "TODO",
+      "owner": "GitHub Copilot",
+      "summary": "补充从旧 API 认知模型到当前 Signal/JSX 模型的迁移与说明文档。",
+      "updatedAt": "2026-03-21T13:50:05.893Z",
+      "links": [
+        "README.md",
+        "README_CN.md"
+      ],
+      "roadmapRefs": [
+        "ROADMAP-0001"
+      ],
+      "recordVersion": 1
+    },
+    {
+      "id": "TASK-0003",
+      "title": "建立 Airx 发布与质量门禁清单",
+      "status": "TODO",
+      "owner": "GitHub Copilot",
+      "summary": "为构建、lint、测试、发布流程建立最小治理清单与验收标准。",
+      "updatedAt": "2026-03-21T13:50:05.893Z",
+      "links": [
+        "package.json",
+        ".github/workflows/"
+      ],
+      "roadmapRefs": [
+        "ROADMAP-0001"
+      ],
+      "recordVersion": 1
+    },
+    {
+      "id": "TASK-0002",
+      "title": "梳理 Airx 核心 API 与版本兼容矩阵",
+      "status": "DONE",
+      "owner": "GitHub Copilot",
+      "summary": "完成 Airx 当前公开 API、状态模型变化与下游兼容关系梳理，并形成治理矩阵文档。",
+      "updatedAt": "2026-03-21T13:55:30.890Z",
+      "links": [
+        "source/index.ts",
+        "source/types.ts",
+        ".projitive/designs/api-compatibility-matrix.md",
+        "home/yinxulai/Project/yinxulai.github.io/package.json"
+      ],
+      "roadmapRefs": [
+        "ROADMAP-0001"
+      ],
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0005",
+      "title": "建立 Airx 基建升级基线与版本策略",
+      "status": "TODO",
+      "owner": "yinxulai",
+      "summary": "仅做规划与决策，不改代码。明确 Node/Vite/TypeScript/测试工具链目标版本、升级顺序、风险矩阵与回滚策略，输出升级蓝图。",
+      "updatedAt": "2026-03-21T14:20:34.127Z",
+      "links": [
+        "home/yinxulai/Project/airxjs/airx/package.json",
+        "home/yinxulai/Project/airxjs/airx/.github/workflows",
+        "home/yinxulai/Project/airxjs/airx/.projitive/designs/release-quality-gates.md"
+      ],
+      "roadmapRefs": [
+        "ROADMAP-0002"
+      ],
+      "subState": {
+        "phase": "design",
+        "confidence": 0.9
+      },
+      "recordVersion": 1
+    },
+    {
+      "id": "TASK-0006",
+      "title": "定义 Airx 功能正确性验证矩阵与可用性门禁",
+      "status": "TODO",
+      "owner": "yinxulai",
+      "summary": "仅做规划与决策。按核心能力划分验证矩阵：渲染、生命周期、依赖注入、signals 交互，明确每类最小可用标准与回归门禁。",
+      "updatedAt": "2026-03-21T14:20:51.094Z",
+      "links": [
+        "home/yinxulai/Project/airxjs/airx/source",
+        "home/yinxulai/Project/airxjs/airx/.projitive/designs/release-quality-gates.md"
+      ],
+      "roadmapRefs": [
+        "ROADMAP-0002"
+      ],
+      "subState": {
+        "phase": "design",
+        "confidence": 0.9
+      },
+      "recordVersion": 1
+    },
+    {
+      "id": "TASK-0007",
+      "title": "对齐 TC39 Signals 提案并制定单测全覆盖计划",
+      "status": "TODO",
+      "owner": "yinxulai",
+      "summary": "仅做规划与决策。审查 proposal-signals 与 signal-polyfill 的语义差异，重点聚焦变化收集与响应处理；定义 Airx 对应语义与单测覆盖边界。",
+      "updatedAt": "2026-03-21T14:21:07.828Z",
+      "links": [
+        "https://github.com/tc39/proposal-signals",
+        "https://github.com/proposal-signals/signal-polyfill",
+        "home/yinxulai/Project/airxjs/airx/source"
+      ],
+      "roadmapRefs": [
+        "ROADMAP-0002"
+      ],
+      "subState": {
+        "phase": "design",
+        "confidence": 0.86
+      },
+      "recordVersion": 1
+    }
+  ],
+  "roadmaps": [
+    {
+      "id": "ROADMAP-0001",
+      "title": "建立 Airx 核心运行时治理与版本基线",
+      "status": "active",
+      "time": "2026-Q2",
+      "updatedAt": "2026-03-21T13:49:26.925Z",
+      "recordVersion": 2
+    },
+    {
+      "id": "ROADMAP-0002",
+      "title": "AirxJS 现代化与 Signals 一致性路线",
+      "status": "active",
+      "time": "2026-Q2~Q3",
+      "updatedAt": "2026-03-21T14:20:13.674Z",
+      "recordVersion": 1
+    }
+  ],
+  "meta": {
+    "tasks_version": 11,
+    "roadmaps_version": 3,
+    "store_schema_version": 3
+  },
+  "view_state": {
+    "tasks_markdown": {
+      "name": "tasks_markdown",
+      "dirty": false,
+      "lastSourceVersion": 11,
+      "lastBuiltAt": "2026-03-21T14:22:29.375Z",
+      "recordVersion": 35
+    },
+    "roadmaps_markdown": {
+      "name": "roadmaps_markdown",
+      "dirty": false,
+      "lastSourceVersion": 3,
+      "lastBuiltAt": "2026-03-21T14:22:29.378Z",
+      "recordVersion": 8
+    }
+  },
+  "migration_history": []
+}
