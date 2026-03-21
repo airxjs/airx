@@ -92,22 +92,25 @@
     {
       "id": "TASK-0006",
       "title": "定义 Airx 功能正确性验证矩阵与可用性门禁",
-      "status": "TODO",
+      "status": "DONE",
       "owner": "yinxulai",
-      "summary": "仅做规划与决策。按核心能力划分验证矩阵：渲染、生命周期、依赖注入、signals 交互，明确每类最小可用标准与回归门禁。",
-      "updatedAt": "2026-03-21T14:20:51.094Z",
+      "summary": "已完成 Airx 功能正确性验证矩阵与可用性门禁定义，覆盖渲染、生命周期、依赖注入、Signal 响应与 App API。",
+      "updatedAt": "2026-03-21T14:39:59.374Z",
       "links": [
-        "home/yinxulai/Project/airxjs/airx/source",
-        "home/yinxulai/Project/airxjs/airx/.projitive/designs/release-quality-gates.md"
+        "home/yinxulai/Project/airxjs/airx/source/index.ts",
+        "home/yinxulai/Project/airxjs/airx/source/render/common/index.ts",
+        "home/yinxulai/Project/airxjs/airx/source/signal/index.ts",
+        "home/yinxulai/Project/airxjs/airx/.projitive/designs/signals-alignment-test-plan.md",
+        "home/yinxulai/Project/airxjs/airx/.projitive/designs/functional-correctness-matrix.md"
       ],
       "roadmapRefs": [
         "ROADMAP-0002"
       ],
       "subState": {
         "phase": "design",
-        "confidence": 0.9
+        "confidence": 0.94
       },
-      "recordVersion": 1
+      "recordVersion": 3
     },
     {
       "id": "TASK-0007",
@@ -152,7 +155,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 13,
+    "tasks_version": 15,
     "roadmaps_version": 3,
     "store_schema_version": 3
   },
@@ -160,9 +163,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 13,
-      "lastBuiltAt": "2026-03-21T14:33:50.774Z",
-      "recordVersion": 41
+      "lastSourceVersion": 15,
+      "lastBuiltAt": "2026-03-21T14:39:59.378Z",
+      "recordVersion": 47
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
