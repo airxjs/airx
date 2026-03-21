@@ -71,23 +71,25 @@
     {
       "id": "TASK-0005",
       "title": "建立 Airx 基建升级基线与版本策略",
-      "status": "TODO",
+      "status": "DONE",
       "owner": "yinxulai",
-      "summary": "仅做规划与决策，不改代码。明确 Node/Vite/TypeScript/测试工具链目标版本、升级顺序、风险矩阵与回滚策略，输出升级蓝图。",
-      "updatedAt": "2026-03-21T14:20:34.127Z",
+      "summary": "已完成 Airx 基建升级基线与版本策略，包含目标版本窗口、分阶段升级路径、风险矩阵与回滚策略。",
+      "updatedAt": "2026-03-21T14:41:06.327Z",
       "links": [
         "home/yinxulai/Project/airxjs/airx/package.json",
-        "home/yinxulai/Project/airxjs/airx/.github/workflows",
-        "home/yinxulai/Project/airxjs/airx/.projitive/designs/release-quality-gates.md"
+        "home/yinxulai/Project/airxjs/airx/.github/workflows/check.yml",
+        "home/yinxulai/Project/airxjs/airx/.projitive/designs/infrastructure-upgrade-baseline.md",
+        "home/yinxulai/Project/airxjs/airx/.projitive/designs/functional-correctness-matrix.md",
+        "home/yinxulai/Project/airxjs/airx/.projitive/designs/signals-alignment-test-plan.md"
       ],
       "roadmapRefs": [
         "ROADMAP-0002"
       ],
       "subState": {
         "phase": "design",
-        "confidence": 0.9
+        "confidence": 0.95
       },
-      "recordVersion": 1
+      "recordVersion": 3
     },
     {
       "id": "TASK-0006",
@@ -155,7 +157,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 15,
+    "tasks_version": 17,
     "roadmaps_version": 3,
     "store_schema_version": 3
   },
@@ -163,9 +165,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 15,
-      "lastBuiltAt": "2026-03-21T14:39:59.378Z",
-      "recordVersion": 47
+      "lastSourceVersion": 17,
+      "lastBuiltAt": "2026-03-21T14:41:06.332Z",
+      "recordVersion": 53
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
