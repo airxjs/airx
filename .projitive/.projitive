@@ -154,10 +154,10 @@
     {
       "id": "TASK-0008",
       "title": "确认 0.6.0-beta.1 发布条件并完成稳定版发布",
-      "status": "TODO",
+      "status": "DONE",
       "owner": "",
       "summary": "当前 dev 分支为 0.6.0-beta.1，npm 最新稳定版为 0.4.0。需要明确 0.6.0 从 beta 到 stable 的发布门禁，完成验证后发布稳定版，并通知下游 airx-router 与 vite-plugin-airx 同步对齐。\n\n产出物：\n1. 0.6.0 发布门禁清单（测试全通过、CI 绿、API 文档更新）\n2. dev 分支合并 main 并打 tag v0.6.0\n3. npm publish 0.6.0\n4. 通知下游 airx-router peerDeps 升级 unblock\n\n下游阻塞：airx-router peerDeps 对齐与主站迁移均依赖本任务完成",
-      "updatedAt": "2026-03-21T16:21:39.808Z",
+      "updatedAt": "2026-03-21T18:19:05.118Z",
       "links": [
         "home/yinxulai/Project/airxjs/airx/package.json",
         "home/yinxulai/Project/airxjs/airx/source/index.ts",
@@ -166,7 +166,7 @@
       "roadmapRefs": [
         "ROADMAP-0002"
       ],
-      "recordVersion": 1
+      "recordVersion": 3
     }
   ],
   "roadmaps": [
@@ -188,7 +188,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 22,
+    "tasks_version": 24,
     "roadmaps_version": 3,
     "store_schema_version": 3
   },
@@ -196,9 +196,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 22,
-      "lastBuiltAt": "2026-03-21T16:21:39.815Z",
-      "recordVersion": 66
+      "lastSourceVersion": 24,
+      "lastBuiltAt": "2026-03-21T18:19:05.123Z",
+      "recordVersion": 72
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
