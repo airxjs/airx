@@ -7,9 +7,11 @@
 ## 2. 当前包状态
 
 - 包名: `airx`
-- 当前版本: `0.3.1`
+- 当前版本: `0.4.0`
 - 构建方式: Rollup
 - 质量门禁状态: 建设中
+- 开发分支: `dev`
+- 发布基线分支: `main`
 
 ## 3. 门禁清单
 
@@ -49,11 +51,12 @@
 
 | 检查项 | 命令/方式 | 验收标准 |
 | --- | --- | --- |
-| 单元测试 | `npm test` (如配置) | 所有测试通过 |
+| 单元测试 | `npm test` | 所有测试通过 |
+| 核心正确性矩阵 | `npm run test:core` | P0 用例全部通过 |
+| Signal 语义验证 | `npm run test:signal` | MVP 用例全部通过 |
 | 渲染行为验证 | 手动或示例应用 | 基础 JSX 渲染、provide/inject 正常工作 |
-| Signal 状态验证 | 手动或示例应用 | 状态响应式更新正常 |
 
-**注意**: 当前 `airx` 包**没有测试套件**，这是质量风险点。建议后续补充。
+**注意**: 当前 `airx` 包**没有测试套件**，这是质量风险点。后续测试应以 `functional-correctness-matrix.md` 和 `signals-alignment-test-plan.md` 为准。
 
 ### 3.5 下游兼容门禁 (Downstream Compatibility Gate)
 
@@ -67,13 +70,13 @@
 
 ```bash
 # 1. 在 airx 目录构建
-cd packages/airx && npm run build
+cd airx && npm run build
 
 # 2. 在 router 目录验证兼容
-cd packages/router && npm install && npm run build
+cd ../router && npm install && npm run build
 
 # 3. 在 vite-plugin 目录验证兼容
-cd packages/vite-plugin && npm install && npm run build
+cd ../vite-plugin && npm install && npm run build
 ```
 
 ### 3.6 发布门禁 (Publish Gate)
@@ -92,7 +95,9 @@ cd packages/vite-plugin && npm install && npm run build
 ```yaml
 # 当前问题：
 # - 缺少 TypeScript 类型检查
+# - 缺少 test 门禁
 # - 缺少下游兼容性验证
+# - workflow action 版本偏旧（v3）
 ```
 
 ### 4.2 建议的 check.yml
@@ -102,7 +107,7 @@ name: Code Check
 
 on:
   push:
-    branches: ["main"]
+    branches: ["dev", "main"]
   pull_request:
     branches: ["*"]
 
@@ -114,7 +119,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npm install
+      - run: npm ci
       - run: npm run lint
 
   typecheck:
@@ -124,8 +129,18 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npm install
-      - run: npx tsc --noEmit
+      - run: npm ci
+      - run: npm run typecheck
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - run: npm test
 
   build:
     runs-on: ubuntu-latest
@@ -134,11 +149,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npm install
+      - run: npm ci
       - run: npm run build
 
   downstream-check:
-    needs: build
+    needs: [typecheck, test, build]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -152,29 +167,36 @@ jobs:
 
 ## 5. 发布流程
 
+### 5.0 分支策略
+
+- 所有日常开发在 `dev` 分支进行。
+- 发布候选必须先在 `dev` 完成 lint/typecheck/test/build 全绿。
+- 对外发布以前，变更通过合并进入 `main`，再由 release 流程触发 publish。
+
 ### 5.1 标准发布步骤
 
 1. **本地验证**
    ```bash
    npm run lint      # 1. Lint 通过
-   npx tsc --noEmit # 2. 类型检查通过
-   npm run build    # 3. 构建成功
-   npm publish --dry-run  # 4. 预览发布内容
+  npm run typecheck # 2. 类型检查通过
+  npm test         # 3. 测试通过
+  npm run build    # 4. 构建成功
+  npm publish --dry-run  # 5. 预览发布内容
    ```
 
 2. **版本更新**
    ```bash
    # 遵循 semver
-   npm version patch  # 0.3.1 -> 0.3.2
-   npm version minor  # 0.3.1 -> 0.4.0
-   npm version major  # 0.3.1 -> 1.0.0
+  npm version patch  # 0.4.0 -> 0.4.1
+  npm version minor  # 0.4.0 -> 0.5.0
+  npm version major  # 0.4.0 -> 1.0.0
    ```
 
 3. **Git 提交**
    ```bash
    git add .
-   git commit -m "chore: release v0.3.2"
-   git tag v0.3.2
+  git commit -m "chore: release v0.4.1"
+  git tag v0.4.1
    git push && git push --tags
    ```
 
@@ -212,6 +234,7 @@ jobs:
 ## 7. 当前待办
 
 - [ ] 在 `package.json` 中补充 `typecheck` 脚本
+- [ ] 在 `package.json` 中补充 `test` 与 `test:core` 脚本
 - [ ] 建立基础测试套件
 - [ ] 增强 `check.yml` 工作流
 - [ ] 补充 downstream-check job
@@ -219,4 +242,7 @@ jobs:
 ## 8. 相关文档
 
 - [API 兼容矩阵](./api-compatibility-matrix.md)
+- [基建升级基线](./infrastructure-upgrade-baseline.md)
+- [功能正确性验证矩阵](./functional-correctness-matrix.md)
+- [Signals 对齐与单测计划](./signals-alignment-test-plan.md)
 - [Router 兼容矩阵 (router 项目)](../router/.projitive/designs/router-airx-compatibility-matrix.md)
