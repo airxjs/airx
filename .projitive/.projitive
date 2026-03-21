@@ -112,23 +112,25 @@
     {
       "id": "TASK-0007",
       "title": "对齐 TC39 Signals 提案并制定单测全覆盖计划",
-      "status": "TODO",
+      "status": "DONE",
       "owner": "yinxulai",
-      "summary": "仅做规划与决策。审查 proposal-signals 与 signal-polyfill 的语义差异，重点聚焦变化收集与响应处理；定义 Airx 对应语义与单测覆盖边界。",
-      "updatedAt": "2026-03-21T14:21:07.828Z",
+      "summary": "已完成 Signals 对齐与单测全覆盖计划文档，覆盖变化收集、响应处理、清理语义，并给出测试矩阵与执行顺序。",
+      "updatedAt": "2026-03-21T14:33:50.771Z",
       "links": [
         "https://github.com/tc39/proposal-signals",
         "https://github.com/proposal-signals/signal-polyfill",
-        "home/yinxulai/Project/airxjs/airx/source"
+        "home/yinxulai/Project/airxjs/airx/source/signal/index.ts",
+        "home/yinxulai/Project/airxjs/airx/source/render/common/index.ts",
+        "home/yinxulai/Project/airxjs/airx/.projitive/designs/signals-alignment-test-plan.md"
       ],
       "roadmapRefs": [
         "ROADMAP-0002"
       ],
       "subState": {
         "phase": "design",
-        "confidence": 0.86
+        "confidence": 0.93
       },
-      "recordVersion": 1
+      "recordVersion": 3
     }
   ],
   "roadmaps": [
@@ -150,7 +152,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 11,
+    "tasks_version": 13,
     "roadmaps_version": 3,
     "store_schema_version": 3
   },
@@ -158,9 +160,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 11,
-      "lastBuiltAt": "2026-03-21T14:22:29.375Z",
-      "recordVersion": 35
+      "lastSourceVersion": 13,
+      "lastBuiltAt": "2026-03-21T14:33:50.774Z",
+      "recordVersion": 41
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
