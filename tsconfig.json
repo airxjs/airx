@@ -108,5 +108,10 @@
   },
   "include": [
     "source"
+  ],
+  "exclude": [
+    "output",
+    "node_modules",
+    "source/**/*.test.ts"
   ]
 }

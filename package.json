@@ -15,11 +15,11 @@
     "output/*"
   ],
   "scripts": {
-    "dev": "vite build -w",
-    "build": "vite build",
+    "dev": "node -e \"require('node:fs').rmSync('output', { recursive: true, force: true })\" && tsc -w",
+    "build": "node -e \"require('node:fs').rmSync('output', { recursive: true, force: true })\" && tsc",
     "lint": "eslint source",
     "typecheck": "tsc --noEmit",
-    "prepublishOnly": "vite build",
+    "prepublishOnly": "npm run build",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage"
@@ -38,8 +38,6 @@
     "jsdom": "^26.1.0",
     "signal-polyfill": "^0.2.2",
     "typescript": "^5.4.5",
-    "vite": "^7.0.0",
-    "vite-plugin-dts": "^4.5.4",
     "vitest": "^3.2.4"
   },
   "repository": {
