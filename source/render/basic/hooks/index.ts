@@ -3,4 +3,4 @@ export {
   provide,
   onMounted,
   onUnmounted
-} from './hooks'
+} from './hooks.js'

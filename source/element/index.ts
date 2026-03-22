@@ -13,4 +13,4 @@ export {
   AirxComponentMountedListener,
   AirxComponentUnmountedListener,
   createErrorRender
-} from './element'
+} from './element.js'

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { Instance } from '../../../common'
-import { InjectSystem } from './inject'
+import { Instance } from '../../../common.js'
+import { InjectSystem } from './inject.js'
 
 describe('InjectSystem', () => {
   let injectSystem: InjectSystem

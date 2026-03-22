@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { AirxElement, Props } from '../../../element'
-import { Instance } from '../common'
-import { Plugin } from './plugin'
+import { AirxElement, Props } from '../../../element/index.js'
+import { Instance } from '../common.js'
+import { Plugin } from './plugin.js'
 
 describe('Plugin Interface', () => {
   let mockInstance: Instance

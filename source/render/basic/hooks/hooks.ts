@@ -1,4 +1,4 @@
-import { AirxComponentContext } from '../../../element'
+import { AirxComponentContext } from '../../../element/index.js'
 
 interface GlobalContext {
   current: AirxComponentContext | null

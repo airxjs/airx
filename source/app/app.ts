@@ -1,12 +1,12 @@
-import { browserRender, serverRender, Plugin, PluginContext } from '../render'
-import { AirxComponent, AirxElement, createElement } from '../element'
+import { browserRender, serverRender, Plugin, PluginContext } from '../render/index.js'
+import { AirxComponent, AirxElement, createElement } from '../element/index.js'
 
 /**
  * Airx 应用实例。
  *
  * @example
  * import { createApp } from 'airx'
- * import { App } from './App'
+ * import { App } from './App.js'
  *
  * createApp(App).mount(document.getElementById('root')!)
  */
@@ -29,13 +29,13 @@ export interface AirxApp {
  *
  * @example
  * import { createApp } from 'airx'
- * import { App } from './App'
+ * import { App } from './App.js'
  *
  * createApp(App).mount(document.getElementById('root')!)
  *
  * @example
  * import { createApp, createElement } from 'airx'
- * import { App } from './App'
+ * import { App } from './App.js'
  *
  * const appElement = createElement(App, { title: 'Airx' })
  * createApp(appElement).mount(document.getElementById('root')!)

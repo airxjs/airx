@@ -6,8 +6,8 @@ import {
   component,
   createErrorRender,
   AirxElement
-} from './element'
-import * as symbol from '../symbol'
+} from './element.js'
+import * as symbol from '../symbol/index.js'
 
 describe('Element Module', () => {
   describe('createElement', () => {

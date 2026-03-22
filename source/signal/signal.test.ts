@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { Signal } from 'signal-polyfill'
-import { createWatch, createState, createComputed, isState } from './signal'
+import { createWatch, createState, createComputed, isState } from './signal.js'
 
 // 扩展 globalThis 类型
 declare global {

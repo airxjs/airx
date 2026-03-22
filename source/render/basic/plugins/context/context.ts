@@ -1,6 +1,6 @@
-import { Plugin } from '..'
-import { BasicLogic } from '../internal/basic/basic'
-import { InjectSystem } from '../internal/inject/inject'
+import { Plugin } from '../index.js'
+import { BasicLogic } from '../internal/basic/basic.js'
+import { InjectSystem } from '../internal/inject/inject.js'
 
 export class PluginContext {
   plugins: Plugin[] = [

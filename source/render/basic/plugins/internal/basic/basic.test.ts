@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { BasicLogic } from './basic'
-import { Instance } from '../../../common'
-import { AirxElement, Props } from '../../../../../element'
+import { BasicLogic } from './basic.js'
+import { Instance } from '../../../common.js'
+import { AirxElement, Props } from '../../../../../element/index.js'
 
 // Mock the logger
 vi.mock('../../../../logger', () => ({
