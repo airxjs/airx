@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { PluginContext } from './context'
-import { Plugin } from '../plugin'
-import { BasicLogic } from '../internal/basic/basic'
-import { InjectSystem } from '../internal/inject/inject'
+import { PluginContext } from './context.js'
+import { Plugin } from '../plugin.js'
+import { BasicLogic } from '../internal/basic/basic.js'
+import { InjectSystem } from '../internal/inject/inject.js'
 
 // Mock the internal plugins
 vi.mock('./internal/basic')

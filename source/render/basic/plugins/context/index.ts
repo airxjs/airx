@@ -1,1 +1,1 @@
-export { PluginContext } from './context'
+export { PluginContext } from './context.js'

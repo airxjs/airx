@@ -3,4 +3,4 @@ import type { Signal as Polyfill } from 'signal-polyfill'
 
 export declare type Watcher = Polyfill.subtle.Watcher
 
-export * from './signal'
+export * from './signal.js'

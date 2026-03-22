@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type * as CSS from 'csstype'
 import type { Signal } from 'signal-polyfill'
-import type { AirxComponentRender, AirxChildren } from '../element'
+import type { AirxComponentRender, AirxChildren } from '../element/index.js'
 
 export interface Events {
   onCopy: ClipboardEvent

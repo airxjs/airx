@@ -1,23 +1,23 @@
 /**
  * JSX/DOM 属性类型定义。
  */
-export * from './types'
+export * from './types/index.js'
 
 /**
  * 渲染插件类型。
  */
-export { type Plugin } from './render'
+export { type Plugin } from './render/index.js'
 
 /**
  * 应用入口 API。
  *
  * @example
  * import { createApp } from 'airx'
- * import { App } from './App'
+ * import { App } from './App.js'
  *
  * createApp(App).mount(document.getElementById('root')!)
  */
-export { type AirxApp, createApp } from './app'
+export { type AirxApp, createApp } from './app/index.js'
 
 /**
  * 节点和组件 API。
@@ -37,7 +37,7 @@ export {
   type AirxElement,
   type AirxChildren,
   type AirxComponentContext
-} from './element'
+} from './element/index.js'
 
 /**
  * 组件上下文 Hook API。
@@ -53,4 +53,4 @@ export {
   provide,
   onMounted,
   onUnmounted
-} from './render'
+} from './render/index.js'

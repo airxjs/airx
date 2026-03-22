@@ -1,6 +1,6 @@
-import * as signal from '../../signal'
+import * as signal from '../../signal/index.js'
 
-import { createLogger } from '../../logger'
+import { createLogger } from '../../logger/index.js'
 import {
   AirxElement,
   AirxChildren,
@@ -11,9 +11,9 @@ import {
   AirxComponentUnmountedListener,
   AirxComponentRender,
   createErrorRender,
-} from '../../element'
-import { PluginContext } from './plugins'
-import { globalContext } from './hooks/hooks'
+} from '../../element/index.js'
+import { PluginContext } from './plugins/index.js'
+import { globalContext } from './hooks/hooks.js'
 
 export type Disposer = () => void
 

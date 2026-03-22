@@ -1,5 +1,5 @@
-import { AirxElement, Props } from '../../../element'
-import type { Instance } from '../common'
+import { AirxElement, Props } from '../../../element/index.js'
+import type { Instance } from '../common.js'
 
 export interface Plugin {
   /**

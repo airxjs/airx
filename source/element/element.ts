@@ -1,5 +1,5 @@
-import * as symbol from '../symbol'
-import { CSSProperties } from '../types'
+import * as symbol from '../symbol/index.js'
+import { CSSProperties } from '../types/index.js'
 
 type AirxElementType<P> = string | AirxComponent<P>
 

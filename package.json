@@ -9,14 +9,24 @@
       "types": "./output/index.d.ts",
       "import": "./output/index.js",
       "default": "./output/index.js"
+    },
+    "./jsx-runtime": {
+      "types": "./output/jsx-runtime.d.ts",
+      "import": "./output/jsx-runtime.js",
+      "default": "./output/jsx-runtime.js"
+    },
+    "./jsx-dev-runtime": {
+      "types": "./output/jsx-dev-runtime.d.ts",
+      "import": "./output/jsx-dev-runtime.js",
+      "default": "./output/jsx-dev-runtime.js"
     }
   },
   "files": [
     "output/*"
   ],
   "scripts": {
-    "dev": "node -e \"require('node:fs').rmSync('output', { recursive: true, force: true })\" && tsc -w",
-    "build": "node -e \"require('node:fs').rmSync('output', { recursive: true, force: true })\" && tsc",
+    "dev": "tsc -w",
+    "build": "tsc",
     "lint": "eslint source",
     "typecheck": "tsc --noEmit",
     "prepublishOnly": "npm run build",

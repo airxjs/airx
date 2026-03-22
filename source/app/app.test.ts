@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { createApp, AirxApp } from './app'
-import { createElement } from '../element'
+import { createApp, AirxApp } from './app.js'
+import { createElement } from '../element/index.js'
 
 // Mock the render functions
 vi.mock('../render', () => ({
