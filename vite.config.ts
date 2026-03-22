@@ -14,6 +14,7 @@ export default defineConfig({
       name: pkg.name,
       fileName: 'index',
       entry: resolve(__dirname, 'source/index.ts'),
+      formats: ['es'],
     }
   },
 })

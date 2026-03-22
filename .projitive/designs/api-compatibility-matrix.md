@@ -10,7 +10,7 @@
 - 当前版本: `0.3.1`
 - 代码入口: `source/index.ts`
 - 运行时基础: JSX + Signal
-- 构建方式: Rollup
+- 构建方式: Vite library build（ESM only）
 
 ## 3. 当前公开 API 面
 
