@@ -167,6 +167,19 @@
         "ROADMAP-0002"
       ],
       "recordVersion": 3
+    },
+    {
+      "id": "TASK-0009",
+      "title": "提升 signal.ts 测试覆盖率至 90%+",
+      "status": "DONE",
+      "owner": "",
+      "summary": "signal.ts 当前行覆盖率 80.55%，未覆盖行 19-25 为\"多实例检测\"代码路径。建议通过 vi.isolateModules() 重载模块或 mock signal-polyfill 的方式触发该路径测试。同时补充 browser.ts (66.25%) 和 server.ts (75.09%) 的渲染层集成测试用例。",
+      "updatedAt": "2026-03-22T01:40:00.337Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0002"
+      ],
+      "recordVersion": 3
     }
   ],
   "roadmaps": [
@@ -188,7 +201,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 24,
+    "tasks_version": 27,
     "roadmaps_version": 3,
     "store_schema_version": 3
   },
@@ -196,9 +209,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 24,
-      "lastBuiltAt": "2026-03-21T18:19:05.123Z",
-      "recordVersion": 72
+      "lastSourceVersion": 27,
+      "lastBuiltAt": "2026-03-22T01:40:00.343Z",
+      "recordVersion": 81
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
