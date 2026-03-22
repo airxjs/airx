@@ -276,28 +276,26 @@ describe('Signal Polyfill External Dependency Tests', () => {
         const originalSignal = globalThis.Signal
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ;(globalThis as any).Signal = undefined
-        
+
         expect(() => createState(42)).toThrow('Signal is undefined')
-        
+
         // Restore Signal
         globalThis.Signal = originalSignal
       })
 
       it('should detect multiple Signal instances', () => {
-        // This test is complex because it requires simulating multiple Signal instances
-        // In practice, this might happen when different versions of polyfill are loaded
-        const originalSignal = globalThis.Signal
-        
-        // Create first instance
-        const state1 = createState(1)
-        expect(state1.get()).toBe(1)
-        
-        // Simulate different Signal instance (though this is hard to fully simulate in practice)
-        // Here we mainly verify the code can detect this situation
-        globalThis.Signal = originalSignal // Keep the same instance, so no error is thrown
-        
-        const state2 = createState(2)
-        expect(state2.get()).toBe(2)
+        // NOTE: Lines 19-20 in signal.ts (firstSignal caching and multi-instance detection)
+        // are not reliably coverable in Vitest unit tests because:
+        // 1. firstSignal is a module-level singleton set on first getSignal() call
+        // 2. Vitest's beforeEach runs before test body, setting globalThis.Signal first
+        // 3. signal-polyfill cannot be dynamically replaced to create a "different instance"
+        //
+        // This is defensive code for environments loading two different polyfill versions.
+        // In practice, this scenario almost never occurs (polyfill is bundled, not loaded twice).
+        //
+        // We verify the normal path still works (no error with single instance):
+        const state = createState(42)
+        expect(state.get()).toBe(42)
       })
     })
 
