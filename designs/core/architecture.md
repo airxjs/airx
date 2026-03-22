@@ -102,7 +102,7 @@ render(element) → ServerRenderer
 
 ## 8. 相关文档
 
-- [发布门禁清单](../designs/release-quality-gates.md)
-- [功能正确性矩阵](../designs/functional-correctness-matrix.md)
-- [Signals 对齐计划](../designs/signals-alignment-test-plan.md)
-- [升级指南 0.3](../designs/upgrade-guide-0.3.md)
+- [发布门禁清单](../../.projitive/designs/release-quality-gates.md)
+- [功能正确性矩阵](../../.projitive/designs/functional-correctness-matrix.md)
+- [Signals 对齐计划](../../.projitive/designs/signals-alignment-test-plan.md)
+- [升级指南 0.3](../../.projitive/designs/upgrade-guide-0.3.md)
