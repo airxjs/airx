@@ -9,6 +9,23 @@ interface RenderContext {
   rootInstance: Instance<BrowserElement>
   needCommitDom: boolean
   nextUnitOfWork: Instance<BrowserElement> | null
+  isWorkLoopScheduled: boolean
+}
+
+function createIdleDeadline(): IdleDeadline {
+  return {
+    didTimeout: false,
+    timeRemaining: () => Number.MAX_SAFE_INTEGER
+  }
+}
+
+function scheduleIdleWork(callback: (deadline: IdleDeadline) => void) {
+  if (typeof globalThis.requestIdleCallback === 'function') {
+    globalThis.requestIdleCallback(callback)
+    return
+  }
+
+  globalThis.setTimeout(() => callback(createIdleDeadline()), 0)
 }
 
 export function render(pluginContext: PluginContext, element: AirxElement, domRef: BrowserElement) {
@@ -21,7 +38,8 @@ export function render(pluginContext: PluginContext, element: AirxElement, domRe
   const context: RenderContext = {
     rootInstance,
     nextUnitOfWork: null,
-    needCommitDom: false
+    needCommitDom: false,
+    isWorkLoopScheduled: false
   }
 
   const appInstance: Instance<BrowserElement> = {
@@ -205,16 +223,30 @@ export function render(pluginContext: PluginContext, element: AirxElement, domRe
     commitWalkV2(rootInstance, rootNode)
   }
 
+  function scheduleWorkLoop() {
+    if (context.isWorkLoopScheduled || context.nextUnitOfWork == null) {
+      return
+    }
+
+    context.isWorkLoopScheduled = true
+    scheduleIdleWork(deadline => {
+      context.isWorkLoopScheduled = false
+      workLoop(deadline)
+    })
+  }
+
   function onUpdateRequire() {
     if (context.nextUnitOfWork == null && context.rootInstance.child) {
       context.nextUnitOfWork = context.rootInstance.child
     }
+
+    scheduleWorkLoop()
   }
 
   /**
    * 调度
    */
-  function workLoop(deadline?: IdleDeadline) {
+  function workLoop(deadline: IdleDeadline = createIdleDeadline()) {
     let shouldYield = false
     const logger = createLogger('workLoop')
     while (context.nextUnitOfWork && !shouldYield) {
@@ -231,8 +263,7 @@ export function render(pluginContext: PluginContext, element: AirxElement, domRe
       context.needCommitDom = false
     }
 
-    // TODO: 兼容性
-    requestIdleCallback(workLoop)
+    scheduleWorkLoop()
   }
 
   // 开始调度

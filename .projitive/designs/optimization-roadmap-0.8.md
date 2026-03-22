@@ -1,459 +1,114 @@
-# Airx 优化行动计划 (0.7.0 → 1.0.0)
-
-## 概述
-
-本文档定义了接下来 Q2-Q3 的优化方向、优先级、资源分配与时间表。
-
----
-
-## 优化目标
-
-| 维度 | 目标 | 当前 | Gap |
-|------|------|------|-----|
-| **性能** | 平均渲染 < 16ms | 未测 | 建立基准 |
-| **稳定性** | 信号过载处理 | 缺失 | batch() 实现 |
-| **可维护性** | 核心测试 > 95% | ~85% | +10% |
-| **文档** | 完整 API JSDoc | ~60% | +40% |
-| **示例** | 10+ 渐进式示例 | 1 | +9 |
-
----
-
-## Phase 1: 基础改进（4 周，即刻启动）
-
-### 1.1 Signal.batch() 集成
-
-**任务**: 在高频 Signal 更新时自动应用批处理
-
-**工作内容**：
-
-```typescript
-// 当前问题
-count.set(1)      // 触发渲染
-count.set(2)      // 触发渲染
-count.set(3)      // 触发渲染  ← 应该只渲染 1 次
-
-// 目标实现
-Signal.batch(() => {
-  count.set(1)
-  count.set(2)
-  count.set(3)    // ← 仅 1 次渲染
-})
-```
-
-**实施清单**：
-- [ ] 创建 `source/signal/batch.ts`
-- [ ] 实现 `batched()` 包装函数
-- [ ] 在事件处理器中自动启用 batch
-- [ ] 编写单测: `source/signal/batch.test.ts`
-- [ ] 更新 README 示例
-
-**预期成果**：
-- 高频场景渲染次数减少 50-80%
-- 内存抖动降低
-
-**工作量**: 1-2 周  
-**所有者**: TBD  
-**优先级**: 🔴 P0
-
-### 1.2 性能基准框架
-
-**任务**: 建立可重复的性能测试基准
-
-**工作内容**：
-
-创建 `perf/` 目录：
-```
-perf/
-├── bench.config.ts        # Benchmark.js 配置
-├── render-bench.ts        # 渲染性能
-├── signal-bench.ts        # Signal 更新
-├── lifecycle-bench.ts     # 生命周期开销
-└── report.md              # 基准报告
-```
-
-**基准场景**：
-
-1. **初始化渲染** (Cold start)
-   ```typescript
-   // 1000 个组件树的首次渲染时间
-   benchmark('Render 1000 components', () => {
-     const app = createApp(<Tree depth={10} breadth={10} />)
-     app.mount(container)
-   })
-   ```
-
-2. **单元素更新** (Hot path)
-   ```typescript
-   // 单个 Signal 更新的延迟
-   benchmark('Update single signal', () => {
-     count.set(count.get() + 1)
-   })
-   ```
-
-3. **批量更新** (Batch)
-   ```typescript
-   // 100 个 Signal 同时更新
-   benchmark('Update 100 signals', () => {
-     Signal.batch(() => {
-       for (let i = 0; i < 100; i++) {
-         signals[i].set(Math.random())
-       }
-     })
-   })
-   ```
-
-4. **内存占用** (Memory)
-   ```typescript
-   // 1000 个组件树的内存占用
-   // 使用 performance.memory 或 heap snapshot
-   ```
-
-**预期成果**：
-- 确立性能基线
-- 性能回归早期发现
-- 优化效果量化
-
-**工作量**: 1 周  
-**所有者**: TBD  
-**优先级**: 🟠 P0
-
-### 1.3 API JSDoc 补充
-
-**任务**: 为所有导出 API 补充完整的 JSDoc 文档
-
-**工作内容**：
-
-```typescript
-/**
- * 创建一个 Airx 应用根对象
- * 
- * @param element - 根 JSX 元素或组件
- * @returns 应用对象，支持链式调用 mount()
- * 
- * @example
- * ```tsx
- * import * as airx from 'airx'
- * 
- * const app = airx.createApp(<App />)
- * app.mount(document.body)
- * ```
- * 
- * @see {@link AirxApp} 应用 API 接口
- */
-export function createApp(element: AirxElement | AirxComponent): AirxApp
-```
-
-**需补充的文件**：
-- [ ] `source/app/app.ts` 中 `createApp()`
-- [ ] `source/element/element.ts` 中 all functions
-- [ ] `source/render/basic/hooks/hooks.ts` 中生命周期钩子
-- [ ] `source/types/index.ts` 中接口定义
-
-**预期成果**：
-- IDE 智能提示完整
-- 自动生成 API 文档可行
-
-**工作量**: 3-4 天  
-**所有者**: TBD  
-**优先级**: 🟡 P1
-
----
-
-## Phase 2: 功能增强（4-6 周，Week 5-10）
-
-### 2.1 异步生命周期支持
-
-**任务**: 支持在 onMounted 中执行异步操作
-
-**当前问题**：
-```typescript
-// 无法支持，onMounted 是同步的
-onMounted(async () => {
-  const data = await fetchData()
-  state.set(data)
-})
-```
-
-**目标设计**：
-```typescript
-// 新增异步钩子
-onMountedAsync(async () => {
-  const data = await fetchData()
-  state.set(data)
-  
-  return () => {
-    // cleanup
-  }
-})
-
-// 或保持当前，支持返回 Promise<cleanup>
-onMounted(async () => {
-  const data = await fetchData()
-  state.set(data)
-  
-  return () => {}  // 清理函数
-})
-```
-
-**实施清单**：
-- [ ] 修改 `AirxComponentContext.onMounted()` 类型定义
-- [ ] 实现异步 listener 支持
-- [ ] 处理错误与超时
-- [ ] 编写完整单测
-- [ ] 更新文档与示例
-
-**预期成果**：
-- 支持 async/await 数据加载
-- 清晰的 SSR 支持
-
-**工作量**: 2 周  
-**所有者**: TBD  
-**优先级**: 🟠 P1
-
-### 2.2 错误边界实现
-
-**任务**: 实现错误边界 (Error Boundary)，父组件可捕获子组件错误
-
-**当前问题**：
-```typescript
-// 子组件崩溃会导致整个树崩溃
-function Parent() {
-  return () => <ChildWithError />  // 如果 ChildWithError 抛错，无法捕获
-}
-```
-
-**目标设计**：
-```typescript
-// 错误边界包装器
-import { withErrorBoundary } from 'airx'
-
-function Parent() {
-  const SafeChild = withErrorBoundary(ChildWithError, {
-    fallback: (err) => <div>组件崩溃: {err.message}</div>,
-    onError: (err) => console.log('子组件错误:', err)
-  })
-  
-  return () => <SafeChild />
-}
-```
-
-**实施清单**：
-- [ ] 创建 `source/render/error-boundary.ts`
-- [ ] 实现 `withErrorBoundary()` 高阶组件
-- [ ] 支持自定义 fallback 组件
-- [ ] 支持错误恢复与重试
-- [ ] 编写单测与集成测试
-
-**预期成果**：
-- 应用稳定性提升
-- 优雅降级能力
-
-**工作量**: 2.5 周  
-**所有者**: TBD  
-**优先级**: 🟠 P1
-
-### 2.3 扩展生命周期钩子
-
-**任务**: 补充 `onBeforeMount`, `onBeforeUnmount` 等钩子
-
-**当前 API**：
-```typescript
-onMounted(() => {})       // 挂载后
-onUnmounted(() => {})     // 卸载时（开始）
-```
-
-**扩展目标**：
-```typescript
-onBeforeMount(() => {})        // 挂载前
-onMounted(() => {})            // 挂载后
-onBeforeUnmount(() => {})      // 卸载前
-onUnmounted(() => {})          // 卸载后
-
-onUpdated?.(deps => {})        // 依赖更新后
-onErrorCaptured?.(err => {})   // 捕获错误
-```
-
-**实施清单**：
-- [ ] 扩展 `AirxComponentContext` 接口
-- [ ] 实现新钩子的触发逻辑
-- [ ] 定义钩子执行顺序
-- [ ] 编写完整单测
-- [ ] 文档与示例
-
-**预期成果**：
-- 更灵活的生命周期控制
-- 与其他框架 API 更接近
-
-**工作量**: 1.5 周  
-**所有者**: TBD  
-**优先级**: 🟡 P1
-
----
-
-## Phase 3: 工具与内容（2-4 周，并行或 Week 6+）
-
-### 3.1 文档扩展
-
-**任务**: 补充 API 文档、最佳实践、故障排除
-
-**内容清单**：
-- [ ] **API 参考** (已有 JSDoc，需生成 HTML)
-  - `docs/api/createApp.md`
-  - `docs/api/createElement.md`
-  - `docs/api/hooks.md`
-  - `docs/api/signals.md`
-
-- [ ] **最佳实践** (新增)
-  - `docs/guides/signal-patterns.md`
-  - `docs/guides/component-patterns.md`
-  - `docs/guides/lifecycle-best-practices.md`
-  - `docs/guides/ssr-guide.md`
-
-- [ ] **故障排除** (新增)
-  - `docs/troubleshooting/faq.md`
-  - `docs/troubleshooting/common-errors.md`
-
-**工作量**: 1.5 周  
-**所有者**: TBD  
-**优先级**: 🟡 P2
-
-### 3.2 示例项目扩展
-
-**任务**: 创建 5-10 个渐进式示例
-
-**示例清单**：
-1. **Counter** (现有)
-2. **Todo List** - 单列表操作
-3. **Form Validation** - 表单与验证
-4. **Async Data** - 数据加载
-5. **Context API** - provide/inject 用法
-6. **Lifecycle Hooks** - 生命周期完整示例
-7. **Error Handling** - 错误边界
-8. **SSR App** - 服务端渲染
-9. **Router Integration** - 与 airx-router 集成
-10. **Performance Monitoring** - 性能监控
-
-**预期成果**：
-- 新用户快速上手
-- 常见场景有参考实现
-
-**工作量**: 2 周  
-**所有者**: TBD  
-**优先级**: 🟡 P2
-
-### 3.3 DevTools 原型
-
-**任务**: 探索 ReactDevTools 兼容层或独立 DevTools 原型
-
-**调研内容**：
-- [ ] ReactDevTools Hook API 研究
-- [ ] Airx 组件树与 React 树的映射
-- [ ] 独立 Airx DevTools 原型（使用 browser extension API）
-
-**预期成果**：
-- DevTools 原型可行性评估
-- 后续实现的技术方案
-
-**工作量**: 1 周（调研）  
-**所有者**: TBD  
-**优先级**: 🟣 P3
-
----
-
-## 时间表 (Q2 2026)
-
-```
-Week 1-2   ├─ Signal.batch() 集成 (P0)
-           ├─ 性能基准框架 (P0)
-           └─ API JSDoc (P1)
-
-Week 3-4   ├─ 异步生命周期 (P1)
-           ├─ 错误边界 (P1)
-           └─ 文档扩展 (P2) [并行]
-
-Week 5-6   ├─ 生命周期扩展 (P1)
-           ├─ 示例项目 (P2) [并行]
-           └─ 下游包兼容性测试
-
-Week 7-8   ├─ DevTools 调研 (P3)
-           ├─ 性能优化 (基于 benchmark)
-           └─ 发布 0.8.0-beta
-
-Week 9-10  ├─ 稳定性修复
-           ├─ 性能微调
-           └─ 发布 0.8.0 stable
-
-...
-
-Q3         ├─ DevTools 实现 (可选)
-           ├─ 高级特性探索
-           └─ 1.0.0 准备
-```
-
----
-
-## 资源分配
-
-| 角色 | 职责 | 周期 | 优先级 |
-|------|------|------|--------|
-| **核心开发** | Signal.batch, 异步钩子, 错误边界 | 8 周 | P0-P1 |
-| **性能工程师** | 性能基准, 优化 | 4 周 | P0 |
-| **文档编者** | API JSDoc, 最佳实践, 示例 | 5 周 | P1-P2 |
-| **QA/测试** | 兼容性, 性能回归, 集成测试 | 持续 | P1 |
-
----
-
-## 风险与缓释
-
-| 风险 | 影响 | 缓释措施 |
-|------|------|---------|
-| **Signal.batch() 影响广泛** | 高 | 充分的单测覆盖，分步发布 |
-| **异步钩子改变 API** | 中 | 向后兼容设计，充分文档 |
-| **性能基准建立难** | 低 | 参考其他框架方案 |
-| **DevTools 实现复杂** | 低 | 列为 P3，可后延 |
-
----
-
-## 成功指标
-
-**0.8.0 发布时**：
-- ✅ Signal.batch() 実装完成，性能提升 50%+
-- ✅ 性能基准框架建立，1000 component 渲染 < 100ms
-- ✅ API 文档 JSDoc 完整 (100%)
-- ✅ 异步生命周期支持
-- ✅ 错误边界实现
-- ✅ 5+ 官方示例项目
-- ✅ 下游包 (router, vite-plugin) 兼容性验证
-
-**1.0.0 发布时**：
-- ✅ API 冻结，向后兼容承诺
-- ✅ 完整文档与示例库
-- ✅ 所有主流浏览器支持验证
-- ✅ TypeScript 5.0+、strict 模式全支持
-- ✅ 测试覆盖 > 95%
-- ✅ DevTools 支持 (可选)
-
----
-
-## 下一步行动
-
-1. **立即** (本周):
-   - [ ] 分配 Signal.batch() 开发者
-   - [ ] 创建性能基准代码框架
-   - [ ] 启动 API JSDoc 补充
-
-2. **下周** (Week 2):
-   - [ ] 完成 batch() 初稿
-   - [ ] 性能基准数据收集
-   - [ ] 计划异步钩子设计评审
-
-3. **两周后** (Week 3):
-   - [ ] batch() 合并至 Dev
-   - [ ] 异步生命周期设计完成
-   - [ ] 示例项目规划启动
-
----
-
-**计划发布日期**: 2026-06-30 (0.8.0)  
-**最后更新**: 2026-03-22  
-**维护者**: Airx Core Team
+# Airx 0.8.x Optimization Roadmap
+
+## 1. Goal
+
+本路线图承接 TASK-0011，目标不是一次性重写运行时，而是在 0.7.x 到 0.10.x 之间按优先级持续消化当前技术债。
+
+核心目标如下：
+
+1. 让 Browser 调度与提交流程可验证、可扩展。
+2. 收敛 Browser / Server 的重复实现，减少后续回归成本。
+3. 补齐文档与实现的一致性，降低下游接入误解。
+4. 为 router、vite-plugin 等下游包提供更稳定的运行时边界。
+
+## 2. Baseline
+
+结合 [designs/research/TASK-0011.implementation-research.md](../../designs/research/TASK-0011.implementation-research.md) 与现有实现，当前最关键的技术债集中在以下位置：
+
+- [source/render/browser/browser.ts#L14-L240](../../source/render/browser/browser.ts#L14-L240): 浏览器调度与提交逻辑。
+- [source/render/server/server.ts#L104-L314](../../source/render/server/server.ts#L104-L314): 服务端提交逻辑与浏览器版本重复。
+- [source/render/basic/common.ts#L191-L533](../../source/render/basic/common.ts#L191-L533): children 协调、Signal watcher 与遍历主路径。
+- [source/render/basic/plugins/internal/basic/basic.ts#L55-L173](../../source/render/basic/plugins/internal/basic/basic.ts#L55-L173): DOM 更新与实例复用判断。
+- [designs/core/architecture.md#L1-L127](../../designs/core/architecture.md#L1-L127): 运行时文档基线。
+
+## 3. Iterations
+
+### Iteration A: 0.7.1 稳定化
+
+目标：先把最容易产生运行时噪声的问题收口。
+
+工作项：
+
+- 完成 Browser 调度器优化，避免无工作时持续排队，并补充宿主兼容降级。
+- 为调度器补充回归测试，确认同步完成时不会空转。
+- 更新架构文档，统一 0.7.0 API 边界与实现流程描述。
+
+验收标准：
+
+- render/browser 定向测试通过。
+- 研究简报、架构文档、路线图三者内容一致。
+- 无新增公开 API 变更。
+
+### Iteration B: 0.8.0 提交流程收敛
+
+目标：降低维护成本，为后续性能优化腾出空间。
+
+工作项：
+
+- 提取 browser/server 共用的 commit helper。
+- 收敛 DOM 创建、删除、父节点查找与深度遍历逻辑。
+- 明确哪些 DOM 更新必须走插件，哪些属于 renderer 内核职责。
+
+验收标准：
+
+- browser/server 重复逻辑显著下降。
+- DOM 提交改动有双端回归测试覆盖。
+- 不引入 SSR 输出差异。
+
+### Iteration C: 0.9.0 响应式一致性与测试补强
+
+目标：增强对 Signal 与注入系统边界的信心。
+
+工作项：
+
+- 为 `performUnitOfWork` 增加真实 Signal watcher 集成测试。
+- 补充 provide/inject 变化、列表 children 复用、生命周期交错场景测试。
+- 评估 watcher 的微任务收集策略是否需要抽象或替换。
+
+验收标准：
+
+- common/browser/server 三层关键路径均有集成测试。
+- 明确记录未覆盖边界与风险。
+
+### Iteration D: 0.10.0 API 与生态收口
+
+目标：明确对外长期稳定边界。
+
+工作项：
+
+- 决定 `plugin()` 与 `renderToHTML()` 的长期定位。
+- 清理 README / README_CN 与代码导出不一致内容。
+- 与 router、vite-plugin 对齐版本说明与接入约束。
+
+验收标准：
+
+- README、架构文档、CHANGELOG 保持一致。
+- 下游包不再依赖模糊或过渡语义。
+
+## 4. Priority
+
+| Priority | Topic | Reason |
+| -------- | ----- | ------ |
+| P0 | Browser 调度空转 | 直接影响运行时行为与后续性能分析 |
+| P1 | 提交流程重复 | 影响维护成本与回归风险 |
+| P1 | Signal/Inject 集成测试 | 当前实现复杂但验证不足 |
+| P2 | 文档与 API 一致性 | 影响下游接入与版本升级理解 |
+
+## 5. Process Constraints
+
+每轮迭代都应遵守以下流程：
+
+1. 先更新 research brief 或设计说明，再进入代码修改。
+2. 优先做小步收敛，不把重构和行为变更混在同一轮。
+3. 每次运行时改动都要有最小回归测试。
+4. 改动公开 API 或迁移路径时，同步更新 CHANGELOG 与迁移文档。
+
+## 6. Current Outcome
+
+本轮已完成的第一步：
+
+- 优化 browser 调度器，使其只在存在剩余工作时继续调度。
+- 增加 `requestIdleCallback` 不可用时的降级路径。
+- 更新核心架构文档并补齐 TASK-0011 研究简报。
+
+下一步建议从 commit 提交流程收敛开始，而不是继续堆叠零散修补。
