@@ -47,6 +47,10 @@
     "vite-plugin-dts": "^4.5.4",
     "vitest": "^3.2.4"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/airxjs/airx"
+  },
   "author": "yinxulai",
   "license": "MIT"
 }
