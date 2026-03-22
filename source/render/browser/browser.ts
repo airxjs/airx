@@ -1,7 +1,14 @@
 import { AirxElement } from '../../element/index.js'
 import { createLogger } from '../../logger/index.js'
 import { PluginContext } from '../basic/plugins/index.js'
-import { AbstractElement, InnerAirxComponentContext, Instance, performUnitOfWork } from '../basic/common.js'
+import {
+  AbstractElement,
+  InnerAirxComponentContext,
+  INTERNAL_COMMENT_NODE_TYPE,
+  INTERNAL_TEXT_NODE_TYPE,
+  Instance,
+  performUnitOfWork
+} from '../basic/common.js'
 
 class BrowserElement extends Element implements AbstractElement {}
 
@@ -114,6 +121,19 @@ export function render(pluginContext: PluginContext, element: AirxElement, domRe
     }
 
     function commitInstanceDom(nextInstance: Instance<BrowserElement>, oldNode?: ChildNode) {
+      const getDebugElementName = (instance?: Instance<BrowserElement>): string => {
+        if (typeof instance?.element?.type === 'string') {
+          return `<${instance.element.type}>`
+        }
+
+        if (typeof instance?.element?.type === 'function') {
+          const componentName = instance.element.type.name || 'AnonymousComponent'
+          return `Component(${componentName})`
+        }
+
+        return '<unknown>'
+      }
+
       // 移除标删元素
       if (nextInstance.deletions) {
         for (const deletion of nextInstance.deletions) {
@@ -132,11 +152,11 @@ export function render(pluginContext: PluginContext, element: AirxElement, domRe
       if (nextInstance.domRef == null) {
         if (nextInstance.element == null) throw new Error('???')
         if (typeof nextInstance.element.type === 'string') {
-          if (nextInstance.element.type === 'text') {
+          if (nextInstance.element.type === INTERNAL_TEXT_NODE_TYPE) {
             const textContent = nextInstance.element.props.textContent
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             nextInstance.domRef = document.createTextNode(textContent as string) as any
-          } else if (nextInstance.element.type === 'comment') {
+          } else if (nextInstance.element.type === INTERNAL_COMMENT_NODE_TYPE) {
             const textContent = nextInstance.element.props.textContent
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             nextInstance.domRef = document.createComment(textContent as string) as any
@@ -171,6 +191,17 @@ export function render(pluginContext: PluginContext, element: AirxElement, domRe
           }
 
           const parentDom = getParentDom(nextInstance)
+          if (
+            parentDom.nodeType === Node.TEXT_NODE
+            || parentDom.nodeType === Node.COMMENT_NODE
+          ) {
+            const parentInstance = (parentDom as { airxInstance?: Instance<BrowserElement> }).airxInstance
+            throw new Error(
+              `[airx] Invalid DOM hierarchy: cannot append ${getDebugElementName(nextInstance)} to ${getDebugElementName(parentInstance)}. `
+              + 'A text/comment node cannot contain child nodes.'
+            )
+          }
+
           parentDom.appendChild(nextInstance.domRef)
         }
       }

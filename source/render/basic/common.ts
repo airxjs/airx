@@ -20,6 +20,9 @@ import {
 import { PluginContext } from './plugins/index.js'
 import { globalContext } from './hooks/hooks.js'
 
+export const INTERNAL_TEXT_NODE_TYPE = '__airx_text__'
+export const INTERNAL_COMMENT_NODE_TYPE = '__airx_comment__'
+
 export type Disposer = () => void
 
 export class InnerAirxComponentContext<E extends AbstractElement> implements AirxComponentContext {
@@ -443,7 +446,9 @@ export function performUnitOfWork<E extends AbstractElement>(pluginContext: Plug
       }
 
       if (isValidElement(element)) return element
-      const elementType = isComment(element) ? 'comment' : 'text'
+      const elementType = isComment(element)
+        ? INTERNAL_COMMENT_NODE_TYPE
+        : INTERNAL_TEXT_NODE_TYPE
       const textContent = element === '' ? 'empty-string' : String(element)
       return createElement(elementType, { textContent })
     })

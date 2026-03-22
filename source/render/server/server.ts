@@ -1,7 +1,14 @@
 import { CSSProperties } from '../../types/index.js'
 import { AirxElement } from '../../element/index.js'
 import { createLogger } from '../../logger/index.js'
-import { InnerAirxComponentContext, Instance, performUnitOfWork, AbstractElement } from '../basic/common.js'
+import {
+  InnerAirxComponentContext,
+  Instance,
+  performUnitOfWork,
+  AbstractElement,
+  INTERNAL_COMMENT_NODE_TYPE,
+  INTERNAL_TEXT_NODE_TYPE
+} from '../basic/common.js'
 import { PluginContext } from '../basic/plugins/index.js'
 
 function camelToKebab(str: string): string {
@@ -261,6 +268,19 @@ export function render(pluginContext: PluginContext, element: AirxElement, onCom
     }
 
     function commitInstanceDom(nextInstance: Instance<ServerElement>, oldNode?: ServerElement) {
+      const getDebugElementName = (instance?: Instance<ServerElement>): string => {
+        if (typeof instance?.element?.type === 'string') {
+          return `<${instance.element.type}>`
+        }
+
+        if (typeof instance?.element?.type === 'function') {
+          const componentName = instance.element.type.name || 'AnonymousComponent'
+          return `Component(${componentName})`
+        }
+
+        return '<unknown>'
+      }
+
       // 移除标删元素
       if (nextInstance.deletions) {
         for (const deletion of nextInstance.deletions) {
@@ -279,11 +299,11 @@ export function render(pluginContext: PluginContext, element: AirxElement, onCom
       if (nextInstance.domRef == null) {
         if (nextInstance.element == null) throw new Error('???')
         if (typeof nextInstance.element.type === 'string') {
-          if (nextInstance.element.type === 'text') {
+          if (nextInstance.element.type === INTERNAL_TEXT_NODE_TYPE) {
             const textContent = nextInstance.element.props.textContent
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             nextInstance.domRef = ServerElement.createTextNode(textContent as string) as any
-          } else if (nextInstance.element.type === 'comment') {
+          } else if (nextInstance.element.type === INTERNAL_COMMENT_NODE_TYPE) {
             const textContent = nextInstance.element.props.textContent
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             nextInstance.domRef = ServerElement.createComment(textContent as string) as any
@@ -311,6 +331,13 @@ export function render(pluginContext: PluginContext, element: AirxElement, onCom
           }
 
           const parentDom = getParentDom(nextInstance)
+          if (parentDom.nodeName === '#text' || parentDom.nodeName === '#comment') {
+            throw new Error(
+              `[airx] Invalid DOM hierarchy: cannot append ${getDebugElementName(nextInstance)} to ${getDebugElementName(nextInstance.parent)}. `
+              + 'A text/comment node cannot contain child nodes.'
+            )
+          }
+
           parentDom.appendChild(nextInstance.domRef)
         }
       }

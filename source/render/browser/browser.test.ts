@@ -29,6 +29,8 @@ vi.mock('../basic/common', () => ({
     provide: vi.fn(),
     inject: vi.fn()
   })),
+  INTERNAL_TEXT_NODE_TYPE: '__airx_text__',
+  INTERNAL_COMMENT_NODE_TYPE: '__airx_comment__',
   performUnitOfWork: vi.fn(() => null), // Return null to indicate work is done
   AbstractElement: class {}
 }))
