@@ -12,6 +12,11 @@ import {
   AirxComponentRender,
   createErrorRender,
 } from '../../element/index.js'
+import {
+  assertValidChildValue,
+  createInvalidComponentReturnError,
+  normalizeComponentReturnValue,
+} from './errors.js'
 import { PluginContext } from './plugins/index.js'
 import { globalContext } from './hooks/hooks.js'
 
@@ -402,6 +407,24 @@ type OnUpdateRequire<E extends AbstractElement> = (instance: Instance<E>) => voi
 export function performUnitOfWork<E extends AbstractElement>(pluginContext: PluginContext, instance: Instance<E>, onUpdateRequire?: OnUpdateRequire<E>): Instance<E> | null {
   const element = instance.element
 
+  function getComponentName(): string {
+    if (typeof element?.type === 'function') {
+      if (typeof element.type.name === 'string' && element.type.name !== '') {
+        return element.type.name
+      }
+    }
+
+    return 'AnonymousComponent'
+  }
+
+  function getCurrentNodeName(): string {
+    if (typeof element?.type === 'string') {
+      return `<${element.type}>`
+    }
+
+    return `Component "${getComponentName()}"`
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function childrenAsElements(children: AirxChildren): AirxElement<any>[] {
     const childrenAsArray = Array.isArray(children) ? children : [children]
@@ -413,6 +436,12 @@ export function performUnitOfWork<E extends AbstractElement>(pluginContext: Plug
     }
 
     return childrenAsArray.flat(3).map(element => {
+      try {
+        assertValidChildValue(getCurrentNodeName(), element)
+      } catch (error) {
+        return createErrorRender(error)() as AirxElement
+      }
+
       if (isValidElement(element)) return element
       const elementType = isComment(element) ? 'comment' : 'text'
       const textContent = element === '' ? 'empty-string' : String(element)
@@ -427,10 +456,10 @@ export function performUnitOfWork<E extends AbstractElement>(pluginContext: Plug
       const beforeContext = globalContext.current
       globalContext.current = instance.context.getSafeContext()
 
-      let componentReturnValue: AirxComponentRender | undefined = undefined
+      let componentReturnValue: AirxComponentRender | AirxElement | undefined = undefined
 
       try {
-        componentReturnValue = component(instance.memoProps)
+        componentReturnValue = normalizeComponentReturnValue(getComponentName(), component(instance.memoProps))
       } catch (error) {
         componentReturnValue = createErrorRender(error)
       }
@@ -486,11 +515,13 @@ export function performUnitOfWork<E extends AbstractElement>(pluginContext: Plug
       try {
         if (isValidElement(instance.componentReturnValue)) {
           children = instance.componentReturnValue
-        } else {
+        } else if (typeof instance.componentReturnValue === 'function') {
           // 如果是由于父组件导致的子组件渲染
           // 直接使用 childrenComputed.get() 将读取到缓存值
           // 因此这里使用 childrenRender 来更新 children 的值
           children = instance.componentReturnValue!()
+        } else {
+          throw createInvalidComponentReturnError(getComponentName(), instance.componentReturnValue)
         }
       } catch (error) {
         children = createErrorRender(error)()
