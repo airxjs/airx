@@ -1,8 +1,8 @@
-import { CSSProperties } from '../../types'
-import { AirxElement } from '../../element'
-import { createLogger } from '../../logger'
-import { InnerAirxComponentContext, Instance, performUnitOfWork, AbstractElement } from '../basic/common'
-import { PluginContext } from '../basic/plugins'
+import { CSSProperties } from '../../types/index.js'
+import { AirxElement } from '../../element/index.js'
+import { createLogger } from '../../logger/index.js'
+import { InnerAirxComponentContext, Instance, performUnitOfWork, AbstractElement } from '../basic/common.js'
+import { PluginContext } from '../basic/plugins/index.js'
 
 function camelToKebab(str: string): string {
   return str.replace(/([A-Z])/g, (match, p1, offset) => {

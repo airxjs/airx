@@ -1,2 +1,2 @@
-export { PluginContext } from './context'
-export { type Plugin } from './plugin'
+export { PluginContext } from './context/index.js'
+export { type Plugin } from './plugin.js'

@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { InnerAirxComponentContext, performUnitOfWork } from './common'
-import { AirxElement } from '../../element'
-import { PluginContext } from './plugins'
-import { airxElementSymbol } from '../../symbol'
+import { InnerAirxComponentContext, performUnitOfWork } from './common.js'
+import { AirxElement } from '../../element/index.js'
+import { PluginContext } from './plugins/index.js'
+import { airxElementSymbol } from '../../symbol/index.js'
 
 // Mock dependencies
 vi.mock('../../logger', () => ({

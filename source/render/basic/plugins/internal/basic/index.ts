@@ -1,1 +1,1 @@
-export { BasicLogic } from './basic'
+export { BasicLogic } from './basic.js'

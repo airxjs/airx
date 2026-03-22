@@ -1,26 +1,35 @@
 {
   "name": "airx",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "a front framework with jsx",
   "type": "module",
-  "main": "./output/index.umd.cjs",
-  "module": "./output/index.js",
+  "types": "./output/index.d.ts",
   "exports": {
     ".": {
-      "import": "./output/index.js",
       "types": "./output/index.d.ts",
-      "require": "./output/index.umd.cjs"
+      "import": "./output/index.js",
+      "default": "./output/index.js"
+    },
+    "./jsx-runtime": {
+      "types": "./output/jsx-runtime.d.ts",
+      "import": "./output/jsx-runtime.js",
+      "default": "./output/jsx-runtime.js"
+    },
+    "./jsx-dev-runtime": {
+      "types": "./output/jsx-dev-runtime.d.ts",
+      "import": "./output/jsx-dev-runtime.js",
+      "default": "./output/jsx-dev-runtime.js"
     }
   },
   "files": [
     "output/*"
   ],
   "scripts": {
-    "dev": "vite build -w",
-    "build": "vite build",
+    "dev": "tsc -w",
+    "build": "tsc",
     "lint": "eslint source",
     "typecheck": "tsc --noEmit",
-    "prepublishOnly": "vite build",
+    "prepublishOnly": "npm run build",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage"
@@ -29,9 +38,6 @@
     "csstype": "^3.1.3"
   },
   "devDependencies": {
-    "@rollup/plugin-babel": "^6.0.4",
-    "@rollup/plugin-commonjs": "^25.0.7",
-    "@rollup/plugin-node-resolve": "^15.2.3",
     "@types/node": "^24.0.10",
     "@typescript-eslint/eslint-plugin": "^8.35.1",
     "@typescript-eslint/parser": "^8.35.1",
@@ -40,11 +46,8 @@
     "@vitest/ui": "^3.2.4",
     "eslint": "^8.57.0",
     "jsdom": "^26.1.0",
-    "rollup-plugin-typescript2": "^0.36.0",
     "signal-polyfill": "^0.2.2",
     "typescript": "^5.4.5",
-    "vite": "^7.0.0",
-    "vite-plugin-dts": "^4.5.4",
     "vitest": "^3.2.4"
   },
   "repository": {

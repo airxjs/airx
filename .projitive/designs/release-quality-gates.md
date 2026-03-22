@@ -8,7 +8,7 @@
 
 - 包名: `airx`
 - 当前版本: `0.4.0`
-- 构建方式: Rollup
+- 构建方式: Vite library build（ESM only）
 - 质量门禁状态: 建设中
 - 开发分支: `dev`
 - 发布基线分支: `main`
@@ -19,8 +19,8 @@
 
 | 检查项 | 命令 | 验收标准 |
 | --- | --- | --- |
-| 构建成功 | `npm run build` | 退出码为 0，生成 `output/esm/` 和 `output/umd/` |
-| 类型声明 | `output/esm/index.d.ts` 存在 | 文件非空，包含主要类型导出 |
+| 构建成功 | `npm run build` | 退出码为 0，生成 `output/index.js` 与 `output/index.d.ts` |
+| 类型声明 | `output/index.d.ts` 存在 | 文件非空，包含主要类型导出 |
 | 包体积 | `output/` 目录大小 | 无异常增长（相比上一版本 `< 20%`） |
 
 ### 3.2 代码质量门禁 (Lint Gate)
@@ -35,7 +35,7 @@
 | 检查项 | 命令 | 验收标准 |
 | --- | --- | --- |
 | TypeScript 编译 | `npx tsc --noEmit` | 退出码为 0，无类型错误 |
-| API 表面稳定 | `output/esm/index.d.ts` 对比 | 公开 API 数量不减少 |
+| API 表面稳定 | `output/index.d.ts` 对比 | 公开 API 数量不减少 |
 
 **注意**: 当前 `package.json` 的 `scripts` 中未包含 `typecheck`，建议补充:
 

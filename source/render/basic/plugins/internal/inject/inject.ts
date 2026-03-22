@@ -1,5 +1,5 @@
-import { Plugin } from '../..'
-import { Instance } from '../../../common'
+import { Plugin } from '../../index.js'
+import { Instance } from '../../../common.js'
 
 export class InjectSystem implements Plugin {
   private getProvideValueForParent(instance: Instance | undefined, key: unknown): unknown {

@@ -1,1 +1,1 @@
-export { InjectSystem } from './inject'
+export { InjectSystem } from './inject.js'

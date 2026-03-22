@@ -10,7 +10,7 @@
 
 - Node: CI 使用 Node 20（`check.yml`）
 - TypeScript: `^5.4.5`
-- 构建: Rollup + `rollup-plugin-typescript2`
+- 构建: Vite 7 library build + `vite-plugin-dts`
 - Lint: ESLint 8 + `@typescript-eslint` 7
 - 测试: 暂无 test 脚本与测试门禁
 - CI: `check.yml` 仅 `lint + build`，无 typecheck/test
@@ -31,7 +31,7 @@
 
 ### 3.3 构建链策略
 
-- 保持 Rollup 主链稳定。
+- 保持 Vite library build 主链稳定。
 - 优先升级与安全相关插件（node-resolve/commonjs/eslint）。
 - 任何构建链升级都必须跑完核心正确性矩阵（TASK-0006）。
 
@@ -65,7 +65,7 @@
 | --- | --- | --- | --- |
 | 类型声明漂移 | TS 升级后 d.ts 变化 | 下游编译失败 | 增加 d.ts diff 检查 |
 | 调度语义回归 | signal/polyfill 版本变化 | 运行时更新异常 | 跑 Signals MVP 用例 |
-| 构建输出变化 | Rollup 插件升级 | 包体积或格式异常 | build 产物对比 + smoke test |
+| 构建输出变化 | Vite / dts 插件升级 | 包体积或格式异常 | build 产物对比 + smoke test |
 | CI 漏检 | 仅 lint/build | 隐藏回归进入发布 | 增加 typecheck/test 阻断 |
 
 ## 6. 回滚策略

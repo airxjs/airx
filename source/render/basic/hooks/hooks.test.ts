@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { globalContext, onMounted, onUnmounted, inject, provide } from './hooks'
-import { AirxComponentContext } from '../../../element'
+import { globalContext, onMounted, onUnmounted, inject, provide } from './hooks.js'
+import { AirxComponentContext } from '../../../element/index.js'
 
 describe('hooks', () => {
   let mockContext: AirxComponentContext
