@@ -1,6 +1,6 @@
 {
   "name": "airx",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "a front framework with jsx",
   "type": "module",
   "main": "./output/index.umd.cjs",
