@@ -43,15 +43,20 @@ export function jsx(type: JSXElementType, props: Props | null, key?: Key): AirxE
 
 export const jsxs = jsx
 
+// eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace JSX {
   export type ElementClass = never
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
   export interface Element extends AirxComponentRender {}
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
   export interface ElementChildrenAttribute {
+    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
     children: {}
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
   export interface IntrinsicElements extends NativeElements {}
 
   export interface IntrinsicAttributes {

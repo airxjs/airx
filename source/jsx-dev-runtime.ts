@@ -10,5 +10,8 @@ export function jsxDEV(
   _source?: unknown,
   _self?: unknown
 ): ReturnType<typeof jsx> {
+  void _isStaticChildren
+  void _source
+  void _self
   return jsx(type, props, key)
 }
