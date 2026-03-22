@@ -6,11 +6,16 @@ type AirxElementType<P> = string | AirxComponent<P>
 export type Props = { [propKey: string]: unknown }
 
 /**
- * AirxElement 表示一个 Airx 元素
- * type 表示元素的类型，可能是一个 html 标签，
- * 也可能是一个自定义组件
- * props 表示元素的属性
- * children 表示元素的子元素
+ * Airx 虚拟节点结构。
+ *
+ * - type: 标签名或组件函数
+ * - props: 组件参数或标签属性
+ * - props.children: 子节点列表
+ *
+ * @example
+ * import { createElement, type AirxElement } from 'airx'
+ *
+ * const node: AirxElement = createElement('div', { id: 'app' }, 'hello')
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface AirxElement<P = any> {
@@ -19,6 +24,9 @@ export interface AirxElement<P = any> {
   [symbol.airxElementSymbol]: true
 }
 
+/**
+ * 组件可返回的子节点类型。
+ */
 export type AirxChildren =
   | null
   | string
@@ -27,17 +35,40 @@ export type AirxChildren =
   | undefined
   | AirxElement
   | Array<AirxChildren>
-  | AirxComponentRender // allow function component return type
+  | AirxComponentRender
 
 /**
- * 函数式组件接收自己的 props，并返回一个 AirxElement
+ * 组件渲染函数类型。
+ *
+ * 组件函数返回值本身是一个 "render 函数"，该函数最终返回子节点。
  */
 export type AirxComponentRender = () => AirxChildren
 export type AirxComponent<P = unknown> = ReactiveComponent<P>
 export type ReactiveComponent<P = unknown> = (props: P) => AirxComponentRender
 
 /**
- * createElement 是用于创建 AirxElement 的工具函数
+ * 创建 Airx 虚拟节点。
+ *
+ * 可用于手写节点，也会被 JSX 转换后调用。
+ *
+ * @param type 标签名或组件函数。
+ * @param props 属性对象。
+ * @param children 可变子节点参数。
+ * @returns 标准化后的 AirxElement。
+ *
+ * @example
+ * import { createElement } from 'airx'
+ *
+ * const view = createElement('div', { class: 'box' }, 'hello')
+ *
+ * @example
+ * import { createElement } from 'airx'
+ *
+ * function Title(props: { text: string }) {
+ *   return () => createElement('h1', null as never, props.text)
+ * }
+ *
+ * const node = createElement(Title, { text: 'Airx' })
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function createElement<P = any>(
@@ -63,12 +94,28 @@ export function createElement<P = any>(
   }
 }
 
+/**
+ * 判断一个值是否是合法的 AirxElement。
+ */
 export function isValidElement(element: unknown): element is AirxElement {
   return typeof element === 'object'
     && element !== null
     && Reflect.get(element, symbol.airxElementSymbol) === true
 }
 
+/**
+ * JSX Fragment 对应的运行时实现。
+ *
+ * @example
+ * function Card() {
+ *   return () => (
+ *     <>
+ *       <h3>Title</h3>
+ *       <p>Content</p>
+ *     </>
+ *   )
+ * }
+ */
 export function Fragment(props: { children: AirxElement }) {
   return () => props.children
 }
@@ -88,6 +135,18 @@ export type AirxComponentContext = AirxComponentLifecycle & {
   inject: <T = unknown>(key: unknown) => T | undefined
 }
 
+/**
+ * 为组件提供类型友好的包装。
+ *
+ * 主要用于在不使用 JSX 的场景下显式声明组件签名。
+ *
+ * @example
+ * import { component, createElement } from 'airx'
+ *
+ * const Hello = component<{ name: string }>((props) => {
+ *   return () => createElement('h1', null as never, `Hello ${props.name}`)
+ * })
+ */
 export function component<P = unknown>(comp: AirxComponent<P>): AirxComponent<P> {
   return comp
 }
