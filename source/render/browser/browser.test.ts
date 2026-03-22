@@ -4,19 +4,10 @@ import { AirxElement } from '../../element'
 import { PluginContext, Plugin } from '../basic/plugins'
 import { airxElementSymbol } from '../../symbol'
 
-// Mock requestIdleCallback for Node.js test environment
-let requestIdleCallbackCallCount = 0
+const requestIdleCallbackSpy = vi.fn(() => 1)
 Object.defineProperty(globalThis, 'requestIdleCallback', {
   writable: true,
-  value: vi.fn((callback: () => void) => {
-    // Limit calls to prevent infinite loop in tests
-    if (requestIdleCallbackCallCount < 3) {
-      requestIdleCallbackCallCount++
-      // Schedule callback asynchronously but don't let it run too many times
-      setTimeout(callback, 0)
-    }
-    return 1
-  })
+  value: requestIdleCallbackSpy
 })
 
 // Mock dependencies
@@ -48,8 +39,7 @@ describe('render/browser', () => {
   let mockPluginContext: PluginContext
 
   beforeEach(() => {
-    // Reset requestIdleCallback call count
-    requestIdleCallbackCallCount = 0
+    requestIdleCallbackSpy.mockClear()
     
     // Create mock DOM element
     mockDomRef = document.createElement('div')
@@ -78,6 +68,12 @@ describe('render/browser', () => {
     expect(() => {
       render(mockPluginContext, mockElement, mockDomRef as Element)
     }).not.toThrow()
+  })
+
+  it('should not reschedule idle work after synchronous completion', () => {
+    render(mockPluginContext, mockElement, mockDomRef as Element)
+
+    expect(requestIdleCallbackSpy).not.toHaveBeenCalled()
   })
 
   it('should work with empty plugin context', () => {
