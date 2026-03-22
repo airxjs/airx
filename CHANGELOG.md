@@ -4,6 +4,29 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.7.0] - 2026-03-22
+
+### Breaking Changes
+
+- **Removed Legacy API** — Removed deprecated `createRef` and `watch` functions from `source/legacy.ts`. 
+  - Use `Signal.State` instead of `createRef`
+  - Use `Signal.Computed` or `Signal.Effect` instead of `watch`
+  - For migration guide, see `.projitive/designs/migration-0.7.md`
+  - This aligns fully with TC39 Signals proposal standard
+
+### Removed
+
+- `createRef<T>()` function
+- `watch<T>()` function  
+- `Ref<T>` type and `LegacyRef<T>` class
+- `source/legacy.ts` file
+
+### Migration
+
+See detailed migration guide in [`.projitive/designs/migration-0.7.md`](.projitive/designs/migration-0.7.md) for step-by-step instructions on upgrading from 0.6.x.
+
+---
+
 ## [0.6.0] - 2026-03-22
 
 ### Added

@@ -180,6 +180,41 @@
         "ROADMAP-0002"
       ],
       "recordVersion": 3
+    },
+    {
+      "id": "TASK-0010",
+      "title": "移除旧的兼容代码，完全采用 Signal 标准",
+      "status": "IN_PROGRESS",
+      "owner": "yinxulai",
+      "summary": "移除 legacy.ts 中基于 Ref 和 watch 的兼容 API，完全迁移到 TC39 Signals 提案标准。当前 legacy.ts 提供的 createRef 和 watch 函数是 Vue 3 风格的响应式 API，与标准 Signal 实现存在编程模型差异，需要尽快移除以统一开发体验。\n\n产出物：\n1. 删除 source/legacy.ts 文件\n2. 更新 source/index.ts，移除 legacy 导出和类型定义\n3. 检查并更新依赖于 legacy API 的单测\n4. 更新 README 和迁移指南，说明如何从 Ref/watch 迁移到 Signal/effect\n5. 发布 0.7.0+ 破坏性版本\n\n下游影响：已发布的使用 legacy API 的应用需要迁移",
+      "updatedAt": "2026-03-22T01:59:35.185Z",
+      "links": [
+        ".projitive/designs/migration-0.7.md"
+      ],
+      "roadmapRefs": [],
+      "subState": {
+        "phase": "discovery",
+        "confidence": 0.8
+      },
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0011",
+      "title": "评审架构与实现，制定持续优化计划",
+      "status": "IN_PROGRESS",
+      "owner": "yinxulai",
+      "summary": "系统性地评审 Airx 核心架构与实现，识别性能瓶颈、可维护性问题与演进机会，并制定具体的优化改进计划。\n\n导查范围：\n1. 架构评审：signal/render/app 核心模块交互、依赖关系、扩展性\n2. 实现评审：关键路径（变化检测、批量更新、生命周期）的效率\n3. 性能分析：基准测试、内存占用、编译产物大小优化空间\n4. 开发体验：API 表面、文档完整性、错误提示清晰度\n5. 生态对接：下游项目（router、vite-plugin）的集成度与阻塞点\n\n产出物：\n1. 架构评审报告与可视化图表\n2. 性能基准测试与优化清单\n3. 改进建议优先级排序与时间规划\n4. 技术债清单与还债计划\n5. 新特性演进路线图（0.7.x - 0.10.x）\n\n阶段：Discovery → Design → Implementation（预期 4-5 周）",
+      "updatedAt": "2026-03-22T01:59:35.183Z",
+      "links": [
+        ".projitive/designs/architecture-review-0.7.md",
+        ".projitive/designs/optimization-roadmap-0.8.md"
+      ],
+      "roadmapRefs": [],
+      "subState": {
+        "phase": "discovery",
+        "confidence": 0.7
+      },
+      "recordVersion": 2
     }
   ],
   "roadmaps": [
@@ -201,7 +236,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 27,
+    "tasks_version": 32,
     "roadmaps_version": 3,
     "store_schema_version": 3
   },
@@ -209,9 +244,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 27,
-      "lastBuiltAt": "2026-03-22T01:40:00.343Z",
-      "recordVersion": 81
+      "lastSourceVersion": 32,
+      "lastBuiltAt": "2026-03-22T01:59:35.190Z",
+      "recordVersion": 95
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
