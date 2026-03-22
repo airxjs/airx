@@ -238,11 +238,18 @@
       "time": "2026-Q2~Q3",
       "updatedAt": "2026-03-21T14:20:13.674Z",
       "recordVersion": 1
+    },
+    {
+      "id": "ROADMAP-0003",
+      "title": "SSR 服务端渲染支持\",\n<parameter name=\"time\">2026-Q3~Q4",
+      "status": "active",
+      "updatedAt": "2026-03-22T03:53:19.366Z",
+      "recordVersion": 1
     }
   ],
   "meta": {
     "tasks_version": 33,
-    "roadmaps_version": 3,
+    "roadmaps_version": 4,
     "store_schema_version": 3
   },
   "view_state": {
@@ -256,9 +263,9 @@
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
       "dirty": false,
-      "lastSourceVersion": 3,
-      "lastBuiltAt": "2026-03-22T02:10:12.811Z",
-      "recordVersion": 9
+      "lastSourceVersion": 4,
+      "lastBuiltAt": "2026-03-22T03:55:09.389Z",
+      "recordVersion": 15
     }
   },
   "migration_history": []
