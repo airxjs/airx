@@ -299,10 +299,10 @@
     {
       "id": "TASK-0016",
       "title": "实现 SSR 接口与最小可用能力",
-      "status": "TODO",
+      "status": "DONE",
       "owner": "yinxulai",
       "summary": "实现首版 SSR 接口与核心流程：服务端字符串渲染、客户端激活、基础上下文与错误处理；补充必要导出并保证与现有运行时 API 的兼容。实现时优先代码清晰度、模块边界稳定性与后续演进可维护性。",
-      "updatedAt": "2026-03-22T04:14:01.200Z",
+      "updatedAt": "2026-03-23T20:01:56.788Z",
       "links": [],
       "roadmapRefs": [
         "ROADMAP-0003"
@@ -311,7 +311,7 @@
         "phase": "implementation",
         "confidence": 0.74
       },
-      "recordVersion": 2
+      "recordVersion": 4
     },
     {
       "id": "TASK-0017",
@@ -360,7 +360,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 59,
+    "tasks_version": 61,
     "roadmaps_version": 4,
     "store_schema_version": 3
   },
@@ -368,9 +368,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 59,
-      "lastBuiltAt": "2026-03-23T19:51:20.082Z",
-      "recordVersion": 177
+      "lastSourceVersion": 61,
+      "lastBuiltAt": "2026-03-23T20:01:56.795Z",
+      "recordVersion": 183
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",

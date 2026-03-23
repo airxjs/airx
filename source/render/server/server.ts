@@ -1,5 +1,5 @@
 import { CSSProperties } from '../../types/index.js'
-import { AirxElement } from '../../element/index.js'
+import { AirxElement, createElement, AirxComponent } from '../../element/index.js'
 import { createLogger } from '../../logger/index.js'
 import {
   InnerAirxComponentContext,
@@ -404,3 +404,68 @@ export function render(pluginContext: PluginContext, element: AirxElement, onCom
 
   onComplete(context.rootInstance.domRef?.toString() || '')
 }
+
+/**
+ * SSR 应用实例
+ */
+export interface SSRApp {
+  /**
+   * 将应用渲染为 HTML 字符串
+   */
+  renderToString(): Promise<string>
+  /**
+   * 客户端激活 SSR 输出的 HTML
+   * @param container 服务端渲染时使用的容器元素
+   */
+  hydrate(container: HTMLElement): void
+}
+
+/**
+ * 创建 SSR 应用实例
+ * @param element 根组件或根元素
+ */
+export function createSSRApp(element: AirxElement | AirxComponent): SSRApp {
+  const appContext = new PluginContext()
+
+  const ensureAsElement = (element: AirxElement | AirxComponent): AirxElement => {
+    if (typeof element === 'function') {
+      return createElement(element, {})
+    }
+    return element
+  }
+
+  const rootElement = ensureAsElement(element)
+
+  return {
+    renderToString(): Promise<string> {
+      return new Promise<string>((resolve) => {
+        render(appContext, rootElement, resolve)
+      })
+    },
+
+    hydrate(_container: HTMLElement): void {
+      // TODO: 实现客户端 hydration
+      // 初步版本暂不实现，实际使用时 hydrate 是客户端行为
+      // 需要将 appInstance 传递给客户端，由客户端的 browserRender 处理
+    }
+  }
+}
+
+/**
+ * 将 SSR 应用渲染为 HTML 字符串
+ * @param app SSR 应用实例
+ */
+export function renderToString(app: SSRApp): Promise<string> {
+  return app.renderToString()
+}
+
+/**
+ * 客户端激活 SSR 输出的 HTML
+ * @param _html 服务端渲染的 HTML 字符串（暂未使用）
+ * @param container 容器元素
+ * @param _app SSR 应用实例（暂未使用）
+ */
+export function hydrate(_html: string, container: HTMLElement, _app: SSRApp): void {
+  _app.hydrate(container)
+}
+

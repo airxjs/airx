@@ -54,3 +54,19 @@ export {
   onMounted,
   onUnmounted
 } from './render/index.js'
+
+/**
+ * SSR（服务端渲染）API。
+ *
+ * @example
+ * import { createSSRApp, renderToString } from 'airx'
+ *
+ * const app = createSSRApp(App)
+ * const html = await app.renderToString()
+ */
+export {
+  type SSRApp,
+  createSSRApp,
+  renderToString,
+  hydrate
+} from './render/index.js'
