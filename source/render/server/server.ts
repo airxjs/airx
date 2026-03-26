@@ -443,6 +443,7 @@ export function createSSRApp(element: AirxElement | AirxComponent): SSRApp {
       })
     },
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     hydrate(_container: HTMLElement): void {
       // TODO: 实现客户端 hydration
       // 初步版本暂不实现，实际使用时 hydrate 是客户端行为
