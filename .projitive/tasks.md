@@ -9,7 +9,7 @@ This file is generated from .projitive governance store by Projitive MCP. Manual
 ## TASK-0030 | IN_PROGRESS | 提升 airx render/browser 测试覆盖率至 85%+
 - owner: ai-copilot
 - summary: 基于 ROADMAP-0001 Phase 3 建议，提升 render/browser 模块测试覆盖率。当前覆盖率：line 65.68%, branch 67.64%, func 71.42%。目标：通过补充关键路径测试（browser.ts 未覆盖行 62-266, 270-275），将行覆盖提升至 85%+，为 SSR hydration 提供更可靠的单元测试基础。输出：更新的测试用例和覆盖率报告。
-- updatedAt: 2026-03-27T21:06:21.329Z
+- updatedAt: 2026-03-27T22:31:08.847Z
 - roadmapRefs: ROADMAP-0001
 - links:
   - (none)
