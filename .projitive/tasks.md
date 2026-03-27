@@ -8,8 +8,8 @@ This file is generated from .projitive governance store by Projitive MCP. Manual
 
 ## TASK-0030 | IN_PROGRESS | 提升 airx render/browser 测试覆盖率至 85%+
 - owner: ai-copilot
-- summary: 基于 ROADMAP-0001 Phase 3 建议，提升 render/browser 模块测试覆盖率。当前覆盖率：line 65.68%, branch 67.64%, func 71.42%。目标：通过补充关键路径测试（browser.ts 未覆盖行 62-266, 270-275），将行覆盖提升至 85%+，为 SSR hydration 提供更可靠的单元测试基础。输出：更新的测试用例和覆盖率报告。
-- updatedAt: 2026-03-27T22:31:08.847Z
+- summary: 测试覆盖提升：line 68.47%, branch 78.57%, func 71.42%。新增 11 个测试用例覆盖 SVG namespace、分支路径、sibling/child 处理等。getChildDoms/getDebugElementName/onUpdateRequire/scheduleIdleWork setTimeout fallback 仍为 0%——需要真实 Signal 异步更新或 instance 树手动构建，超出当前 jsdom+mock 基础设施能力。85% 目标需 Signal polyfill 支持。
+- updatedAt: 2026-03-27T22:51:20.096Z
 - roadmapRefs: ROADMAP-0001
 - links:
   - (none)
