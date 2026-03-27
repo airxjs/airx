@@ -1,5 +1,9 @@
 # Airx API 与版本兼容矩阵
 
+> ⚠️ **已废弃**: 本文档描述的是 0.3.x 时代的 API，已严重过时。
+> 
+> **请使用 [api-stability-audit.md](./api-stability-audit.md) 获取 0.7.x API 的最新信息**（更新于 2026-03-25）
+
 ## 1. 目标
 
 本文档用于收敛 Airx 作为生态核心运行时的 API 面、版本边界与下游兼容关系，避免主站、router、vite-plugin 在升级时各自做隐式判断。
@@ -7,7 +11,7 @@
 ## 2. 当前包状态
 
 - 包名: `airx`
-- 当前版本: `0.3.1`
+- 当前版本: `0.3.1`（**已废弃，请参考 api-stability-audit.md**）
 - 代码入口: `source/index.ts`
 - 运行时基础: JSX + Signal
 - 构建方式: Vite library build（ESM only）
