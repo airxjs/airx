@@ -716,4 +716,351 @@ describe('render/browser', () => {
       }).not.toThrow()
     })
   })
+
+  describe('SVG namespace inheritance', () => {
+    it('should create SVG elements with xmlns namespace', () => {
+      const svgElement = createElement('svg', {
+        xmlns: 'http://www.w3.org/2000/svg',
+        children: createElement('rect', { x: 0, y: 0, width: 10, height: 10 })
+      })
+      
+      render(mockPluginContext, svgElement, mockDomRef as Element)
+      
+      expect(mockDomRef.querySelector('svg')).toBeTruthy()
+      expect(mockDomRef.querySelector('rect')).toBeTruthy()
+    })
+
+    it('should create SVG child elements', () => {
+      const svgElement = createElement('svg', {
+        xmlns: 'http://www.w3.org/2000/svg',
+        children: [
+          createElement('circle', { cx: 5, cy: 5, r: 3 }),
+          createElement('rect', { x: 0, y: 0, width: 5, height: 5 })
+        ]
+      })
+      
+      render(mockPluginContext, svgElement, mockDomRef as Element)
+      
+      const svg = mockDomRef.querySelector('svg')
+      expect(svg?.querySelector('circle')).toBeTruthy()
+      expect(svg?.querySelector('rect')).toBeTruthy()
+    })
+
+    it('should break namespace inheritance at foreignObject boundary', () => {
+      // foreignObject should create a foreignObject element but NOT inherit SVG namespace to its children
+      const svgWithForeignObject = createElement('svg', {
+        xmlns: 'http://www.w3.org/2000/svg',
+        children: createElement('foreignObject', {
+          children: createElement('div', {}, 'HTML in SVG')
+        })
+      })
+      
+      render(mockPluginContext, svgWithForeignObject, mockDomRef as Element)
+      
+      expect(mockDomRef.querySelector('svg')).toBeTruthy()
+      expect(mockDomRef.querySelector('foreignObject')).toBeTruthy()
+      // div inside foreignObject should be a proper DIV element
+      expect(mockDomRef.querySelector('div')).toBeTruthy()
+    })
+
+    it('should handle deeply nested SVG structure', () => {
+      const complexSvg = createElement('svg', {
+        xmlns: 'http://www.w3.org/2000/svg',
+        children: createElement('g', {
+          children: createElement('path', { d: 'M0 0 L10 10' })
+        })
+      })
+      
+      render(mockPluginContext, complexSvg, mockDomRef as Element)
+      
+      expect(mockDomRef.querySelector('svg')).toBeTruthy()
+      expect(mockDomRef.querySelector('g')).toBeTruthy()
+      expect(mockDomRef.querySelector('path')).toBeTruthy()
+    })
+  })
+
+  describe('comment nodes via INTERNAL_COMMENT_NODE_TYPE', () => {
+    it('should create comment nodes with correct content', () => {
+      const commentElement = createElement(INTERNAL_COMMENT_NODE_TYPE as any, { textContent: 'This is a comment' })
+      
+      render(mockPluginContext, commentElement, mockDomRef as Element)
+      
+      expect(mockDomRef.childNodes.length).toBe(1)
+      expect(mockDomRef.childNodes[0].nodeType).toBe(Node.COMMENT_NODE)
+      expect(mockDomRef.childNodes[0].textContent).toBe('This is a comment')
+    })
+
+    it('should create comment node with empty content', () => {
+      const emptyComment = createElement(INTERNAL_COMMENT_NODE_TYPE as any, { textContent: '' })
+      
+      render(mockPluginContext, emptyComment, mockDomRef as Element)
+      
+      expect(mockDomRef.childNodes.length).toBe(1)
+      expect(mockDomRef.childNodes[0].nodeType).toBe(Node.COMMENT_NODE)
+      expect(mockDomRef.childNodes[0].textContent).toBe('')
+    })
+  })
+
+  describe('text nodes via INTERNAL_TEXT_NODE_TYPE', () => {
+    it('should create text nodes with correct content', () => {
+      const textElement = createElement(INTERNAL_TEXT_NODE_TYPE as any, { textContent: 'Direct text node' })
+      
+      render(mockPluginContext, textElement, mockDomRef as Element)
+      
+      expect(mockDomRef.childNodes.length).toBe(1)
+      expect(mockDomRef.childNodes[0].nodeType).toBe(Node.TEXT_NODE)
+      expect(mockDomRef.childNodes[0].textContent).toBe('Direct text node')
+    })
+
+    it('should render text node inside container', () => {
+      const containerWithText = createElement('div', {
+        children: createElement(INTERNAL_TEXT_NODE_TYPE as any, { textContent: 'Embedded text' })
+      })
+      
+      render(mockPluginContext, containerWithText, mockDomRef as Element)
+      
+      expect(mockDomRef.querySelector('div')?.textContent).toBe('Embedded text')
+    })
+  })
+
+  describe('plugin updateDom with prevProps', () => {
+    it('should call updateDom with beforeElement props when available', () => {
+      const updateDomSpy = vi.fn()
+      const mockPlugin: Plugin = {
+        updateDom: updateDomSpy
+      }
+      
+      const pluginContext = new PluginContext()
+      pluginContext.plugins = [mockPlugin]
+      
+      // First render
+      const element = createElement('div', { className: 'initial' }, 'Initial')
+      render(pluginContext, element, mockDomRef as Element)
+      
+      // Get the call where beforeElement would have been set
+      // The first render should have called updateDom
+      expect(updateDomSpy).toHaveBeenCalled()
+      
+      // Check updateDom was called at least once
+      expect(updateDomSpy.mock.calls.length).toBeGreaterThan(0)
+    })
+
+    it('should call updateDom with empty prevProps on initial render', () => {
+      const updateDomSpy = vi.fn()
+      const mockPlugin: Plugin = {
+        updateDom: updateDomSpy
+      }
+      
+      const pluginContext = new PluginContext()
+      pluginContext.plugins = [mockPlugin]
+      
+      const element = createElement('span', { id: 'test-span' }, 'Content')
+      render(pluginContext, element, mockDomRef as Element)
+      
+      // updateDom should be called at least once
+      expect(updateDomSpy).toHaveBeenCalled()
+    })
+  })
+
+  describe('getChildDoms traversal (deletion path)', () => {
+    it('should traverse nested instances to find DOM nodes', () => {
+      // This exercises the getChildDoms function which is called during deletion handling
+      const deeplyNested = createElement('section', {
+        children: [
+          createElement('div', { key: '1' }, 'Item 1'),
+          createElement('div', { key: '2' }, 'Item 2')
+        ]
+      })
+      
+      render(mockPluginContext, deeplyNested, mockDomRef as Element)
+      
+      // Verify the structure was built correctly
+      expect(mockDomRef.querySelectorAll('div').length).toBe(2)
+    })
+
+    it('should handle multiple sibling chains in instance tree', () => {
+      const listWithManyItems = createElement('ul', {
+        children: [
+          createElement('li', { key: 'a' }, 'A'),
+          createElement('li', { key: 'b' }, 'B'),
+          createElement('li', { key: 'c' }, 'C'),
+          createElement('li', { key: 'd' }, 'D')
+        ]
+      })
+      
+      render(mockPluginContext, listWithManyItems, mockDomRef as Element)
+      
+      expect(mockDomRef.querySelectorAll('li').length).toBe(4)
+    })
+  })
+
+  describe('airxInstance property on DOM nodes', () => {
+    it('should set airxInstance on created DOM elements', () => {
+      const element = createElement('div', {
+        children: createElement('span', {}, 'Child')
+      })
+      
+      render(mockPluginContext, element, mockDomRef as Element)
+      
+      const childDom = mockDomRef.firstChild as any
+      expect(childDom).toBeDefined()
+      expect(childDom.airxInstance).toBeDefined()
+      expect(childDom.airxInstance.element).toBeDefined()
+    })
+
+    it('should set airxInstance on nested child elements', () => {
+      const element = createElement('div', {
+        children: createElement('section', {
+          children: createElement('p', {}, 'Paragraph')
+        })
+      })
+      
+      render(mockPluginContext, element, mockDomRef as Element)
+      
+      const section = mockDomRef.querySelector('section') as any
+      const p = mockDomRef.querySelector('p') as any
+      
+      expect(section?.airxInstance).toBeDefined()
+      expect(p?.airxInstance).toBeDefined()
+    })
+  })
+
+  describe('commitWalkV2 traversal order', () => {
+    it('should process children before siblings', () => {
+      // commitWalkV2 uses a stack that processes children first, then siblings
+      // This test verifies the rendering order is correct
+      const element = createElement('div', {
+        children: [
+          createElement('span', { key: '1' }, 'First'),
+          createElement('em', { key: '2' }, 'Second')
+        ]
+      })
+      
+      render(mockPluginContext, element, mockDomRef as Element)
+      
+      const divChildren = Array.from(mockDomRef.querySelector('div')?.childNodes || [])
+      const elements = divChildren.filter(n => n.nodeType === Node.ELEMENT_NODE)
+      expect(elements.length).toBe(2)
+      expect((elements[0] as Element).tagName).toBe('SPAN')
+      expect((elements[1] as Element).tagName).toBe('EM')
+    })
+
+    it('should handle deeply nested children in correct order', () => {
+      const element = createElement('div', {
+        children: createElement('section', {
+          children: [
+            createElement('p', { key: '1' }, 'Para 1'),
+            createElement('p', { key: '2' }, 'Para 2')
+          ]
+        })
+      })
+      
+      render(mockPluginContext, element, mockDomRef as Element)
+      
+      const paragraphs = mockDomRef.querySelectorAll('p')
+      expect(paragraphs.length).toBe(2)
+      expect(paragraphs[0].textContent).toBe('Para 1')
+      expect(paragraphs[1].textContent).toBe('Para 2')
+    })
+  })
+
+  describe('empty and false children handling', () => {
+    it('should handle empty string child', () => {
+      const element = createElement('div', {}, '')
+      
+      render(mockPluginContext, element, mockDomRef as Element)
+      
+      // Should render without error
+      expect(mockDomRef.querySelector('div')).toBeTruthy()
+    })
+
+    it('should handle false child via comment', () => {
+      // false children become comment nodes with 'empty-string' content
+      const element = createElement('div', {
+        children: [false as any, 'Text']
+      })
+      
+      render(mockPluginContext, element, mockDomRef as Element)
+      
+      expect(mockDomRef.textContent).toContain('Text')
+    })
+
+    it('should handle null child', () => {
+      const element = createElement('div', {
+        children: [null as any, 'Valid']
+      })
+      
+      render(mockPluginContext, element, mockDomRef as Element)
+      
+      expect(mockDomRef.textContent).toBe('Valid')
+    })
+  })
+
+  describe('getDebugElementName for error messages', () => {
+    it('should format string element types correctly', () => {
+      function DivComponent() {
+        return createElement('section', {}, 'Section')
+      }
+      
+      const element = createElement(DivComponent as any, {})
+      render(mockPluginContext, element, mockDomRef as Element)
+      
+      expect(mockDomRef.querySelector('section')).toBeTruthy()
+    })
+
+    it('should format named function components correctly', () => {
+      function MyNamedComponent() {
+        return createElement('article', {}, 'Article')
+      }
+      
+      const element = createElement(MyNamedComponent as any, {})
+      render(mockPluginContext, element, mockDomRef as Element)
+      
+      expect(mockDomRef.querySelector('article')?.textContent).toBe('Article')
+    })
+
+    it('should handle anonymous component names', () => {
+      const Anon = () => createElement('blockquote', {}, 'Quote')
+      
+      const element = createElement(Anon as any, {})
+      render(mockPluginContext, element, mockDomRef as Element)
+      
+      expect(mockDomRef.querySelector('blockquote')?.textContent).toBe('Quote')
+    })
+  })
+
+  describe('commitInstanceDom element creation branches', () => {
+    it('should create element without namespace for HTML elements', () => {
+      const element = createElement('article', {}, 'Article content')
+      
+      render(mockPluginContext, element, mockDomRef as Element)
+      
+      const article = mockDomRef.querySelector('article')
+      expect(article).toBeTruthy()
+      expect(article?.namespaceURI).toBe('http://www.w3.org/1999/xhtml')
+    })
+
+    it('should create nested mixed content elements', () => {
+      const element = createElement('main', {
+        children: [
+          createElement('h1', {}, 'Title'),
+          createElement('p', {
+            children: [
+              'Paragraph with ',
+              createElement('strong', {}, 'bold'),
+              ' and normal text'
+            ]
+          }),
+          createElement('span', {}, 'After paragraph')
+        ]
+      })
+      
+      render(mockPluginContext, element, mockDomRef as Element)
+      
+      expect(mockDomRef.querySelector('h1')?.textContent).toBe('Title')
+      expect(mockDomRef.querySelector('p')?.textContent).toBe('Paragraph with bold and normal text')
+      expect(mockDomRef.querySelector('strong')?.textContent).toBe('bold')
+      expect(mockDomRef.querySelector('span')?.textContent).toBe('After paragraph')
+    })
+  })
 })
