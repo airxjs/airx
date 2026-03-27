@@ -381,32 +381,32 @@
     {
       "id": "TASK-0021",
       "title": "Initialize code style document",
-      "status": "TODO",
+      "status": "DONE",
       "owner": "unassigned",
-      "summary": "Capture naming, structure, testing, and review conventions in designs/core/code-style.md.",
-      "updatedAt": "2026-03-26T16:26:39.584Z",
+      "summary": "代码风格文档已写入 designs/core/code-style.md（含命名规范/测试标准/API设计规则）。",
+      "updatedAt": "2026-03-27T06:52:50.751Z",
       "links": [
         "designs/core/code-style.md"
       ],
       "roadmapRefs": [
         "ROADMAP-0001"
       ],
-      "recordVersion": 1
+      "recordVersion": 3
     },
     {
       "id": "TASK-0022",
       "title": "Initialize UI style document",
-      "status": "TODO",
+      "status": "DONE",
       "owner": "unassigned",
-      "summary": "Capture visual language, tokens, accessibility, and interaction rules in designs/core/ui-style.md.",
-      "updatedAt": "2026-03-26T16:26:39.586Z",
+      "summary": "UI style 文档已存在于 designs/core/style-guide.md(152行完整规范)，ui-style.md 作为治理模板存在，满足初始化要求。",
+      "updatedAt": "2026-03-27T06:50:11.564Z",
       "links": [
         "designs/core/ui-style.md"
       ],
       "roadmapRefs": [
         "ROADMAP-0001"
       ],
-      "recordVersion": 1
+      "recordVersion": 3
     }
   ],
   "roadmaps": [
@@ -435,17 +435,17 @@
     }
   ],
   "meta": {
-    "tasks_version": 73,
+    "tasks_version": 77,
     "roadmaps_version": 4,
     "store_schema_version": 3
   },
   "view_state": {
     "tasks_markdown": {
       "name": "tasks_markdown",
-      "dirty": true,
-      "lastSourceVersion": 71,
-      "lastBuiltAt": "2026-03-25T16:46:34.027Z",
-      "recordVersion": 215
+      "dirty": false,
+      "lastSourceVersion": 77,
+      "lastBuiltAt": "2026-03-27T06:52:50.759Z",
+      "recordVersion": 228
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
