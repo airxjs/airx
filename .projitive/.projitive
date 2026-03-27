@@ -474,13 +474,13 @@
     {
       "id": "TASK-0028",
       "title": "同步 architecture.md 至 0.7.2 版本基线",
-      "status": "TODO",
+      "status": "DONE",
       "owner": "ai-copilot",
-      "summary": "",
-      "updatedAt": "2026-03-27T20:44:13.731Z",
+      "summary": "在 architecture.md 标题后添加版本基线声明（0.7.2），便于贡献者快速了解项目当前版本。",
+      "updatedAt": "2026-03-27T20:46:49.882Z",
       "links": [],
       "roadmapRefs": [],
-      "recordVersion": 1
+      "recordVersion": 3
     },
     {
       "id": "TASK-0029",
@@ -520,7 +520,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 94,
+    "tasks_version": 96,
     "roadmaps_version": 4,
     "store_schema_version": 3
   },
@@ -528,9 +528,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 94,
-      "lastBuiltAt": "2026-03-27T20:45:45.095Z",
-      "recordVersion": 278
+      "lastSourceVersion": 96,
+      "lastBuiltAt": "2026-03-27T20:46:49.888Z",
+      "recordVersion": 284
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
