@@ -463,13 +463,13 @@
     {
       "id": "TASK-0027",
       "title": "为 package.json 添加 typecheck script",
-      "status": "TODO",
+      "status": "DONE",
       "owner": "ai-copilot",
-      "summary": "",
-      "updatedAt": "2026-03-27T20:44:02.699Z",
+      "summary": "package.json 已包含 typecheck script（tsc --noEmit），任务已提前完成，无需额外操作。",
+      "updatedAt": "2026-03-27T20:48:01.989Z",
       "links": [],
       "roadmapRefs": [],
-      "recordVersion": 1
+      "recordVersion": 3
     },
     {
       "id": "TASK-0028",
@@ -520,7 +520,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 96,
+    "tasks_version": 98,
     "roadmaps_version": 4,
     "store_schema_version": 3
   },
@@ -528,9 +528,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 96,
-      "lastBuiltAt": "2026-03-27T20:46:49.888Z",
-      "recordVersion": 284
+      "lastSourceVersion": 98,
+      "lastBuiltAt": "2026-03-27T20:48:01.999Z",
+      "recordVersion": 290
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
