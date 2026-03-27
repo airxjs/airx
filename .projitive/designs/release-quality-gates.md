@@ -7,9 +7,9 @@
 ## 2. 当前包状态
 
 - 包名: `airx`
-- 当前版本: `0.4.0`
+- 当前版本: `0.7.2`（2026-03-24）
 - 构建方式: Vite library build（ESM only）
-- 质量门禁状态: 建设中
+- 质量门禁状态: 基本完善（见下方清单）
 - 开发分支: `dev`
 - 发布基线分支: `main`
 
@@ -56,7 +56,7 @@
 | Signal 语义验证 | `npm run test:signal` | MVP 用例全部通过 |
 | 渲染行为验证 | 手动或示例应用 | 基础 JSX 渲染、provide/inject 正常工作 |
 
-**注意**: 当前 `airx` 包**没有测试套件**，这是质量风险点。后续测试应以 `functional-correctness-matrix.md` 和 `signals-alignment-test-plan.md` 为准。
+**注意**: `airx` 包已有测试套件（Vitest + jsdom）。覆盖率整体约 77%，部分模块（如 `render/browser`）覆盖率约 65% 需持续提升。
 
 ### 3.5 下游兼容门禁 (Downstream Compatibility Gate)
 
@@ -187,16 +187,16 @@ jobs:
 2. **版本更新**
    ```bash
    # 遵循 semver
-  npm version patch  # 0.4.0 -> 0.4.1
-  npm version minor  # 0.4.0 -> 0.5.0
-  npm version major  # 0.4.0 -> 1.0.0
+  npm version patch  # 0.7.2 -> 0.7.3
+  npm version minor  # 0.7.2 -> 0.8.0
+  npm version major  # 0.7.2 -> 1.0.0
    ```
 
 3. **Git 提交**
    ```bash
    git add .
-  git commit -m "chore: release v0.4.1"
-  git tag v0.4.1
+  git commit -m "chore: release v0.7.3"
+  git tag v0.7.3
    git push && git push --tags
    ```
 
@@ -233,11 +233,11 @@ jobs:
 
 ## 7. 当前待办
 
-- [ ] 在 `package.json` 中补充 `typecheck` 脚本
-- [ ] 在 `package.json` 中补充 `test` 与 `test:core` 脚本
-- [ ] 建立基础测试套件
-- [ ] 增强 `check.yml` 工作流
-- [ ] 补充 downstream-check job
+- [x] 在 `package.json` 中补充 `typecheck` 脚本 ✅
+- [x] 在 `package.json` 中补充 `test` 与 `test:coverage` 脚本 ✅
+- [x] 建立基础测试套件（Vitest + jsdom） ✅
+- [ ] 增强 `check.yml` 工作流（补充 typecheck 步骤）
+- [ ] 下游包（airx-router, vite-plugin）升级至 0.7.x 并验证兼容性
 
 ## 8. 相关文档
 
