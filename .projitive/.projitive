@@ -437,15 +437,15 @@
     {
       "id": "TASK-0025",
       "title": "airx WIP API (plugin/renderToHTML) 决策与代码清理",
-      "status": "TODO",
+      "status": "DONE",
       "owner": "ai-copilot",
       "summary": "基于 TASK-0023 健康检查发现，AirxApp.plugin() 和 AirxApp.renderToHTML() JSDoc 标记 @deprecated WIP，状态不明确。本次任务：分析这两个 API 的实际使用情况和价值，决定处置方案（完成实现解除 WIP / 从公开 API 中移除），并执行相应代码变更。",
-      "updatedAt": "2026-03-27T18:29:46.839Z",
+      "updatedAt": "2026-03-27T18:38:54.686Z",
       "links": [],
       "roadmapRefs": [
         "ROADMAP-0001"
       ],
-      "recordVersion": 1
+      "recordVersion": 3
     },
     {
       "id": "TASK-0026",
@@ -487,7 +487,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 85,
+    "tasks_version": 87,
     "roadmaps_version": 4,
     "store_schema_version": 3
   },
@@ -495,9 +495,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 85,
-      "lastBuiltAt": "2026-03-27T18:36:54.180Z",
-      "recordVersion": 251
+      "lastSourceVersion": 87,
+      "lastBuiltAt": "2026-03-27T18:38:54.694Z",
+      "recordVersion": 257
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
