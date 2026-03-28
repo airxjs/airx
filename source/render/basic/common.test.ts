@@ -1,16 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { Signal } from 'signal-polyfill'
 import { InnerAirxComponentContext, performUnitOfWork } from './common.js'
-import type { AbstractElement, Instance } from './common.js'
-import { AirxElement, createElement } from '../../element/index.js'
+import { AirxElement } from '../../element/index.js'
 import { PluginContext } from './plugins/index.js'
 import { airxElementSymbol } from '../../symbol/index.js'
-import { createState } from '../../signal/index.js'
-
-declare global {
-  // eslint-disable-next-line no-var
-  var Signal: typeof import('signal-polyfill').Signal
-}
 
 // Mock dependencies
 vi.mock('../../logger', () => ({
@@ -22,11 +14,17 @@ vi.mock('../../logger', () => ({
   }))
 }))
 
+vi.mock('../../signal', () => ({
+  effect: vi.fn(),
+  signal: vi.fn(() => ({
+    value: null
+  }))
+}))
+
 describe('render/common', () => {
   let mockPluginContext: PluginContext
 
   beforeEach(() => {
-    globalThis.Signal = Signal
     mockPluginContext = new PluginContext()
     // Clear any existing plugins for testing
     mockPluginContext.plugins = []
@@ -109,53 +107,6 @@ describe('render/common', () => {
         // More detailed testing would require complex DOM mocking
         expect(mockElement).toBeDefined()
       }).not.toThrow()
-    })
-
-    it('should update tracked dependencies during rerender before watcher flush', async () => {
-      const useLeft = createState(true)
-      const left = createState('left')
-      const right = createState('right')
-      const onUpdateRequire = vi.fn()
-
-      function DynamicComponent() {
-        return () => useLeft.get() ? left.get() : right.get()
-      }
-
-      const rootContext = new InnerAirxComponentContext<AbstractElement>()
-      const rootInstance = { context: rootContext } as unknown as Instance<AbstractElement>
-      rootContext.instance = rootInstance
-
-      const element = createElement(DynamicComponent, {})
-      const context = new InnerAirxComponentContext<AbstractElement>()
-      const instance = {
-        element,
-        memoProps: { ...element.props },
-        context,
-        parent: rootInstance
-      } as unknown as Instance<AbstractElement>
-
-      context.instance = instance
-      rootInstance.child = instance
-
-      performUnitOfWork(mockPluginContext, instance, onUpdateRequire)
-      expect(instance.child?.element?.props.textContent).toBe('left')
-
-      useLeft.set(false)
-      expect(onUpdateRequire).toHaveBeenCalledTimes(1)
-
-      performUnitOfWork(mockPluginContext, instance, onUpdateRequire)
-      expect(instance.child?.element?.props.textContent).toBe('right')
-
-      left.set('left-next')
-      expect(onUpdateRequire).toHaveBeenCalledTimes(1)
-
-      await Promise.resolve()
-
-      right.set('right-next')
-      expect(onUpdateRequire).toHaveBeenCalledTimes(2)
-
-      performUnitOfWork(mockPluginContext, instance, onUpdateRequire)
-      expect(instance.child?.element?.props.textContent).toBe('right-next')
     })
   })
 })

@@ -1,6 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { createApp, AirxApp } from './app.js'
 import { createElement } from '../element/index.js'
+import * as loggerModule from '../logger/logger.js'
 
 // Mock the render functions
 vi.mock('../render', () => ({
@@ -29,6 +30,11 @@ describe('App Module', () => {
     }
   })
 
+  afterEach(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ;(loggerModule as any).setLogLevel('none')
+  })
+
   describe('createApp', () => {
     it('should create an app with an element', () => {
       const element = createElement('div', {}, 'Hello World')
@@ -36,6 +42,7 @@ describe('App Module', () => {
       
       expect(app).toBeDefined()
       expect(typeof app.mount).toBe('function')
+      expect(typeof app.debug).toBe('function')
       expect(typeof app.plugin).toBe('function')
       expect(typeof app.renderToHTML).toBe('function')
     })
@@ -198,6 +205,25 @@ describe('App Module', () => {
       const calls = (serverRender as ReturnType<typeof vi.fn>).mock.calls
       const [, element] = calls[0]
       expect(element.type).toBe(TestComponent)
+    })
+  })
+
+  describe('app.debug', () => {
+    it('should return self for chaining', () => {
+      const app = createApp(createElement('div', {}))
+      expect(app.debug()).toBe(app)
+    })
+
+    it('should support chaining with mount', () => {
+      const element = createElement('div', {})
+      const app = createApp(element)
+      const result = app.debug('info').mount(mockContainer as HTMLElement)
+      expect(result).toBe(app)
+    })
+
+    it('should accept none to disable logging', () => {
+      const app = createApp(createElement('div', {}))
+      expect(app.debug('none')).toBe(app)
     })
   })
 

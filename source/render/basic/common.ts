@@ -1,5 +1,4 @@
 import * as signal from '../../signal/index.js'
-import type { Signal as Polyfill } from 'signal-polyfill'
 
 import { createLogger } from '../../logger/index.js'
 import {
@@ -21,8 +20,16 @@ import {
 import { PluginContext } from './plugins/index.js'
 import { globalContext } from './hooks/hooks.js'
 
-export const INTERNAL_TEXT_NODE_TYPE = '__airx_text__'
-export const INTERNAL_COMMENT_NODE_TYPE = '__airx_comment__'
+export function getInstanceLabel<E extends AbstractElement>(instance: Instance<E>): string {
+  const type = instance.element?.type
+  if (typeof type === 'function') {
+    return type.name || 'Anonymous'
+  }
+  if (typeof type === 'string') {
+    return `<${type}>`
+  }
+  return '<root>'
+}
 
 export type Disposer = () => void
 
@@ -181,8 +188,6 @@ export interface Instance<E extends AbstractElement = AbstractElement> {
   element?: AirxElement
   beforeElement?: AirxElement
   signalWatcher?: signal.Watcher
-  childrenComputed?: Polyfill.Computed<AirxChildren | undefined>
-  watcherFlushQueued?: boolean
   componentReturnValue?: AirxComponentRender | AirxElement
 
   needReRender?: boolean
@@ -200,8 +205,6 @@ export interface Instance<E extends AbstractElement = AbstractElement> {
    * @param children  当前组件的子节点
    */
 export function reconcileChildren<E extends AbstractElement>(appContext: PluginContext, parentInstance: Instance<E>, childrenElementArray: AirxElement[]) {
-  const logger = createLogger('reconcileChildren')
-  logger.debug('reconcileChildren', parentInstance, childrenElementArray)
   // parentInstance ←-------- 
   //   |    ↑                ↑
   // child parent          parent
@@ -399,8 +402,6 @@ export function reconcileChildren<E extends AbstractElement>(appContext: PluginC
       parentInstance.deletions?.add(instance)
     })
   }
-
-  logger.debug('parentInstance', parentInstance)
 }
 
 type OnUpdateRequire<E extends AbstractElement> = (instance: Instance<E>) => void
@@ -449,9 +450,7 @@ export function performUnitOfWork<E extends AbstractElement>(pluginContext: Plug
       }
 
       if (isValidElement(element)) return element
-      const elementType = isComment(element)
-        ? INTERNAL_COMMENT_NODE_TYPE
-        : INTERNAL_TEXT_NODE_TYPE
+      const elementType = isComment(element) ? 'comment' : 'text'
       const textContent = element === '' ? 'empty-string' : String(element)
       return createElement(elementType, { textContent })
     })
@@ -485,48 +484,35 @@ export function performUnitOfWork<E extends AbstractElement>(pluginContext: Plug
       // reaction function component
       if (typeof componentReturnValue === 'function') {
         if (instance.signalWatcher == null) {
-          // Watch 是惰性的，只有当 Signal 被读取时才会触发。
-          // 注意：notify 回调内不能同步读取 pending computed，需等当前通知阶段结束。
-          const signalWatcher = signal.createWatch(() => {
+          const componentLogger = createLogger('signal')
+          // Watch 是惰性的，只有当 Signal 被读取时才会触发 --！
+          const signalWatcher = signal.createWatch(async () => {
             instance.needReRender = true
-            onUpdateRequire?.(instance)
-
-            if (instance.watcherFlushQueued === true) return
-            instance.watcherFlushQueued = true
+            componentLogger.info('notify:', getInstanceLabel(instance))
 
             queueMicrotask(() => {
-              instance.watcherFlushQueued = false
-              if (instance.signalWatcher !== signalWatcher) return
-
               signalWatcher.watch()
-              const pendings = signalWatcher.getPending()
-              for (const pending of pendings) pending.get()
+              const paddings = signalWatcher.getPending()
+              for (const padding of paddings) padding.get()
+              onUpdateRequire?.(instance)
             })
           })
 
           instance.signalWatcher = signalWatcher
-          instance.context.addDisposer(() => {
-            delete instance.watcherFlushQueued
-            delete instance.childrenComputed
-            delete instance.signalWatcher
-            signalWatcher.unwatch()
-          })
+          instance.context.addDisposer(() => signalWatcher.unwatch())
         }
 
-        if (instance.childrenComputed == null) {
-          instance.childrenComputed = signal.createComputed(() => {
-            try {
-              if (typeof instance.componentReturnValue === 'function') {
-                return instance.componentReturnValue()
-              }
-            } catch (error) {
-              return createErrorRender(error)()
+        const childrenComputed = signal.createComputed(() => {
+          try {
+            if (typeof componentReturnValue === 'function') {
+              return componentReturnValue()
             }
-          })
-        }
-
-        instance.signalWatcher.watch(instance.childrenComputed)
-        const children = instance.childrenComputed.get()
+          } catch (error) {
+            return createErrorRender(error)()
+          }
+        })
+        instance.signalWatcher.watch(childrenComputed)
+        const children = childrenComputed.get()
 
         reconcileChildren(pluginContext, instance, childrenAsElements(children))
       }
@@ -539,11 +525,10 @@ export function performUnitOfWork<E extends AbstractElement>(pluginContext: Plug
         if (isValidElement(instance.componentReturnValue)) {
           children = instance.componentReturnValue
         } else if (typeof instance.componentReturnValue === 'function') {
-          if (instance.childrenComputed != null) {
-            children = instance.childrenComputed.get()
-          } else {
-            children = instance.componentReturnValue()
-          }
+          // 如果是由于父组件导致的子组件渲染
+          // 直接使用 childrenComputed.get() 将读取到缓存值
+          // 因此这里使用 childrenRender 来更新 children 的值
+          children = instance.componentReturnValue!()
         } else {
           throw createInvalidComponentReturnError(getComponentName(), instance.componentReturnValue)
         }
