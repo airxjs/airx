@@ -1,6 +1,6 @@
 {
   "name": "airx",
-  "version": "0.7.4",
+  "version": "0.7.7",
   "description": "a front framework with jsx",
   "type": "module",
   "types": "./output/index.d.ts",
@@ -52,7 +52,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/airxjs/airx.git"
+    "url": "https://github.com/airxjs/airx"
   },
   "author": "yinxulai",
   "license": "MIT"

@@ -1,14 +1,7 @@
 import { AirxElement } from '../../element/index.js'
 import { createLogger } from '../../logger/index.js'
 import { PluginContext } from '../basic/plugins/index.js'
-import {
-  AbstractElement,
-  InnerAirxComponentContext,
-  INTERNAL_COMMENT_NODE_TYPE,
-  INTERNAL_TEXT_NODE_TYPE,
-  Instance,
-  performUnitOfWork
-} from '../basic/common.js'
+import { AbstractElement, InnerAirxComponentContext, Instance, getInstanceLabel, performUnitOfWork } from '../basic/common.js'
 
 class BrowserElement extends Element implements AbstractElement {}
 
@@ -17,6 +10,7 @@ interface RenderContext {
   needCommitDom: boolean
   nextUnitOfWork: Instance<BrowserElement> | null
   isWorkLoopScheduled: boolean
+  needRestartFromRoot: boolean
 }
 
 function createIdleDeadline(): IdleDeadline {
@@ -46,7 +40,8 @@ export function render(pluginContext: PluginContext, element: AirxElement, domRe
     rootInstance,
     nextUnitOfWork: null,
     needCommitDom: false,
-    isWorkLoopScheduled: false
+    isWorkLoopScheduled: false,
+    needRestartFromRoot: false
   }
 
   const appInstance: Instance<BrowserElement> = {
@@ -61,12 +56,12 @@ export function render(pluginContext: PluginContext, element: AirxElement, domRe
   context.rootInstance.child = appInstance
   context.nextUnitOfWork = appInstance
 
+  const logger = createLogger('renderer')
+
   /**
    * 提交 Dom 变化
    */
   function commitDom(rootInstance: Instance<BrowserElement>, rootNode?: ChildNode) {
-    const logger = createLogger('commitDom')
-    logger.debug('commitDom', rootInstance)
 
     type PropsType = Record<string, unknown>
 
@@ -121,19 +116,6 @@ export function render(pluginContext: PluginContext, element: AirxElement, domRe
     }
 
     function commitInstanceDom(nextInstance: Instance<BrowserElement>, oldNode?: ChildNode) {
-      const getDebugElementName = (instance?: Instance<BrowserElement>): string => {
-        if (typeof instance?.element?.type === 'string') {
-          return `<${instance.element.type}>`
-        }
-
-        if (typeof instance?.element?.type === 'function') {
-          const componentName = instance.element.type.name || 'AnonymousComponent'
-          return `Component(${componentName})`
-        }
-
-        return '<unknown>'
-      }
-
       // 移除标删元素
       if (nextInstance.deletions) {
         for (const deletion of nextInstance.deletions) {
@@ -152,11 +134,11 @@ export function render(pluginContext: PluginContext, element: AirxElement, domRe
       if (nextInstance.domRef == null) {
         if (nextInstance.element == null) throw new Error('???')
         if (typeof nextInstance.element.type === 'string') {
-          if (nextInstance.element.type === INTERNAL_TEXT_NODE_TYPE) {
+          if (nextInstance.element.type === 'text') {
             const textContent = nextInstance.element.props.textContent
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             nextInstance.domRef = document.createTextNode(textContent as string) as any
-          } else if (nextInstance.element.type === INTERNAL_COMMENT_NODE_TYPE) {
+          } else if (nextInstance.element.type === 'comment') {
             const textContent = nextInstance.element.props.textContent
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             nextInstance.domRef = document.createComment(textContent as string) as any
@@ -191,17 +173,6 @@ export function render(pluginContext: PluginContext, element: AirxElement, domRe
           }
 
           const parentDom = getParentDom(nextInstance)
-          if (
-            parentDom.nodeType === Node.TEXT_NODE
-            || parentDom.nodeType === Node.COMMENT_NODE
-          ) {
-            const parentInstance = (parentDom as { airxInstance?: Instance<BrowserElement> }).airxInstance
-            throw new Error(
-              `[airx] Invalid DOM hierarchy: cannot append ${getDebugElementName(nextInstance)} to ${getDebugElementName(parentInstance)}. `
-              + 'A text/comment node cannot contain child nodes.'
-            )
-          }
-
           parentDom.appendChild(nextInstance.domRef)
         }
       }
@@ -266,9 +237,15 @@ export function render(pluginContext: PluginContext, element: AirxElement, domRe
     })
   }
 
-  function onUpdateRequire() {
+  function onUpdateRequire(instance: Instance<BrowserElement>) {
     if (context.nextUnitOfWork == null && context.rootInstance.child) {
       context.nextUnitOfWork = context.rootInstance.child
+      logger.info('onUpdateRequire: schedule from root', getInstanceLabel(instance))
+    } else {
+      // workLoop 正在进行中（yield 状态），标记需要重新从 root 开始
+      // 以确保 yield 点之前被标记 needReRender 的实例不会被遗漏
+      context.needRestartFromRoot = true
+      logger.info('onUpdateRequire: mark restart (workLoop in progress)', getInstanceLabel(instance))
     }
 
     scheduleWorkLoop()
@@ -279,19 +256,33 @@ export function render(pluginContext: PluginContext, element: AirxElement, domRe
    */
   function workLoop(deadline: IdleDeadline = createIdleDeadline()) {
     let shouldYield = false
-    const logger = createLogger('workLoop')
+    let processedCount = 0
     while (context.nextUnitOfWork && !shouldYield) {
-      logger.debug('nextUnitOfWork', context.nextUnitOfWork)
       context.nextUnitOfWork = performUnitOfWork(pluginContext, context.nextUnitOfWork, onUpdateRequire) as Instance<BrowserElement>
+      processedCount++
       if (context.nextUnitOfWork == null) context.needCommitDom = true
       if (deadline) shouldYield = deadline.timeRemaining() < 1
     }
 
+    if (shouldYield && context.nextUnitOfWork) {
+      logger.info('workLoop: yield after', processedCount, 'units, paused at', getInstanceLabel(context.nextUnitOfWork))
+    }
+
     if (context.needCommitDom && context.rootInstance.child) {
+      logger.info('workLoop: commit DOM after', processedCount, 'units')
       commitDom(context.rootInstance.child,
         context.rootInstance.domRef?.firstChild || undefined
       )
       context.needCommitDom = false
+    }
+
+    // yield 期间有信号变更命中了已处理的实例，需要从 root 重新遍历
+    if (context.needRestartFromRoot) {
+      context.needRestartFromRoot = false
+      if (context.nextUnitOfWork == null && context.rootInstance.child) {
+        context.nextUnitOfWork = context.rootInstance.child
+        logger.info('workLoop: restart from root due to signal change during yield')
+      }
     }
 
     scheduleWorkLoop()

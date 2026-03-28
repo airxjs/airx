@@ -1,5 +1,6 @@
 import { browserRender, serverRender, Plugin, PluginContext } from '../render/index.js'
 import { AirxComponent, AirxElement, createElement } from '../element/index.js'
+import { setLogLevel, LogLevel } from '../logger/logger.js'
 
 /**
  * Airx 应用实例。
@@ -12,24 +13,11 @@ import { AirxComponent, AirxElement, createElement } from '../element/index.js'
  */
 export interface AirxApp {
   mount: (container: HTMLElement) => AirxApp
+  debug: (level?: LogLevel) => AirxApp
 
-  /**
-   * 注册插件，返回 app 实例以支持链式调用。
-   *
-   * @example
-   * import { createApp } from 'airx'
-   * import { customPlugin } from './plugins'
-   *
-   * createApp(App).plugin(customPlugin).mount(...)
-   */
+  /** @deprecated WIP */
   plugin: (...plugins: Plugin[]) => AirxApp
-
-  /**
-   * 将应用渲染为 HTML 字符串（SSR）。
-   *
-   * @example
-   * const html = await createApp(App).renderToHTML()
-   */
+  /** @deprecated WIP */
   renderToHTML: () => Promise<string>
 }
 
@@ -67,6 +55,11 @@ export function createApp(element: AirxElement<any> | AirxComponent): AirxApp {
   }
 
   const app: AirxApp = {
+    debug: (level: LogLevel = 'debug') => {
+      setLogLevel(level)
+      return app
+    },
+
     plugin: (...plugins: Plugin[]) => {
       appContext.registerPlugin(...plugins)
       return app

@@ -1,9 +1,27 @@
 declare const process: { env?: { NODE_ENV?: string, AIRX_DEBUG?: string } } | undefined
 
-function shouldPrintLogs() {
-  return typeof process != 'undefined'
+export type LogLevel = 'none' | 'warn' | 'info' | 'debug'
+
+const levelOrder: Record<LogLevel, number> = { none: 0, warn: 1, info: 2, debug: 3 }
+
+let runtimeLevel: LogLevel = 'none'
+
+export function setLogLevel(level: LogLevel): void {
+  runtimeLevel = level
+}
+
+function getEffectiveLevel(): LogLevel {
+  if (runtimeLevel !== 'none') return runtimeLevel
+  if (typeof process != 'undefined'
     && process?.env?.NODE_ENV === 'development'
-    && process?.env?.AIRX_DEBUG === 'true'
+    && process?.env?.AIRX_DEBUG === 'true') {
+    return 'debug'
+  }
+  return 'none'
+}
+
+function shouldPrint(level: LogLevel) {
+  return levelOrder[getEffectiveLevel()] >= levelOrder[level]
 }
 
 export function createLogger(name: string) {
@@ -13,8 +31,16 @@ export function createLogger(name: string) {
   }
 
   function debug(...args: unknown[]) {
-    if (shouldPrintLogs()) console.log(getPrintPrefix(), ...args)
+    if (shouldPrint('debug')) console.log(getPrintPrefix(), ...args)
   }
 
-  return { debug }
+  function info(...args: unknown[]) {
+    if (shouldPrint('info')) console.info(getPrintPrefix(), ...args)
+  }
+
+  function warn(...args: unknown[]) {
+    if (shouldPrint('warn')) console.warn(getPrintPrefix(), ...args)
+  }
+
+  return { debug, info, warn }
 }

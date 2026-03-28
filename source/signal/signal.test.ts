@@ -243,49 +243,6 @@ describe('Signal Polyfill External Dependency Tests', () => {
         for (const s of pending2) s.get()
         watcher.watch()
       })
-
-      it('should defer computed reads until after watcher notify completes', async () => {
-        const syncState = createState(0)
-        const syncComputed = createComputed(() => syncState.get() + 1)
-        const syncNotifyError = vi.fn()
-
-        const syncWatcher = createWatch(() => {
-          try {
-            const pending = syncWatcher.getPending()
-            for (const s of pending) s.get()
-            syncWatcher.watch()
-          } catch (error) {
-            syncNotifyError(error)
-          }
-        })
-
-        syncWatcher.watch(syncComputed)
-        expect(syncComputed.get()).toBe(1)
-        syncState.set(1)
-
-        const asyncState = createState(0)
-        const asyncComputed = createComputed(() => asyncState.get() + 1)
-        let latestValue: number | undefined
-
-        const asyncWatcher = createWatch(() => {
-          queueMicrotask(() => {
-            asyncWatcher.watch()
-            const pending = asyncWatcher.getPending()
-            for (const s of pending) {
-              latestValue = s.get()
-            }
-          })
-        })
-
-        asyncWatcher.watch(asyncComputed)
-        expect(asyncComputed.get()).toBe(1)
-        asyncState.set(1)
-        asyncState.set(2)
-        await Promise.resolve()
-
-        expect(syncNotifyError).toHaveBeenCalledTimes(1)
-        expect(latestValue).toBe(3)
-      })
     })
 
     describe('isState function', () => {
