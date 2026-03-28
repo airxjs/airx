@@ -518,6 +518,20 @@
         "ROADMAP-0001"
       ],
       "recordVersion": 3
+    },
+    {
+      "id": "TASK-0032",
+      "title": "为 hydrate() stub 添加运行时警告",
+      "status": "IN_PROGRESS",
+      "owner": "",
+      "summary": "hydrate() 当前是 stub 实现，调用时没有任何提示，导致开发者困惑。基于 roadmap-0.8 的 hydration 支持目标，先添加运行时警告来改善开发体验，并记录完整实现的 TODO。验收标准：1) 调用 hydrate() 时输出 console.warn；2) 包含版本和预计实现时间信息；3) 更新相关测试。",
+      "updatedAt": "2026-03-28T14:22:29.291Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0001",
+        "ROADMAP-0003"
+      ],
+      "recordVersion": 2
     }
   ],
   "roadmaps": [
@@ -546,7 +560,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 107,
+    "tasks_version": 109,
     "roadmaps_version": 4,
     "store_schema_version": 3
   },
@@ -554,9 +568,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 107,
-      "lastBuiltAt": "2026-03-28T02:15:38.865Z",
-      "recordVersion": 317
+      "lastSourceVersion": 109,
+      "lastBuiltAt": "2026-03-28T14:22:29.297Z",
+      "recordVersion": 323
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",

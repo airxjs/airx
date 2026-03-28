@@ -445,9 +445,11 @@ export function createSSRApp(element: AirxElement | AirxComponent): SSRApp {
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     hydrate(_container: HTMLElement): void {
-      // TODO: 实现客户端 hydration
-      // 初步版本暂不实现，实际使用时 hydrate 是客户端行为
-      // 需要将 appInstance 传递给客户端，由客户端的 browserRender 处理
+      console.warn(
+        '[Airx@0.7.x] hydrate() is not yet implemented. ' +
+        'This is a stub that will be fully implemented in 0.8.x. ' +
+        'See: https://github.com/airxjs/airx/issues'
+      )
     }
   }
 }
@@ -467,6 +469,11 @@ export function renderToString(app: SSRApp): Promise<string> {
  * @param _app SSR 应用实例（暂未使用）
  */
 export function hydrate(_html: string, container: HTMLElement, _app: SSRApp): void {
+  console.warn(
+    '[Airx@0.7.x] hydrate() is not yet implemented. ' +
+    'This is a stub that will be fully implemented in 0.8.x. ' +
+    'See: https://github.com/airxjs/airx/issues'
+  )
   _app.hydrate(container)
 }
 

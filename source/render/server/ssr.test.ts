@@ -207,8 +207,39 @@ describe('SSR API', () => {
       // Mock container
       const container = document.createElement('div')
       container.innerHTML = '<div>Hello</div>'
-      // This should not throw
+      // This should not throw (only warn)
       expect(() => hydrate('<div>Hello</div>', container, app)).not.toThrow()
+    })
+
+    it('should warn that hydrate is not yet implemented', () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+      const element = createElement('div', { children: 'Hello' })
+      const app = createSSRApp(element)
+      const container = document.createElement('div')
+      container.innerHTML = '<div>Hello</div>'
+      hydrate('<div>Hello</div>', container, app)
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Airx@0.7.x')
+      )
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining('not yet implemented')
+      )
+      warnSpy.mockRestore()
+    })
+
+    it('should warn when calling app.hydrate() directly', () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+      const element = createElement('div', { children: 'Hello' })
+      const app = createSSRApp(element)
+      const container = document.createElement('div')
+      app.hydrate(container)
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Airx@0.7.x')
+      )
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining('not yet implemented')
+      )
+      warnSpy.mockRestore()
     })
   })
 
