@@ -244,39 +244,47 @@ describe('Signal Polyfill External Dependency Tests', () => {
         watcher.watch()
       })
 
-      it('should not miss rapid updates when re-watch happens synchronously', async () => {
-        const delayedState = createState(0)
+      it('should defer computed reads until after watcher notify completes', async () => {
+        const syncState = createState(0)
+        const syncComputed = createComputed(() => syncState.get() + 1)
+        const syncNotifyError = vi.fn()
 
-        let delayedNotifyCount = 0
-        const delayedWatcher = createWatch(() => {
-          delayedNotifyCount += 1
-          queueMicrotask(() => {
-            delayedWatcher.watch()
-            const pending = delayedWatcher.getPending()
+        const syncWatcher = createWatch(() => {
+          try {
+            const pending = syncWatcher.getPending()
             for (const s of pending) s.get()
+            syncWatcher.watch()
+          } catch (error) {
+            syncNotifyError(error)
+          }
+        })
+
+        syncWatcher.watch(syncComputed)
+        expect(syncComputed.get()).toBe(1)
+        syncState.set(1)
+
+        const asyncState = createState(0)
+        const asyncComputed = createComputed(() => asyncState.get() + 1)
+        let latestValue: number | undefined
+
+        const asyncWatcher = createWatch(() => {
+          queueMicrotask(() => {
+            asyncWatcher.watch()
+            const pending = asyncWatcher.getPending()
+            for (const s of pending) {
+              latestValue = s.get()
+            }
           })
         })
 
-        delayedWatcher.watch(delayedState)
-        delayedState.set(1)
-        delayedState.set(2)
+        asyncWatcher.watch(asyncComputed)
+        expect(asyncComputed.get()).toBe(1)
+        asyncState.set(1)
+        asyncState.set(2)
         await Promise.resolve()
 
-        const syncState = createState(0)
-        let syncNotifyCount = 0
-        const syncWatcher = createWatch(() => {
-          syncNotifyCount += 1
-          const pending = syncWatcher.getPending()
-          for (const s of pending) s.get()
-          syncWatcher.watch()
-        })
-
-        syncWatcher.watch(syncState)
-        syncState.set(1)
-        syncState.set(2)
-
-        expect(delayedNotifyCount).toBe(1)
-        expect(syncNotifyCount).toBe(2)
+        expect(syncNotifyError).toHaveBeenCalledTimes(1)
+        expect(latestValue).toBe(3)
       })
     })
 
