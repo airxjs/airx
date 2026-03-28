@@ -37,4 +37,17 @@ jobs:
         with:
           node-version: 24
           registry-url: 'https://registry.npmjs.org'
-      - run: npm publish
+      - name: Publish package with correct dist-tag
+        run: |
+          npm config delete always-auth || true
+
+          VERSION="$(node -p "require('./package.json').version")"
+          if [[ "$VERSION" == *-* ]]; then
+            TAG="${VERSION#*-}"
+            TAG="${TAG%%.*}"
+            npm publish --tag "$TAG"
+          else
+            npm publish
+          fi
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
