@@ -482,16 +482,15 @@ export function performUnitOfWork<E extends AbstractElement>(pluginContext: Plug
       // reaction function component
       if (typeof componentReturnValue === 'function') {
         if (instance.signalWatcher == null) {
-          // Watch 是惰性的，只有当 Signal 被读取时才会触发 --！
-          const signalWatcher = signal.createWatch(async () => {
+          // Watch 是惰性的，只有当 Signal 被读取时才会触发。
+          // 注意：notify 后若延迟 re-watch，会产生一个“未监听窗口”，连续 set 可能丢通知。
+          const signalWatcher = signal.createWatch(() => {
             instance.needReRender = true
             onUpdateRequire?.(instance)
 
-            queueMicrotask(() => {
-              signalWatcher.watch()
-              const paddings = signalWatcher.getPending()
-              for (const padding of paddings) padding.get()
-            })
+            const pendings = signalWatcher.getPending()
+            for (const pending of pendings) pending.get()
+            signalWatcher.watch()
           })
 
           instance.signalWatcher = signalWatcher

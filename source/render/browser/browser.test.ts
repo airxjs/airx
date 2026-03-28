@@ -1422,8 +1422,7 @@ describe('render/browser', () => {
     it('should execute stacked functions in commitWalkV2', () => {
       // commitWalkV2 pushes functions (lifecycle callbacks) onto the stack
       // and executes them when popped. This verifies the stack mechanism works.
-      
-      let mountCount = 0
+
       function MountingComponent(props: { children: any }) {
         // onMounted would be called via context.triggerMounted()
         return createElement('div', {}, props.children)
