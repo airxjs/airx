@@ -69,6 +69,92 @@ const app = airx.createApp(<Counter />)
 app.mount(document.getElementById('app'))
 ```
 
+## 🌐 Server-Side Rendering (SSR)
+
+Airx supports server-side rendering (SSR) out of the box. SSR allows you to render your components to HTML strings on the server, which can improve initial page load performance and SEO.
+
+### Quick Start
+
+```tsx
+import * as airx from 'airx'
+
+// Create an SSR app
+const app = airx.createSSRApp(<MyComponent />)
+
+// Render to HTML string
+const html = await app.renderToString()
+// html === '<div><h1>Hello World</h1></div>'
+```
+
+### Full SSR Example
+
+```tsx
+import { createSSRApp } from 'airx'
+
+// Define a component
+function UserCard({ name, email }: { name: string; email: string }) {
+  return () => (
+    <div className="user-card">
+      <h2>{name}</h2>
+      <p>{email}</p>
+    </div>
+  )
+}
+
+// Server-side rendering
+async function renderPage() {
+  const app = createSSRApp(
+    <UserCard name="Alice" email="alice@example.com" />
+  )
+  
+  const html = await app.renderToString()
+  console.log(html)
+  // <div class="user-card"><h2>Alice</h2><p>alice@example.com</p></div>
+  
+  return html
+}
+```
+
+### Hydration (Client-Side Activation)
+
+> ⚠️ **Note**: Hydration support is planned for 0.8.x release. Currently, `hydrate()` is available as a stub for future implementation.
+
+```tsx
+// Future: Activate SSR HTML on the client
+import { createSSRApp, hydrate } from 'airx'
+
+async function hydrateApp(ssrHtml: string) {
+  const app = createSSRApp(<App />)
+  
+  const container = document.getElementById('app')
+  if (container) {
+    hydrate(ssrHtml, container, app)
+  }
+}
+```
+
+### API Reference
+
+#### `createSSRApp(element)`
+
+Creates an SSR application instance for server-side rendering.
+
+```tsx
+const app = airx.createSSRApp(<MyComponent />)
+```
+
+#### `renderToString(app)`
+
+Renders an SSR app to an HTML string (returns a Promise).
+
+```tsx
+const html = await airx.renderToString(app)
+```
+
+#### `hydrate(html, container, app)`
+
+Activates server-rendered HTML on the client (planned for 0.8.x).
+
 ## 📖 Core Concepts
 
 ### Components

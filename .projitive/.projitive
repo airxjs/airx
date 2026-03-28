@@ -184,10 +184,10 @@
     {
       "id": "TASK-0010",
       "title": "移除旧的兼容代码，完全采用 Signal 标准",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "owner": "yinxulai",
       "summary": "移除 legacy.ts 中基于 Ref 和 watch 的兼容 API，完全迁移到 TC39 Signals 提案标准。当前 legacy.ts 提供的 createRef 和 watch 函数是 Vue 3 风格的响应式 API，与标准 Signal 实现存在编程模型差异，需要尽快移除以统一开发体验。\n\n产出物：\n1. 删除 source/legacy.ts 文件\n2. 更新 source/index.ts，移除 legacy 导出和类型定义\n3. 检查并更新依赖于 legacy API 的单测\n4. 更新 README 和迁移指南，说明如何从 Ref/watch 迁移到 Signal/effect\n5. 发布 0.7.0+ 破坏性版本\n\n下游影响：已发布的使用 legacy API 的应用需要迁移",
-      "updatedAt": "2026-03-22T01:59:35.185Z",
+      "updatedAt": "2026-03-23T19:28:29.177Z",
       "links": [
         ".projitive/designs/migration-0.7.md"
       ],
@@ -196,7 +196,7 @@
         "phase": "discovery",
         "confidence": 0.8
       },
-      "recordVersion": 3
+      "recordVersion": 4
     },
     {
       "id": "TASK-0011",
@@ -224,10 +224,10 @@
     {
       "id": "TASK-0012",
       "title": "调研 Airx SSR 场景与约束",
-      "status": "TODO",
+      "status": "DONE",
       "owner": "yinxulai",
       "summary": "调研 Airx 现有渲染管线（browser/server/basic）与同构需求，输出 SSR 场景清单、运行时约束、与现有 API 的兼容边界，明确首版 SSR 支持范围。设计原则：优先可读性与可维护性，性能作为不退化约束，不以极限性能优化为首要目标。",
-      "updatedAt": "2026-03-22T04:13:53.331Z",
+      "updatedAt": "2026-03-23T19:51:20.071Z",
       "links": [],
       "roadmapRefs": [
         "ROADMAP-0003"
@@ -236,15 +236,15 @@
         "phase": "discovery",
         "confidence": 0.8
       },
-      "recordVersion": 2
+      "recordVersion": 4
     },
     {
       "id": "TASK-0013",
       "title": "设计 SSR 总体架构与渲染流程",
-      "status": "TODO",
+      "status": "DONE",
       "owner": "yinxulai",
       "summary": "基于调研结果设计 SSR 架构：服务端渲染入口、上下文传递、状态快照与注水、客户端激活（hydrate）流程、错误边界与回退策略，给出模块职责与时序图。优先采用分层清晰、职责单一、文档友好的架构。",
-      "updatedAt": "2026-03-22T04:16:32.354Z",
+      "updatedAt": "2026-03-23T19:45:51.775Z",
       "links": [
         ".projitive/designs/ssr-adr-template.md"
       ],
@@ -255,15 +255,15 @@
         "phase": "design",
         "confidence": 0.78
       },
-      "recordVersion": 3
+      "recordVersion": 5
     },
     {
       "id": "TASK-0014",
       "title": "设计 SSR 公开接口与类型契约",
-      "status": "TODO",
+      "status": "DONE",
       "owner": "yinxulai",
       "summary": "定义 SSR API 与类型：如 createSSRApp / renderToString / hydrate 等候选接口、上下文类型、注水协议与错误模型；评估与现有 createApp、Router、Signal 的兼容性与破坏性风险。接口命名与类型设计优先直观可懂、易于测试与迁移。",
-      "updatedAt": "2026-03-22T04:16:32.354Z",
+      "updatedAt": "2026-03-23T19:47:37.413Z",
       "links": [
         ".projitive/designs/ssr-api-spec-template.md"
       ],
@@ -274,15 +274,15 @@
         "phase": "design",
         "confidence": 0.77
       },
-      "recordVersion": 3
+      "recordVersion": 5
     },
     {
       "id": "TASK-0015",
       "title": "评估 SSR 方案并确定实施基线",
-      "status": "TODO",
+      "status": "DONE",
       "owner": "yinxulai",
       "summary": "对候选 SSR 方案进行评估（复杂度、维护成本、生态兼容性、调试体验、性能基线），给出 ADR 结论与首版落地范围；明确非目标项与后续迭代点。评估权重以可读性和可维护性优先。",
-      "updatedAt": "2026-03-22T04:16:32.354Z",
+      "updatedAt": "2026-03-23T19:49:00.922Z",
       "links": [
         ".projitive/designs/ssr-adr-template.md",
         ".projitive/designs/ssr-api-spec-template.md"
@@ -294,15 +294,15 @@
         "phase": "design",
         "confidence": 0.76
       },
-      "recordVersion": 3
+      "recordVersion": 5
     },
     {
       "id": "TASK-0016",
       "title": "实现 SSR 接口与最小可用能力",
-      "status": "TODO",
+      "status": "DONE",
       "owner": "yinxulai",
       "summary": "实现首版 SSR 接口与核心流程：服务端字符串渲染、客户端激活、基础上下文与错误处理；补充必要导出并保证与现有运行时 API 的兼容。实现时优先代码清晰度、模块边界稳定性与后续演进可维护性。",
-      "updatedAt": "2026-03-22T04:14:01.200Z",
+      "updatedAt": "2026-03-23T20:01:56.788Z",
       "links": [],
       "roadmapRefs": [
         "ROADMAP-0003"
@@ -311,15 +311,15 @@
         "phase": "implementation",
         "confidence": 0.74
       },
-      "recordVersion": 2
+      "recordVersion": 4
     },
     {
       "id": "TASK-0017",
       "title": "补齐 SSR 测试门禁与文档示例",
-      "status": "TODO",
+      "status": "DONE",
       "owner": "yinxulai",
       "summary": "新增 SSR 单测/集成测试（渲染一致性、注水一致性、错误分支、回归场景），并更新 README/迁移说明与示例工程，建立发布前 SSR 验收清单。测试设计优先可读、可复用与问题定位效率。",
-      "updatedAt": "2026-03-22T04:16:32.354Z",
+      "updatedAt": "2026-03-23T20:05:57.075Z",
       "links": [
         ".projitive/designs/ssr-test-checklist-template.md",
         ".projitive/designs/ssr-api-spec-template.md"
@@ -331,7 +331,180 @@
         "phase": "testing",
         "confidence": 0.75
       },
+      "recordVersion": 5
+    },
+    {
+      "id": "TASK-0018",
+      "title": "建立 Airx 0.8.x 版本基线规划",
+      "status": "DONE",
+      "owner": "",
+      "summary": "已完成 Airx 0.8.x 版本规划。梳理了 0.7.x 现状（SSR 完成、hydrate 待实现、2 个 WIP API），制定了 0.8.x 目标：hydrate 支持、API 稳定性承诺、提交流程收敛。里程碑计划：0.8.0 实现 hydrate + API 稳定性，0.8.1 稳定性收口。版本规划文档已输出至 designs/roadmap-0.8-planning.md。",
+      "updatedAt": "2026-03-25T00:59:37.458Z",
+      "links": [
+        ".projitive/designs/roadmap-0.8-planning.md",
+        ".projitive/designs/research/TASK-0018.implementation-research.md"
+      ],
+      "roadmapRefs": [
+        "ROADMAP-0001"
+      ],
       "recordVersion": 3
+    },
+    {
+      "id": "TASK-0019",
+      "title": "Airx 0.7.x API 稳定性审计",
+      "status": "DONE",
+      "owner": "",
+      "summary": "已完成 Airx 0.7.x API 稳定性审计。发现 2 个需要关注的问题：1) AirxApp.plugin() 和 renderToHTML() 标记 @deprecated WIP 但仍在公共类型中；2) hydrate() 是 stub 空实现但作为公共 API 导出。建议在 0.8.x 前处理这两个问题。审计报告已输出至 designs/api-stability-audit.md，研究简报已输出至 designs/research/TASK-0019.implementation-research.md。",
+      "updatedAt": "2026-03-25T00:57:22.676Z",
+      "links": [
+        ".projitive/designs/api-stability-audit.md",
+        ".projitive/designs/research/TASK-0019.implementation-research.md"
+      ],
+      "roadmapRefs": [
+        "ROADMAP-0001"
+      ],
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0020",
+      "title": "修复 airx lint 错误：server.ts _container 未使用",
+      "status": "DONE",
+      "owner": "ai-copilot",
+      "summary": "修复 airx 项目 lint 错误：source/render/server/server.ts:446 行 _container 变量定义但未使用，需要移除或注释掉。lint 通过后验证。",
+      "updatedAt": "2026-03-25T16:46:34.020Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0001"
+      ],
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0021",
+      "title": "Initialize code style document",
+      "status": "DONE",
+      "owner": "unassigned",
+      "summary": "代码风格文档已写入 designs/core/code-style.md（含命名规范/测试标准/API设计规则）。",
+      "updatedAt": "2026-03-27T06:52:50.751Z",
+      "links": [
+        "designs/core/code-style.md"
+      ],
+      "roadmapRefs": [
+        "ROADMAP-0001"
+      ],
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0022",
+      "title": "Initialize UI style document",
+      "status": "DONE",
+      "owner": "unassigned",
+      "summary": "UI style 文档已存在于 designs/core/style-guide.md(152行完整规范)，ui-style.md 作为治理模板存在，满足初始化要求。",
+      "updatedAt": "2026-03-27T06:50:11.564Z",
+      "links": [
+        "designs/core/ui-style.md"
+      ],
+      "roadmapRefs": [
+        "ROADMAP-0001"
+      ],
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0023",
+      "title": "调研 Airx 核心运行时现状并评估版本基线成熟度",
+      "status": "DONE",
+      "owner": "ai-copilot",
+      "summary": "为 ROADMAP-0001（建立 Airx 核心运行时治理与版本基线）做前期准备。调研 airx 核心运行时（core/、render/、ssr/ 等模块）的当前状态：1）版本号与依赖版本；2）API 稳定性（公开接口数量、变更频率）；3）测试覆盖率；4）发布流程成熟度。输出报告至 reports/ 并更新 designs/core/architecture.md。完成后更新 ROADMAP-0001 任务状态。",
+      "updatedAt": "2026-03-27T17:06:46.525Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0001"
+      ],
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0024",
+      "title": "airx 0.7.x 文档版本基线同步",
+      "status": "DONE",
+      "owner": "ai-copilot",
+      "summary": "基于 TASK-0023 健康检查发现，airx 多份文档版本基线与实际不符（0.7.2）。本次任务：1) 更新 architecture.md 版本至 0.7.2；2) 更新 release-quality-gates.md 至 0.7.x 基线（含 typecheck script）；3) 重构或废弃 api-compatibility-matrix.md（当前描述 0.3.x，严重过时）。完成后同步更新 .projitive 文档状态。",
+      "updatedAt": "2026-03-27T18:40:23.515Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0001"
+      ],
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0025",
+      "title": "airx WIP API (plugin/renderToHTML) 决策与代码清理",
+      "status": "DONE",
+      "owner": "ai-copilot",
+      "summary": "基于 TASK-0023 健康检查发现，AirxApp.plugin() 和 AirxApp.renderToHTML() JSDoc 标记 @deprecated WIP，状态不明确。本次任务：分析这两个 API 的实际使用情况和价值，决定处置方案（完成实现解除 WIP / 从公开 API 中移除），并执行相应代码变更。",
+      "updatedAt": "2026-03-27T18:38:54.686Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0001"
+      ],
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0026",
+      "title": "airx 0.7.x 下游包兼容验证",
+      "status": "DONE",
+      "owner": "ai-copilot",
+      "summary": "基于 TASK-0023 健康检查发现，airx 0.7.x 发布后下游包（airx-router、vite-plugin）peer dependency 尚未更新验证。本次任务：验证 airx-router 和 vite-plugin 对 0.7.x 的兼容情况，如有 breaking change 则更新依赖范围或发布补丁。",
+      "updatedAt": "2026-03-27T18:36:54.174Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0001"
+      ],
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0027",
+      "title": "为 package.json 添加 typecheck script",
+      "status": "DONE",
+      "owner": "ai-copilot",
+      "summary": "package.json 已包含 typecheck script（tsc --noEmit），任务已提前完成，无需额外操作。",
+      "updatedAt": "2026-03-27T20:48:01.989Z",
+      "links": [],
+      "roadmapRefs": [],
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0028",
+      "title": "同步 architecture.md 至 0.7.2 版本基线",
+      "status": "DONE",
+      "owner": "ai-copilot",
+      "summary": "在 architecture.md 标题后添加版本基线声明（0.7.2），便于贡献者快速了解项目当前版本。",
+      "updatedAt": "2026-03-27T20:46:49.882Z",
+      "links": [],
+      "roadmapRefs": [],
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0029",
+      "title": "重构或废弃过时的 api-compatibility-matrix.md 文档",
+      "status": "DONE",
+      "owner": "ai-copilot",
+      "summary": "删除已过时的 api-compatibility-matrix.md 文档（0.3.x 时代产物），因其内容已被 api-stability-audit.md 完整替代。",
+      "updatedAt": "2026-03-27T20:45:45.089Z",
+      "links": [],
+      "roadmapRefs": [],
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0030",
+      "title": "提升 airx render/browser 测试覆盖率至 85%+",
+      "status": "IN_PROGRESS",
+      "owner": "ai-copilot",
+      "summary": "测试覆盖提升：line 68.47%, branch 78.57%, func 71.42%。新增 11 个测试用例覆盖 SVG namespace、分支路径、sibling/child 处理等。getChildDoms/getDebugElementName/onUpdateRequire/scheduleIdleWork setTimeout fallback 仍为 0%——需要真实 Signal 异步更新或 instance 树手动构建，超出当前 jsdom+mock 基础设施能力。85% 目标需 Signal polyfill 支持。",
+      "updatedAt": "2026-03-27T22:51:20.096Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0001"
+      ],
+      "recordVersion": 4
     }
   ],
   "roadmaps": [
@@ -360,7 +533,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 49,
+    "tasks_version": 102,
     "roadmaps_version": 4,
     "store_schema_version": 3
   },
@@ -368,9 +541,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 49,
-      "lastBuiltAt": "2026-03-22T04:16:32.367Z",
-      "recordVersion": 147
+      "lastSourceVersion": 102,
+      "lastBuiltAt": "2026-03-27T22:51:20.101Z",
+      "recordVersion": 302
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",

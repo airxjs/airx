@@ -13,9 +13,23 @@ import { AirxComponent, AirxElement, createElement } from '../element/index.js'
 export interface AirxApp {
   mount: (container: HTMLElement) => AirxApp
 
-  /** @deprecated WIP */
+  /**
+   * 注册插件，返回 app 实例以支持链式调用。
+   *
+   * @example
+   * import { createApp } from 'airx'
+   * import { customPlugin } from './plugins'
+   *
+   * createApp(App).plugin(customPlugin).mount(...)
+   */
   plugin: (...plugins: Plugin[]) => AirxApp
-  /** @deprecated WIP */
+
+  /**
+   * 将应用渲染为 HTML 字符串（SSR）。
+   *
+   * @example
+   * const html = await createApp(App).renderToHTML()
+   */
   renderToHTML: () => Promise<string>
 }
 
