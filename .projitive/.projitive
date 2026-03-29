@@ -522,62 +522,62 @@
     {
       "id": "TASK-0032",
       "title": "为 hydrate() stub 添加运行时警告",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "owner": "",
-      "summary": "hydrate() 当前是 stub 实现，调用时没有任何提示，导致开发者困惑。基于 roadmap-0.8 的 hydration 支持目标，先添加运行时警告来改善开发体验，并记录完整实现的 TODO。验收标准：1) 调用 hydrate() 时输出 console.warn；2) 包含版本和预计实现时间信息；3) 更新相关测试。",
-      "updatedAt": "2026-03-28T14:22:29.291Z",
+      "summary": "hydrate() stub 已包含 console.warn（含 Airx@0.7.x 版本信息和 0.8.x 实现计划），ssr.test.ts 测试已覆盖警告验证。任务实际已完成，仅需同步状态。",
+      "updatedAt": "2026-03-29T16:03:18.574Z",
       "links": [],
       "roadmapRefs": [
         "ROADMAP-0001",
         "ROADMAP-0003"
       ],
-      "recordVersion": 2
+      "recordVersion": 3
     }
   ],
   "roadmaps": [
     {
       "id": "ROADMAP-0001",
       "title": "建立 Airx 核心运行时治理与版本基线",
-      "status": "active",
+      "status": "done",
       "time": "2026-Q2",
-      "updatedAt": "2026-03-21T13:49:26.925Z",
-      "recordVersion": 2
+      "updatedAt": "2026-03-29T18:12:45.804Z",
+      "recordVersion": 3
     },
     {
       "id": "ROADMAP-0002",
       "title": "AirxJS 现代化与 Signals 一致性路线",
-      "status": "active",
+      "status": "done",
       "time": "2026-Q2~Q3",
-      "updatedAt": "2026-03-21T14:20:13.674Z",
-      "recordVersion": 1
+      "updatedAt": "2026-03-29T18:12:57.303Z",
+      "recordVersion": 2
     },
     {
       "id": "ROADMAP-0003",
       "title": "SSR 服务端渲染支持\",\n<parameter name=\"time\">2026-Q3~Q4",
-      "status": "active",
-      "updatedAt": "2026-03-22T03:53:19.366Z",
-      "recordVersion": 1
+      "status": "done",
+      "updatedAt": "2026-03-29T18:13:07.935Z",
+      "recordVersion": 2
     }
   ],
   "meta": {
-    "tasks_version": 109,
-    "roadmaps_version": 4,
+    "tasks_version": 110,
+    "roadmaps_version": 7,
     "store_schema_version": 3
   },
   "view_state": {
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 109,
-      "lastBuiltAt": "2026-03-28T14:22:29.297Z",
-      "recordVersion": 323
+      "lastSourceVersion": 110,
+      "lastBuiltAt": "2026-03-29T16:03:18.580Z",
+      "recordVersion": 326
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
       "dirty": false,
-      "lastSourceVersion": 4,
-      "lastBuiltAt": "2026-03-22T03:55:09.389Z",
-      "recordVersion": 15
+      "lastSourceVersion": 7,
+      "lastBuiltAt": "2026-03-29T18:13:07.938Z",
+      "recordVersion": 21
     }
   },
   "migration_history": []
