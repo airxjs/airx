@@ -10,6 +10,7 @@ import {
   INTERNAL_TEXT_NODE_TYPE
 } from '../basic/common.js'
 import { PluginContext } from '../basic/plugins/index.js'
+import { hydrate as clientHydrate, type HydrateOptions } from '../browser/index.js'
 
 function camelToKebab(str: string): string {
   return str.replace(/([A-Z])/g, (match, p1, offset) => {
@@ -416,8 +417,9 @@ export interface SSRApp {
   /**
    * 客户端激活 SSR 输出的 HTML
    * @param container 服务端渲染时使用的容器元素
+   * @param options Hydrate 选项
    */
-  hydrate(container: HTMLElement): void
+  hydrate(container: HTMLElement, options?: HydrateOptions): void
 }
 
 /**
@@ -443,13 +445,12 @@ export function createSSRApp(element: AirxElement | AirxComponent): SSRApp {
       })
     },
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    hydrate(_container: HTMLElement): void {
-      console.warn(
-        '[Airx@0.7.x] hydrate() is not yet implemented. ' +
-        'This is a stub that will be fully implemented in 0.8.x. ' +
-        'See: https://github.com/airxjs/airx/issues'
-      )
+    hydrate(container: HTMLElement, options?: HydrateOptions): void {
+      const logger = createLogger('SSRApp:hydrate')
+      logger.debug('hydrating SSR app', { container, options })
+      
+      // Use the client-side hydrate function
+      clientHydrate(rootElement, container, options)
     }
   }
 }
@@ -464,16 +465,17 @@ export function renderToString(app: SSRApp): Promise<string> {
 
 /**
  * 客户端激活 SSR 输出的 HTML
- * @param _html 服务端渲染的 HTML 字符串（暂未使用）
+ * @param _html 服务端渲染的 HTML 字符串（暂未使用，DOM already in container）
  * @param container 容器元素
- * @param _app SSR 应用实例（暂未使用）
+ * @param app SSR 应用实例
+ * @param options Hydrate 选项
  */
-export function hydrate(_html: string, container: HTMLElement, _app: SSRApp): void {
-  console.warn(
-    '[Airx@0.7.x] hydrate() is not yet implemented. ' +
-    'This is a stub that will be fully implemented in 0.8.x. ' +
-    'See: https://github.com/airxjs/airx/issues'
-  )
-  _app.hydrate(container)
+export function hydrate(_html: string, container: HTMLElement, app: SSRApp, options?: HydrateOptions): void {
+  const logger = createLogger('hydrate')
+  logger.debug('top-level hydrate called')
+  app.hydrate(container, options)
 }
+
+// Re-export HydrateOptions type for public API
+export type { HydrateOptions } from '../browser/index.js'
 

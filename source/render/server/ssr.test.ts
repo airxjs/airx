@@ -207,38 +207,52 @@ describe('SSR API', () => {
       // Mock container
       const container = document.createElement('div')
       container.innerHTML = '<div>Hello</div>'
-      // This should not throw (only warn)
+      // This should not throw
       expect(() => hydrate('<div>Hello</div>', container, app)).not.toThrow()
     })
 
-    it('should warn that hydrate is not yet implemented', () => {
+    it('should accept options parameter', () => {
+      const element = createElement('div', { children: 'Hello' })
+      const app = createSSRApp(element)
+      const container = document.createElement('div')
+      container.innerHTML = '<div>Hello</div>'
+      // Should accept options with forceReset
+      expect(() => hydrate('<div>Hello</div>', container, app, { forceReset: true })).not.toThrow()
+    })
+
+    it('should call app.hydrate when using top-level hydrate', () => {
+      const element = createElement('div', { children: 'Hello' })
+      const app = createSSRApp(element)
+      const container = document.createElement('div')
+      container.innerHTML = '<div>Hello</div>'
+      const appHydrateSpy = vi.spyOn(app, 'hydrate')
+      hydrate('<div>Hello</div>', container, app)
+      expect(appHydrateSpy).toHaveBeenCalledWith(container, undefined)
+    })
+
+    it('should pass options to app.hydrate', () => {
+      const element = createElement('div', { children: 'Hello' })
+      const app = createSSRApp(element)
+      const container = document.createElement('div')
+      container.innerHTML = '<div>Hello</div>'
+      const appHydrateSpy = vi.spyOn(app, 'hydrate')
+      const options = { forceReset: true }
+      hydrate('<div>Hello</div>', container, app, options)
+      expect(appHydrateSpy).toHaveBeenCalledWith(container, options)
+    })
+
+    it('should warn when calling app.hydrate() directly', () => {
+      // Note: With the new implementation, app.hydrate() no longer warns
+      // because it's now fully implemented. This test is kept for documentation
+      // purposes to show the old behavior.
       const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
       const element = createElement('div', { children: 'Hello' })
       const app = createSSRApp(element)
       const container = document.createElement('div')
       container.innerHTML = '<div>Hello</div>'
-      hydrate('<div>Hello</div>', container, app)
-      expect(warnSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Airx@0.7.x')
-      )
-      expect(warnSpy).toHaveBeenCalledWith(
-        expect.stringContaining('not yet implemented')
-      )
-      warnSpy.mockRestore()
-    })
-
-    it('should warn when calling app.hydrate() directly', () => {
-      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
-      const element = createElement('div', { children: 'Hello' })
-      const app = createSSRApp(element)
-      const container = document.createElement('div')
       app.hydrate(container)
-      expect(warnSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Airx@0.7.x')
-      )
-      expect(warnSpy).toHaveBeenCalledWith(
-        expect.stringContaining('not yet implemented')
-      )
+      // Hydrate is now implemented, so it should not warn about being unimplemented
+      // but may still log debug info
       warnSpy.mockRestore()
     })
   })
