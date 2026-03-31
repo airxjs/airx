@@ -169,6 +169,55 @@ export interface AbstractElement { }
  *  ↓    |                 |
  * instance  -sibling→  instance...
  */
+/**
+ * 查找 instance 的父级 DOM
+ * @param instance 
+ * @returns 父级 DOM 引用
+ */
+export function getParentDom<E extends AbstractElement>(instance: Instance<E>): E {
+  if (instance.parent?.domRef != null) {
+    return instance.parent.domRef
+  }
+  if (instance.parent) {
+    return getParentDom(instance.parent)
+  }
+
+  throw new Error('Cant find dom')
+}
+
+/**
+ * 查找 instance 下所有的一级 DOM
+ * @param instance 
+ * @returns DOM 列表
+ */
+export function getChildDoms<E extends AbstractElement>(instance: Instance<E>): E[] {
+  const domList: E[] = []
+  const todoList: Instance<E>[] = [instance]
+
+  while (todoList.length > 0) {
+    const current = todoList.pop()
+
+    // 找到真实 dom 直接提交
+    if (current?.domRef != null) {
+      domList.push(current.domRef)
+    }
+
+    // 有子节点但是无真实 dom，向下继续查找
+    if (current?.domRef == null) {
+      if (current?.child != null) {
+        todoList.push(current.child)
+      }
+    }
+
+    // 可能有兄弟节点，则需要继续查找
+    if (current?.sibling != null) {
+      todoList.push(current.sibling)
+    }
+  }
+
+  return domList
+}
+
 export interface Instance<E extends AbstractElement = AbstractElement> {
   domRef?: E
 

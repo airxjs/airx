@@ -7,7 +7,9 @@ import {
   INTERNAL_COMMENT_NODE_TYPE,
   INTERNAL_TEXT_NODE_TYPE,
   Instance,
-  performUnitOfWork
+  performUnitOfWork,
+  getParentDom,
+  getChildDoms,
 } from '../basic/common.js'
 
 class BrowserElement extends Element implements AbstractElement {}
@@ -74,50 +76,6 @@ export function render(pluginContext: PluginContext, element: AirxElement, domRe
       for (const plugin of pluginContext.plugins) {
         if (plugin.updateDom) plugin.updateDom(dom, nextProps, prevProps)
       }
-    }
-
-    function getParentDom(instance: Instance<BrowserElement>): BrowserElement {
-      if (instance.parent?.domRef != null) {
-        return instance.parent.domRef
-      }
-      if (instance.parent) {
-        return getParentDom(instance.parent)
-      }
-
-      throw new Error('Cant find dom')
-    }
-
-    /**
-     * 查找 instance 下所有的一级 dom
-     * @param instance 
-     * @returns 
-     */
-    function getChildDoms(instance: Instance<BrowserElement>): BrowserElement[] {
-      const domList: BrowserElement[] = []
-      const todoList: Instance<BrowserElement>[] = [instance]
-
-      while (todoList.length > 0) {
-        const current = todoList.pop()
-
-        // 找到真实 dom 直接提交
-        if (current?.domRef != null) {
-          domList.push(current.domRef)
-        }
-
-        // 有子节点但是无真实 dom，向下继续查找
-        if (current?.domRef == null) {
-          if (current?.child != null) {
-            todoList.push(current.child)
-          }
-        }
-
-        // 可能有兄弟节点，则需要继续查找
-        if (current?.sibling != null) {
-          todoList.push(current.sibling)
-        }
-      }
-
-      return domList
     }
 
     function commitInstanceDom(nextInstance: Instance<BrowserElement>, oldNode?: ChildNode) {

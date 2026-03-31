@@ -7,7 +7,9 @@ import {
   performUnitOfWork,
   AbstractElement,
   INTERNAL_COMMENT_NODE_TYPE,
-  INTERNAL_TEXT_NODE_TYPE
+  INTERNAL_TEXT_NODE_TYPE,
+  getParentDom,
+  getChildDoms,
 } from '../basic/common.js'
 import { PluginContext } from '../basic/plugins/index.js'
 import { hydrate as clientHydrate, type HydrateOptions } from '../browser/index.js'
@@ -222,50 +224,6 @@ export function render(pluginContext: PluginContext, element: AirxElement, onCom
         .filter(isNew(prevProps, nextProps))
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .forEach(name => dom.setAttribute(name, nextProps[name] as any))
-    }
-
-    function getParentDom(instance: Instance<ServerElement>): ServerElement {
-      if (instance.parent?.domRef != null) {
-        return instance.parent.domRef
-      }
-      if (instance.parent) {
-        return getParentDom(instance.parent)
-      }
-
-      throw new Error('Cant find dom')
-    }
-
-    /**
-     * 查找 instance 下所有的一级 dom
-     * @param instance 
-     * @returns 
-     */
-    function getChildDoms(instance: Instance<ServerElement>): ServerElement[] {
-      const domList: ServerElement[] = []
-      const todoList: Instance<ServerElement>[] = [instance]
-
-      while (todoList.length > 0) {
-        const current = todoList.pop()
-
-        // 找到真实 dom 直接提交
-        if (current?.domRef != null) {
-          domList.push(current.domRef)
-        }
-
-        // 有子节点但是无真实 dom，向下继续查找
-        if (current?.domRef == null) {
-          if (current?.child != null) {
-            todoList.push(current.child)
-          }
-        }
-
-        // 可能有兄弟节点，则需要继续查找
-        if (current?.sibling != null) {
-          todoList.push(current.sibling)
-        }
-      }
-
-      return domList
     }
 
     function commitInstanceDom(nextInstance: Instance<ServerElement>, oldNode?: ServerElement) {
