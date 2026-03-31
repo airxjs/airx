@@ -545,6 +545,36 @@
         "ROADMAP-0003"
       ],
       "recordVersion": 3
+    },
+    {
+      "id": "TASK-0034",
+      "title": "分析 browser/server 提交流程重复并产出重构方案",
+      "status": "TODO",
+      "owner": "",
+      "summary": "基于 designs/optimization-roadmap-0.8.md Iteration B，分析 browser.ts 和 server.ts 中 commitDom/commitInstanceDom/getParentDom/getChildDoms 等函数的重复程度，产出重构方案研究简报至 designs/research/TASK-0034.implementation-research.md，为后续提取共用 commit helper 做准备。参考：source/render/browser/browser.ts:67-210、source/render/server/server.ts:104-314。",
+      "updatedAt": "2026-03-31T21:36:24.199Z",
+      "links": [
+        "designs/optimization-roadmap-0.8.md",
+        "source/render/browser/browser.ts",
+        "source/render/server/server.ts"
+      ],
+      "roadmapRefs": [],
+      "recordVersion": 2
+    },
+    {
+      "id": "TASK-0035",
+      "title": "提取 browser/server 共用 commit helper 函数",
+      "status": "TODO",
+      "owner": "",
+      "summary": "基于 TASK-0034 产出的研究简报，将 browser.ts 和 server.ts 中重复的 DOM 操作函数提取为共用模块：getParentDom、getChildDoms、commitInstanceDom 等核心函数应统一实现，减少维护成本和回归风险。参考：source/render/browser/browser.ts:67-123、source/render/server/server.ts。",
+      "updatedAt": "2026-03-31T21:37:06.901Z",
+      "links": [
+        "designs/optimization-roadmap-0.8.md",
+        "source/render/browser/browser.ts",
+        "source/render/server/server.ts"
+      ],
+      "roadmapRefs": [],
+      "recordVersion": 2
     }
   ],
   "roadmaps": [
@@ -573,7 +603,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 113,
+    "tasks_version": 117,
     "roadmaps_version": 7,
     "store_schema_version": 3
   },
@@ -581,9 +611,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 113,
-      "lastBuiltAt": "2026-03-30T15:10:29.939Z",
-      "recordVersion": 335
+      "lastSourceVersion": 117,
+      "lastBuiltAt": "2026-03-31T21:37:06.906Z",
+      "recordVersion": 347
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
