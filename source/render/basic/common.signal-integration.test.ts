@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { Signal } from 'signal-polyfill'
-import { InnerAirxComponentContext, performUnitOfWork, reconcileChildren } from './common.js'
+import { InnerAirxComponentContext, performUnitOfWork, reconcileChildren, Instance } from './common.js'
 import { AirxElement, createElement } from '../../element/index.js'
 import { PluginContext } from './plugins/index.js'
 import { airxElementSymbol } from '../../symbol/index.js'
@@ -28,7 +28,7 @@ vi.mock('../../logger', () => ({
   }))
 }))
 
-function createMockElement(type: string | ((props: any) => any), props: Record<string, any> = {}): AirxElement {
+function createMockElement(type: string | ((props: unknown) => unknown), props: Record<string, unknown> = {}): AirxElement {
   return {
     type,
     props,
@@ -58,7 +58,7 @@ describe('render/common Signal Integration', () => {
 
       const element = createMockElement(CounterComponent, {})
       const context = new InnerAirxComponentContext()
-      const instance = { element, context, needReRender: false } as any
+      const instance = { element, context, needReRender: false } as Instance
       context.instance = instance
 
       const nextInstance = performUnitOfWork(pluginContext, instance)
@@ -81,7 +81,7 @@ describe('render/common Signal Integration', () => {
 
       const element = createMockElement(ReactiveComponent, {})
       const context = new InnerAirxComponentContext()
-      const instance = { element, context, needReRender: false } as any
+      const instance = { element, context, needReRender: false } as Instance
       context.instance = instance
 
       // First render - creates watcher
@@ -105,7 +105,7 @@ describe('render/common Signal Integration', () => {
 
       const element = createMockElement(ReactiveComponent, {})
       const context = new InnerAirxComponentContext()
-      const instance = { element, context, needReRender: false } as any
+      const instance = { element, context, needReRender: false } as Instance
       context.instance = instance
 
       // First render
@@ -134,7 +134,7 @@ describe('render/common Signal Integration', () => {
 
       const element = createMockElement(ReactiveComponent, {})
       const context = new InnerAirxComponentContext()
-      const instance = { element, context, needReRender: false } as any
+      const instance = { element, context, needReRender: false } as Instance
       context.instance = instance
 
       // First render - component is called once, returns a function
@@ -179,7 +179,7 @@ describe('render/common Signal Integration', () => {
 
       const element = createMockElement(MultiSignalComponent, {})
       const context = new InnerAirxComponentContext()
-      const instance = { element, context, needReRender: false } as any
+      const instance = { element, context, needReRender: false } as Instance
 
       // First render
       performUnitOfWork(pluginContext, instance)
@@ -201,7 +201,7 @@ describe('render/common Signal Integration', () => {
 
       const element = createMockElement(ReactiveComponent, {})
       const context = new InnerAirxComponentContext()
-      const instance = { element, context, needReRender: false } as any
+      const instance = { element, context, needReRender: false } as Instance
       context.instance = instance
 
       // First render - should create signalWatcher
@@ -219,7 +219,7 @@ describe('render/common Signal Integration', () => {
     it('should handle string type elements (DOM tags)', () => {
       const element = createMockElement('div', { children: 'Hello' })
       const context = new InnerAirxComponentContext()
-      const instance = { element, context } as any
+      const instance = { element, context } as Instance
 
       const nextInstance = performUnitOfWork(pluginContext, instance)
       expect(nextInstance).toBeNull() // No child
@@ -231,9 +231,9 @@ describe('render/common Signal Integration', () => {
         children: [childElement]
       })
       const context = new InnerAirxComponentContext()
-      const instance = { element, context } as any
+      const instance = { element, context } as Instance
 
-      const nextInstance = performUnitOfWork(pluginContext, instance)
+      performUnitOfWork(pluginContext, instance)
 
       // Should have a child instance
       expect(instance.child).toBeDefined()
@@ -261,7 +261,7 @@ describe('render/common Signal Integration', () => {
         element: parentElement,
         context: parentContext,
         needReRender: false
-      } as any
+      } as Instance
 
       performUnitOfWork(pluginContext, parentInstance)
 
@@ -279,12 +279,12 @@ describe('render/common Signal Integration', () => {
       // Set up parent context that provides the value
       const parentContext = new InnerAirxComponentContext()
       parentContext.provide(countKey, countValue)
-      const parentInstance = { context: parentContext } as any
+      const parentInstance = { context: parentContext } as Instance
       parentContext.instance = parentInstance
 
       // Child context that injects from parent
       const context = new InnerAirxComponentContext()
-      const instance = { context, parent: parentInstance } as any
+      const instance = { context, parent: parentInstance } as Instance
       context.instance = instance
 
       const injected = context.inject(countKey)
@@ -301,7 +301,7 @@ describe('render/common Signal Integration', () => {
         return createElement('li', { children: item })
       }
 
-      const elements = items.map((item, i) =>
+      const elements = items.map((item) =>
         createMockElement(ListItem, { item, key: `key-${item}` })
       )
 
@@ -311,7 +311,7 @@ describe('render/common Signal Integration', () => {
         context: parentContext,
         needReRender: false,
         child: undefined
-      } as any
+      } as Instance
 
       // First render
       reconcileChildren(pluginContext, parentInstance, elements)
@@ -320,7 +320,7 @@ describe('render/common Signal Integration', () => {
       expect(firstChild).toBeDefined()
 
       // Re-render with same keys - should reuse
-      const secondElements = ['a', 'b', 'c'].map((item, i) =>
+      const secondElements = ['a', 'b', 'c'].map((item) =>
         createMockElement(ListItem, { item, key: `key-${item}` })
       )
       const parentInstance2 = {
@@ -328,7 +328,7 @@ describe('render/common Signal Integration', () => {
         context: parentContext,
         needReRender: false,
         child: firstChild // Pass existing child as starting point
-      } as any
+      } as Instance
 
       // Note: reconcileChildren is called within performUnitOfWork
       // This tests the reuse logic directly
@@ -339,34 +339,14 @@ describe('render/common Signal Integration', () => {
     })
 
     it('should NOT reuse instances when key changes', () => {
-      // ListItem is a string (DOM tag), not a component function
-      function ListItem({ item }: { item: string }) {
-        return createElement('li', { children: item })
-      }
-
-      const parentContext = new InnerAirxComponentContext()
-      
       // Create existing child with a specific key
       const firstChildInstance = {
         element: createMockElement('li', { children: 'a', key: 'li-a' }),
         context: new InnerAirxComponentContext(),
         parent: undefined,
         sibling: undefined
-      } as any
+      } as Instance
       firstChildInstance.context.instance = firstChildInstance
-
-      // Set up parent with existing child
-      const parentInstance = {
-        element: createMockElement('ul', {}),
-        context: parentContext,
-        needReRender: false,
-        child: firstChildInstance
-      } as any
-
-      // Re-render with different key
-      const newElements = [
-        createMockElement('li', { children: 'b', key: 'li-b' }) // Different key
-      ]
 
       // Since key changed, should not reuse
       // The old instance has key 'li-a' but new element has key 'li-b'
@@ -409,7 +389,7 @@ describe('render/common Signal Integration', () => {
         context: childContext,
         sibling: undefined,
         child: undefined
-      } as any
+      } as Instance
       childContext.instance = childInstance
 
       // Parent instance with child - child is accessible via parentContext.instance.child
@@ -417,7 +397,7 @@ describe('render/common Signal Integration', () => {
         context: parentContext,
         child: childInstance,
         sibling: undefined
-      } as any
+      } as Instance
       parentContext.instance = parentInstance
       childInstance.parent = parentInstance
 
@@ -443,14 +423,14 @@ describe('render/common Signal Integration', () => {
         context: grandchildContext,
         sibling: undefined,
         child: undefined
-      } as any
+      } as Instance
       grandchildContext.instance = grandchildInstance
 
       const childInstance = {
         context: childContext,
         child: grandchildInstance,
         sibling: undefined
-      } as any
+      } as Instance
       childContext.instance = childInstance
       grandchildInstance.parent = childInstance
 
@@ -458,7 +438,7 @@ describe('render/common Signal Integration', () => {
         context: parentContext,
         child: childInstance,
         sibling: undefined
-      } as any
+      } as Instance
       parentContext.instance = parentInstance
       childInstance.parent = parentInstance
 
@@ -480,7 +460,7 @@ describe('render/common Signal Integration', () => {
 
       const element = createMockElement(ReactiveComponent, {})
       const context = new InnerAirxComponentContext()
-      const instance = { element, context, needReRender: false } as any
+      const instance = { element, context, needReRender: false } as Instance
 
       performUnitOfWork(pluginContext, instance)
       expect(instance.signalWatcher).toBeDefined()
@@ -506,7 +486,7 @@ describe('render/common Signal Integration', () => {
         element: createMockElement('ul', {}),
         context: parentContext,
         needReRender: false
-      } as any
+      } as Instance
 
       reconcileChildren(pluginContext, parentInstance, elements)
 
@@ -524,9 +504,9 @@ describe('render/common Signal Integration', () => {
       const existingChild = {
         element: createMockElement('li', { children: 'old' }),
         context: new InnerAirxComponentContext(),
-        parent: undefined as any,
+        parent: undefined,
         sibling: undefined
-      } as any
+      } as Instance
       existingChild.context.instance = existingChild
 
       const parentInstance = {
@@ -534,7 +514,7 @@ describe('render/common Signal Integration', () => {
         context: parentContext,
         needReRender: false,
         child: existingChild
-      } as any
+      } as Instance
       existingChild.parent = parentInstance
 
       // Re-render with empty children
