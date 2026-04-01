@@ -581,7 +581,7 @@ export function performUnitOfWork<E extends AbstractElement>(pluginContext: Plug
       }
 
       reconcileChildren(pluginContext, instance, childrenAsElements(children))
-      delete instance.needReRender
+      instance.needReRender = false
     }
   }
 
@@ -593,7 +593,8 @@ export function performUnitOfWork<E extends AbstractElement>(pluginContext: Plug
   }
 
   // 优先处理 child
-  if (instance.child) {
+  // 如果 needReRender 为 true，需要先执行重渲染逻辑，不能提前返回 child
+  if (instance.child && !instance.needReRender) {
     return instance.child
   }
 
