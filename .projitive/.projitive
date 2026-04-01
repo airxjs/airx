@@ -575,6 +575,19 @@
       ],
       "roadmapRefs": [],
       "recordVersion": 4
+    },
+    {
+      "id": "TASK-0036",
+      "title": "Create first executable slice",
+      "status": "DONE",
+      "owner": "",
+      "summary": "ROADMAP-0001 已全部完成（35个任务均为DONE），治理工作台已建立。此任务为idle discovery自动生成，无独立执行内容。",
+      "updatedAt": "2026-03-31T23:29:30.252Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0001"
+      ],
+      "recordVersion": 3
     }
   ],
   "roadmaps": [
@@ -603,7 +616,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 121,
+    "tasks_version": 124,
     "roadmaps_version": 7,
     "store_schema_version": 3
   },
@@ -611,9 +624,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 121,
-      "lastBuiltAt": "2026-03-31T21:46:21.036Z",
-      "recordVersion": 359
+      "lastSourceVersion": 124,
+      "lastBuiltAt": "2026-03-31T23:29:30.258Z",
+      "recordVersion": 368
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
