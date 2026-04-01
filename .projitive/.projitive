@@ -588,6 +588,32 @@
         "ROADMAP-0001"
       ],
       "recordVersion": 3
+    },
+    {
+      "id": "TASK-0037",
+      "title": "补强 Signal/Inject 集成测试覆盖（0.9.0 Iteration C）",
+      "status": "DONE",
+      "owner": "",
+      "summary": "基于 optimization-roadmap-0.8.md 的 Iteration C，目标是为 performUnitOfWork 增加真实 Signal watcher 集成测试，补齐 provide/inject 变化、列表 children 复用、生命周期交错场景测试覆盖。先行成一个研究简报。",
+      "updatedAt": "2026-04-01T19:28:38.500Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0001"
+      ],
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0038",
+      "title": "修复 inject.test.ts 中 4 个预置失败测试",
+      "status": "IN_PROGRESS",
+      "owner": "ai-copilot",
+      "summary": "修复 inject.test.ts 中 4 个预置失败测试（isReuseInstance 函数相关）。根据 f7265b1 提交记录，这些测试在此次提交前就已失败，与本次代码修改无关。测试期望：当 injectedMap 值与 parent providedMap 值匹配时返回 undefined，不匹配时返回 false。但当前实现逻辑可能有误，导致所有情况都返回 false。需要分析 isReuseInstance 逻辑并修复测试或实现。",
+      "updatedAt": "2026-04-01T21:07:39.423Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0001"
+      ],
+      "recordVersion": 2
     }
   ],
   "roadmaps": [
@@ -616,7 +642,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 124,
+    "tasks_version": 129,
     "roadmaps_version": 7,
     "store_schema_version": 3
   },
@@ -624,9 +650,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 124,
-      "lastBuiltAt": "2026-03-31T23:29:30.258Z",
-      "recordVersion": 368
+      "lastSourceVersion": 129,
+      "lastBuiltAt": "2026-04-01T21:07:39.430Z",
+      "recordVersion": 383
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
