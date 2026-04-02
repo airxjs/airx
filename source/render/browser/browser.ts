@@ -157,7 +157,7 @@ export function render(pluginContext: PluginContext, element: AirxElement, domRe
 
           // 优化：同父节点内移动使用 insertBefore，避免 remove + append
           if (nextInstance.domRef.parentNode === parentDom) {
-            parentDom.insertBefore(nextInstance.domRef, oldNode)
+            parentDom.insertBefore(nextInstance.domRef, oldNode ?? null)
           } else {
             if (nextInstance.domRef.parentNode) {
               nextInstance.domRef.parentNode.removeChild(nextInstance.domRef)

@@ -605,15 +605,39 @@
     {
       "id": "TASK-0038",
       "title": "修复 inject.test.ts 中 4 个预置失败测试",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "owner": "ai-copilot",
       "summary": "修复 inject.test.ts 中 4 个预置失败测试（isReuseInstance 函数相关）。根据 f7265b1 提交记录，这些测试在此次提交前就已失败，与本次代码修改无关。测试期望：当 injectedMap 值与 parent providedMap 值匹配时返回 undefined，不匹配时返回 false。但当前实现逻辑可能有误，导致所有情况都返回 false。需要分析 isReuseInstance 逻辑并修复测试或实现。",
-      "updatedAt": "2026-04-01T21:07:39.423Z",
+      "updatedAt": "2026-04-01T21:15:18.830Z",
       "links": [],
       "roadmapRefs": [
         "ROADMAP-0001"
       ],
-      "recordVersion": 2
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0039",
+      "title": "修复 airx lint errors in test file",
+      "status": "DONE",
+      "owner": "",
+      "summary": "修复 source/render/basic/common.signal-integration.test.ts 中的 34 个 lint 错误（no-explicit-any 和 unused-vars），提升代码质量。",
+      "updatedAt": "2026-04-01T22:09:39.866Z",
+      "links": [],
+      "roadmapRefs": [],
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0040",
+      "title": "优化 DOM reconciliation 中的移动操作",
+      "status": "DONE",
+      "owner": "",
+      "summary": "source/render/browser/browser.ts:144 和 source/render/server/server.ts:285 有 TODO 注释，针对仅移动时的 DOM 操作优化。当元素仅发生位置变化而非增删时，当前代码会执行 remove + insert，可以优化为直接移动以减少 DOM 操作。",
+      "updatedAt": "2026-04-02T01:35:14.253Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0003"
+      ],
+      "recordVersion": 3
     }
   ],
   "roadmaps": [
@@ -642,7 +666,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 129,
+    "tasks_version": 136,
     "roadmaps_version": 7,
     "store_schema_version": 3
   },
@@ -650,9 +674,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 129,
-      "lastBuiltAt": "2026-04-01T21:07:39.430Z",
-      "recordVersion": 383
+      "lastSourceVersion": 136,
+      "lastBuiltAt": "2026-04-02T01:35:14.261Z",
+      "recordVersion": 404
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",

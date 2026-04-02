@@ -89,6 +89,32 @@ class ServerElement implements AbstractElement {
     /* eslint-enable @typescript-eslint/ban-ts-comment */
   }
 
+  insertBefore(dom: ServerElement, refNode: ServerElement | null) {
+    /* eslint-disable @typescript-eslint/ban-ts-comment */
+    if (refNode === null) {
+      return this.appendChild(dom)
+    }
+    const refIndex = this.children.findIndex(v => v === refNode)
+    if (refIndex === -1) {
+      return this.appendChild(dom)
+    }
+    // @ts-ignore
+    dom.parentNode = this
+    // Update nextSibling of previous sibling
+    if (refIndex > 0) {
+      // @ts-ignore
+      this.children[refIndex - 1].nextSibling = dom
+    } else {
+      // @ts-ignore
+      this.firstChild = dom
+    }
+    // Set nextSibling of new node to refNode
+    // @ts-ignore
+    dom.nextSibling = refNode
+    this.children.splice(refIndex, 0, dom)
+    /* eslint-enable @typescript-eslint/ban-ts-comment */
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setAttribute(name: string, value: any) {
     if (value === '') return this.attributes.delete(name)
@@ -294,7 +320,7 @@ export function render(pluginContext: PluginContext, element: AirxElement, onCom
 
           // 优化：同父节点内移动使用 insertBefore，避免 remove + append
           if (nextInstance.domRef.parentNode === parentDom) {
-            parentDom.insertBefore(nextInstance.domRef, oldNode)
+            parentDom.insertBefore(nextInstance.domRef, oldNode ?? null)
           } else {
             if (nextInstance.domRef.parentNode) {
               nextInstance.domRef.parentNode.removeChild(nextInstance.domRef)
