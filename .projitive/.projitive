@@ -666,6 +666,17 @@
         "ROADMAP-0003"
       ],
       "recordVersion": 3
+    },
+    {
+      "id": "TASK-0043",
+      "title": "Fix browser scheduler to only schedule when work exists",
+      "status": "DONE",
+      "owner": "",
+      "summary": "修正 Browser 调度器：仅在 nextUnitOfWork 存在时继续调度，避免 workLoop 结束后无条件调用 scheduleWorkLoop()。提供 requestIdleCallback 降级到 setTimeout 的宿主兼容处理。补测试保证同步完成时不会继续排队空转。",
+      "updatedAt": "2026-04-02T19:15:20.705Z",
+      "links": [],
+      "roadmapRefs": [],
+      "recordVersion": 3
     }
   ],
   "roadmaps": [
@@ -694,7 +705,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 142,
+    "tasks_version": 145,
     "roadmaps_version": 7,
     "store_schema_version": 3
   },
@@ -702,9 +713,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 142,
-      "lastBuiltAt": "2026-04-02T04:28:54.825Z",
-      "recordVersion": 422
+      "lastSourceVersion": 145,
+      "lastBuiltAt": "2026-04-02T19:15:20.714Z",
+      "recordVersion": 431
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",

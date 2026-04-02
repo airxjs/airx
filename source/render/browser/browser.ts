@@ -255,7 +255,10 @@ export function render(pluginContext: PluginContext, element: AirxElement, domRe
       context.needCommitDom = false
     }
 
-    scheduleWorkLoop()
+    // Only schedule follow-up work if there actually is more work
+    if (context.nextUnitOfWork != null) {
+      scheduleWorkLoop()
+    }
   }
 
   // 开始调度
