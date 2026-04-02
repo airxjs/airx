@@ -141,13 +141,8 @@ export function render(pluginContext: PluginContext, element: AirxElement, domRe
       }
 
       // 插入 parent
-      // TODO: 针对仅移动时优化
       if (nextInstance.domRef != null) {
         if (oldNode !== nextInstance.domRef) {
-          if (nextInstance.domRef.parentNode) {
-            nextInstance.domRef.parentNode.removeChild(nextInstance.domRef)
-          }
-
           const parentDom = getParentDom(nextInstance)
           if (
             parentDom.nodeType === Node.TEXT_NODE
@@ -160,7 +155,15 @@ export function render(pluginContext: PluginContext, element: AirxElement, domRe
             )
           }
 
-          parentDom.appendChild(nextInstance.domRef)
+          // 优化：同父节点内移动使用 insertBefore，避免 remove + append
+          if (nextInstance.domRef.parentNode === parentDom) {
+            parentDom.insertBefore(nextInstance.domRef, oldNode)
+          } else {
+            if (nextInstance.domRef.parentNode) {
+              nextInstance.domRef.parentNode.removeChild(nextInstance.domRef)
+            }
+            parentDom.appendChild(nextInstance.domRef)
+          }
         }
       }
     }
