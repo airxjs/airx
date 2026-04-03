@@ -677,6 +677,45 @@
       "links": [],
       "roadmapRefs": [],
       "recordVersion": 3
+    },
+    {
+      "id": "TASK-0044",
+      "title": "更新 release-quality-gates.md 版本基线至 0.7.3-beta.1",
+      "status": "DONE",
+      "owner": "",
+      "summary": "同步文档版本基线。基于 health check 报告，更新 release-quality-gates.md：1）将版本号从 0.7.2 更新为 0.7.3-beta.1；2）移除关于 package.json 缺少 typecheck 脚本的过时提醒（该脚本已于 package.json 中存在）；3）更新版本号相关的发布命令示例（0.7.2 -> 0.7.3）。输出：更新的 release-quality-gates.md",
+      "updatedAt": "2026-04-03T14:54:46.196Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0001"
+      ],
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0045",
+      "title": "在 check.yml 中补充 typecheck CI 步骤",
+      "status": "DONE",
+      "owner": "",
+      "summary": "完善 CI 门禁。基于 health check 报告和 release-quality-gates.md 第 239 项，在 .github/workflows/check.yml 中补充 typecheck 步骤：1）在 lint job 中添加 npm run typecheck；2）确保 GitHub Actions 能捕获类型错误。输出：更新的 check.yml",
+      "updatedAt": "2026-04-03T14:53:47.934Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0001"
+      ],
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0046",
+      "title": "审计 plugin()/renderToHTML() WIP 状态并给出决策建议",
+      "status": "DONE",
+      "owner": "",
+      "summary": "明确 WIP API 去留。基于 TASK-0025 研究结论和 designs/functional-correctness-matrix.md，审计 plugin()/renderToHTML() 的实现状态：1）检查 source/index.ts 和 source/render 中这两个 API 的实际导出/实现情况；2）确认是否应在 0.8.x 前解除 WIP 标记或从公开 API 中移除；3）输出决策文档到 designs/research/WIP-api-decision.md。输出：决策文档和（可选）代码改动",
+      "updatedAt": "2026-04-03T14:53:00.090Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0001"
+      ],
+      "recordVersion": 3
     }
   ],
   "roadmaps": [
@@ -705,7 +744,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 145,
+    "tasks_version": 154,
     "roadmaps_version": 7,
     "store_schema_version": 3
   },
@@ -713,9 +752,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 145,
-      "lastBuiltAt": "2026-04-02T19:15:20.714Z",
-      "recordVersion": 431
+      "lastSourceVersion": 154,
+      "lastBuiltAt": "2026-04-03T14:54:46.203Z",
+      "recordVersion": 458
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
