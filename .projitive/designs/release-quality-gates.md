@@ -7,7 +7,7 @@
 ## 2. 当前包状态
 
 - 包名: `airx`
-- 当前版本: `0.7.2`（2026-03-24）
+- 当前版本: `0.7.3-beta.1`（2026-04-03）
 - 构建方式: Vite library build（ESM only）
 - 质量门禁状态: 基本完善（见下方清单）
 - 开发分支: `dev`
@@ -37,15 +37,7 @@
 | TypeScript 编译 | `npx tsc --noEmit` | 退出码为 0，无类型错误 |
 | API 表面稳定 | `output/index.d.ts` 对比 | 公开 API 数量不减少 |
 
-**注意**: 当前 `package.json` 的 `scripts` 中未包含 `typecheck`，建议补充:
-
-```json
-{
-  "scripts": {
-    "typecheck": "tsc --noEmit"
-  }
-}
-```
+**注意**: `package.json` 已包含 `typecheck` 脚本（`tsc --noEmit`），且 CI 工作流已集成 typecheck 检查（见下方 3.4 节）。
 
 ### 3.4 行为验证门禁 (Test Gate)
 
@@ -187,9 +179,9 @@ jobs:
 2. **版本更新**
    ```bash
    # 遵循 semver
-  npm version patch  # 0.7.2 -> 0.7.3
-  npm version minor  # 0.7.2 -> 0.8.0
-  npm version major  # 0.7.2 -> 1.0.0
+  npm version patch  # 0.7.3 -> 0.7.4
+  npm version minor  # 0.7.3 -> 0.8.0
+  npm version major  # 0.7.3 -> 1.0.0
    ```
 
 3. **Git 提交**
@@ -236,7 +228,7 @@ jobs:
 - [x] 在 `package.json` 中补充 `typecheck` 脚本 ✅
 - [x] 在 `package.json` 中补充 `test` 与 `test:coverage` 脚本 ✅
 - [x] 建立基础测试套件（Vitest + jsdom） ✅
-- [ ] 增强 `check.yml` 工作流（补充 typecheck 步骤）
+- [x] 增强 `check.yml` 工作流（补充 typecheck 步骤） ✅
 - [ ] 下游包（airx-router, vite-plugin）升级至 0.7.x 并验证兼容性
 
 ## 8. 相关文档
