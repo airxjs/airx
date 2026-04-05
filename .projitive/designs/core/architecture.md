@@ -13,10 +13,10 @@
 - Browser DOM rendering
 - Server-side rendering (SSR) to HTML strings
 - Plugin system for extensibility
+- Hydration (client-side activation of SSR HTML)
 - TypeScript-first development
 
 **Out of Scope**:
-- Hydration (planned for 0.8.x) — current SSR output cannot hydrate on client
 - Built-in routing (delegated to `airx-router`)
 - Built-in styling (delegate to CSS/Tailwind)
 - Server-side data fetching (delegate to user)
@@ -35,12 +35,13 @@
 | Component tree | JSX transform | Virtual DOM element tree |
 | Signal state | Developer | `Signal.State`, `Signal.Computed`, `Signal.Effect` |
 | Plugin | Developer | Plugin objects implementing `Plugin.install()` |
+| Pre-rendered HTML | SSR step | SSR output to be hydrated via `hydrate()` |
 
 ### Outputs
 
 | Output | Target | Description |
 |--------|--------|-------------|
-| DOM mutations | Browser | Real DOM updates via `browserRender()` |
+| DOM mutations | Browser | Real DOM updates via `browserRender()` / `hydrate()` |
 | HTML string | Server | SSR output via `serverRender()` / `renderToString()` |
 | Type definitions | TypeScript | `output/*.d.ts` for consumer type safety |
 
@@ -120,7 +121,7 @@
 - `serverRender(ctx, element, callback)` — Renders to string via callback
 - `SSRApp` interface: `renderToString()` → Promise\<string\>
 - `createSSRApp(element)` — Creates SSR app instance
-- `hydrate()` — **Stub only** (planned for 0.8.x)
+- `hydrate()` — Activates SSR-rendered HTML on the client for interactive updates
 - Limitation: String-based, not streaming
 
 ### `source/signal/` — Signal Integration
@@ -212,6 +213,18 @@
           └── Fragment → just children
 ```
 
+### Hydration Flow
+
+```
+1. SSR HTML injected into DOM
+   ↓
+2. hydrate(container)(appContext, element)
+   └── Attaches event listeners and reactive state to existing DOM
+       ↓
+       3. After hydration, component tree is interactive
+          └── Signal changes trigger targeted re-renders via scheduleUpdate()
+```
+
 ### Plugin Installation Flow
 
 ```
@@ -232,7 +245,7 @@
 
 Update this document when any of the following occur:
 
-1. **Hydration implemented (0.8.x)** — SSR section needs major update
+1. ~~**Hydration implemented (0.8.x)** — SSR section needs major update~~ ✅ Done in 0.7.x
 2. **Streaming SSR support added** — server renderer architecture changes
 3. **New rendering target** (e.g., native, canvas) — new render module
 4. **Concurrent SSR support** — thread-local context replaced with proper context

@@ -37,6 +37,7 @@ pnpm add airx
 
 ```tsx
 import * as airx from 'airx'
+import { Signal } from 'signal-polyfill'
 
 // Create reactive state using Signal
 const count = new Signal.State(0)
@@ -117,7 +118,7 @@ async function renderPage() {
 
 ### Hydration (Client-Side Activation)
 
-> ⚠️ **Note**: Hydration support is planned for 0.8.x release. Currently, `hydrate()` is available as a stub for future implementation.
+> ✅ Hydration is available in 0.7.x+ for activating server-rendered HTML on the client.
 
 ```tsx
 // Future: Activate SSR HTML on the client
@@ -143,17 +144,17 @@ Creates an SSR application instance for server-side rendering.
 const app = airx.createSSRApp(<MyComponent />)
 ```
 
-#### `renderToString(app)`
+#### `app.renderToString()`
 
 Renders an SSR app to an HTML string (returns a Promise).
 
 ```tsx
-const html = await airx.renderToString(app)
+const html = await app.renderToString()
 ```
 
 #### `hydrate(html, container, app)`
 
-Activates server-rendered HTML on the client (planned for 0.8.x).
+Activates server-rendered HTML on the client for interactive updates.
 
 ## 📖 Core Concepts
 
