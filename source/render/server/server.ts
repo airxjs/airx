@@ -13,6 +13,21 @@ function camelToKebab(str: string): string {
   })
 }
 
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+}
+
+function escapeAttr(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+}
+
 class ServerElement implements AbstractElement {
   static createTextNode(content: string) {
     const dom = new ServerElement('#text')
@@ -35,6 +50,7 @@ class ServerElement implements AbstractElement {
     this.content = ''
     this.children = []
     this.className = ''
+    this.innerHTML = ''
     this.attributes = new Map()
   }
 
@@ -45,6 +61,7 @@ class ServerElement implements AbstractElement {
 
   readonly className: string
   readonly style: CSSProperties
+  innerHTML: string
   private content: string
   private children: ServerElement[]
   private attributes: Map<string, string>
@@ -80,14 +97,14 @@ class ServerElement implements AbstractElement {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setAttribute(name: string, value: any) {
-    if (value === '') return this.attributes.delete(name)
+    if (value === false || value == null) return this.attributes.delete(name)
     /* eslint-disable @typescript-eslint/ban-ts-comment */
     // @ts-ignore
     if (name === 'class') return this.className = value
     // @ts-ignore
     if (name === 'style') return this.style = value
     /* eslint-enable @typescript-eslint/ban-ts-comment */
-    this.attributes.set(name, value)
+    this.attributes.set(name, value === true ? '' : value)
   }
 
   removeAttribute(name: string) {
@@ -95,8 +112,8 @@ class ServerElement implements AbstractElement {
   }
 
   toString(): string {
-    if (this.nodeName === '#text') return this.content
-    if (this.nodeName === '#comment') return this.content
+    if (this.nodeName === '#text') return escapeHtml(this.content)
+    if (this.nodeName === '#comment') return `<!--${this.content}-->`
 
     const styleString = Object.entries(this.style)
       .map(([key, value]) => `${camelToKebab(key)}:${value}`)
@@ -105,8 +122,9 @@ class ServerElement implements AbstractElement {
     const attributes = [...this.attributes.entries()]
     if (styleString.length > 0) attributes.push(['style', styleString])
     if (this.className.length > 0) attributes.push(['class', this.className])
-    const attributesString = attributes.map(([name, value]) => ` ${name}="${value}"`).join('')
-    return `<${this.nodeName}${attributesString}>${this.children.map(child => child.toString()).join('')}</${this.nodeName}>`
+    const attributesString = attributes.map(([name, value]) => ` ${name}="${escapeAttr(String(value))}"`).join('')
+    const innerContent = this.innerHTML || this.children.map(child => child.toString()).join('')
+    return `<${this.nodeName}${attributesString}>${innerContent}</${this.nodeName}>`
   }
 }
 
@@ -156,9 +174,10 @@ export function render(pluginContext: PluginContext, element: AirxElement, onCom
       const isClass = (key: string) => key === 'class'
       const isEvent = (key: string) => key.startsWith("on")
       const isChildren = (key: string) => key === 'children'
+      const isInnerHTML = (key: string) => key === 'innerHTML'
       const isGone = (_prev: PropsType, next: PropsType) => (key: string) => !(key in next)
       const isNew = (prev: PropsType, next: PropsType) => (key: string) => prev[key] !== next[key]
-      const isProperty = (key: string) => !isChildren(key) && !isEvent(key) && !isStyle(key) && !isClass(key) && !isKey(key) && !isRef(key)
+      const isProperty = (key: string) => !isChildren(key) && !isEvent(key) && !isStyle(key) && !isClass(key) && !isKey(key) && !isRef(key) && !isInnerHTML(key)
 
       // https://developer.mozilla.org/zh-CN/docs/Web/API/Node
       if (dom.nodeName === '#text' || dom.nodeName === '#comment') {
@@ -167,6 +186,14 @@ export function render(pluginContext: PluginContext, element: AirxElement, onCom
           textNode.nodeValue = String(nextProps.textContent)
         }
         return
+      }
+
+      // innerHTML injects raw HTML on server side
+      if ('innerHTML' in nextProps || 'innerHTML' in prevProps) {
+        /* eslint-disable @typescript-eslint/ban-ts-comment */
+        // @ts-ignore
+        dom.innerHTML = nextProps.innerHTML == null || nextProps.innerHTML === false ? '' : String(nextProps.innerHTML)
+        /* eslint-enable @typescript-eslint/ban-ts-comment */
       }
 
       // remove old style
@@ -208,8 +235,17 @@ export function render(pluginContext: PluginContext, element: AirxElement, onCom
       Object.keys(nextProps)
         .filter(isProperty)
         .filter(isNew(prevProps, nextProps))
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .forEach(name => dom.setAttribute(name, nextProps[name] as any))
+        .forEach(name => {
+          const value = nextProps[name]
+          if (value === false || value == null) {
+            dom.removeAttribute(name)
+          } else if (value === true) {
+            dom.setAttribute(name, '')
+          } else {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            dom.setAttribute(name, value as any)
+          }
+        })
     }
 
     function getParentDom(instance: Instance<ServerElement>): ServerElement {

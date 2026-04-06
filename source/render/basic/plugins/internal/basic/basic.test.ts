@@ -202,6 +202,78 @@ describe('BasicLogic', () => {
       
       consoleSpy.mockRestore()
     })
+
+    it('should set boolean true attribute as empty string (present)', () => {
+      const element = document.createElement('input')
+
+      basicLogic.updateDom(element, { disabled: true })
+
+      expect(element.hasAttribute('disabled')).toBe(true)
+      expect(element.getAttribute('disabled')).toBe('')
+    })
+
+    it('should remove attribute when boolean value is false', () => {
+      const element = document.createElement('input')
+      element.setAttribute('disabled', '')
+
+      basicLogic.updateDom(element, { disabled: false }, { disabled: true })
+
+      expect(element.hasAttribute('disabled')).toBe(false)
+    })
+
+    it('should not set disabled="false" string on DOM', () => {
+      const element = document.createElement('input')
+
+      basicLogic.updateDom(element, { disabled: false })
+
+      expect(element.getAttribute('disabled')).not.toBe('false')
+      expect(element.hasAttribute('disabled')).toBe(false)
+    })
+
+    it('should remove attribute when value is null', () => {
+      const element = document.createElement('input')
+      element.setAttribute('required', '')
+
+      basicLogic.updateDom(element, { required: null }, { required: true })
+
+      expect(element.hasAttribute('required')).toBe(false)
+    })
+
+    it('should remove attribute when value is undefined', () => {
+      const element = document.createElement('input')
+      element.setAttribute('readonly', '')
+
+      basicLogic.updateDom(element, { readonly: undefined }, { readonly: true })
+
+      expect(element.hasAttribute('readonly')).toBe(false)
+    })
+
+    it('should set innerHTML via DOM property, not as an attribute', () => {
+      const element = document.createElement('div')
+
+      basicLogic.updateDom(element, { innerHTML: '<b>bold</b>' })
+
+      expect(element.innerHTML).toBe('<b>bold</b>')
+      expect(element.hasAttribute('innerHTML')).toBe(false)
+    })
+
+    it('should clear innerHTML when value is null', () => {
+      const element = document.createElement('div')
+      element.innerHTML = '<b>old</b>'
+
+      basicLogic.updateDom(element, { innerHTML: null }, { innerHTML: '<b>old</b>' })
+
+      expect(element.innerHTML).toBe('')
+    })
+
+    it('should clear innerHTML when value is false', () => {
+      const element = document.createElement('div')
+      element.innerHTML = '<b>old</b>'
+
+      basicLogic.updateDom(element, { innerHTML: false }, { innerHTML: '<b>old</b>' })
+
+      expect(element.innerHTML).toBe('')
+    })
   })
 
   describe('isReuseInstance', () => {

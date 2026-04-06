@@ -65,9 +65,10 @@ export class BasicLogic implements Plugin {
     const isClass = (key: string) => key === 'class'
     const isEvent = (key: string) => key.startsWith("on")
     const isChildren = (key: string) => key === 'children'
+    const isInnerHTML = (key: string) => key === 'innerHTML'
     const isGone = (_prev: Props, next: Props) => (key: string) => !(key in next)
     const isNew = (prev: Props, next: Props) => (key: string) => prev[key] !== next[key]
-    const isProperty = (key: string) => !isChildren(key) && !isEvent(key) && !isStyle(key) && !isClass(key) && !isKey(key) && !isRef(key)
+    const isProperty = (key: string) => !isChildren(key) && !isEvent(key) && !isStyle(key) && !isClass(key) && !isKey(key) && !isRef(key) && !isInnerHTML(key)
 
     // https://developer.mozilla.org/zh-CN/docs/Web/API/Node
     if (dom.nodeName === '#text' || dom.nodeName === '#comment') {
@@ -76,6 +77,18 @@ export class BasicLogic implements Plugin {
         textNode.nodeValue = String(nextProps.textContent)
       }
       return
+    }
+
+    // innerHTML must be set as a DOM property, not an attribute
+    if ('innerHTML' in nextProps || 'innerHTML' in prevProps) {
+      const nextHTML = nextProps.innerHTML
+      if (nextHTML == null || nextHTML === false) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ;(dom as any).innerHTML = ''
+      } else {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ;(dom as any).innerHTML = String(nextHTML)
+      }
     }
 
     // remove old style
@@ -160,8 +173,17 @@ export class BasicLogic implements Plugin {
     Object.keys(nextProps)
       .filter(isProperty)
       .filter(isNew(prevProps, nextProps))
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .forEach(name => dom.setAttribute(name, nextProps[name] as any))
+      .forEach(name => {
+        const value = nextProps[name]
+        if (value === false || value == null) {
+          dom.removeAttribute(name)
+        } else if (value === true) {
+          dom.setAttribute(name, '')
+        } else {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          dom.setAttribute(name, value as any)
+        }
+      })
   }
 
   isReuseInstance(instance: Instance, nextElement: AirxElement): false | void {
