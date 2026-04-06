@@ -32,7 +32,7 @@ describe('App Module', () => {
 
   afterEach(() => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ;(loggerModule as any).setLogLevel('none')
+    (loggerModule as any).setLogLevel('none')
   })
 
   describe('createApp', () => {

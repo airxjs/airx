@@ -84,10 +84,10 @@ export class BasicLogic implements Plugin {
       const nextHTML = nextProps.innerHTML
       if (nextHTML == null || nextHTML === false) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ;(dom as any).innerHTML = ''
+        (dom as any).innerHTML = ''
       } else {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ;(dom as any).innerHTML = String(nextHTML)
+        (dom as any).innerHTML = String(nextHTML)
       }
     }
 

@@ -15,7 +15,7 @@ describe('Logger Module', () => {
   afterEach(() => {
     consoleSpy.mockRestore();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ;(loggerModule as any).setLogLevel('none');
+    (loggerModule as any).setLogLevel('none');
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (globalThis as any).process = originalProcess
   })
@@ -33,7 +33,7 @@ describe('Logger Module', () => {
 
     it('should not log when level is none (default)', () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ;(globalThis as any).process = { env: { NODE_ENV: 'production' } }
+      (globalThis as any).process = { env: { NODE_ENV: 'production' } }
       const logger = createLogger('test')
       logger.debug('should not log')
       logger.info('should not log')
@@ -168,11 +168,11 @@ describe('Logger Module', () => {
 
     it('should not log after setLogLevel(none)', () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ;(globalThis as any).process = { env: { NODE_ENV: 'production' } }
+      (globalThis as any).process = { env: { NODE_ENV: 'production' } }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ;(loggerModule as any).setLogLevel('debug')
+      (loggerModule as any).setLogLevel('debug')
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ;(loggerModule as any).setLogLevel('none')
+      (loggerModule as any).setLogLevel('none')
       const logger = createLogger('test')
       logger.debug('should not appear')
       expect(consoleSpy).not.toHaveBeenCalled()
