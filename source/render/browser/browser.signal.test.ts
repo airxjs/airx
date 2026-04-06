@@ -204,4 +204,72 @@ describe('render/browser signal integration', () => {
     await Promise.resolve()
     expect(root.textContent).toBe('d')
   })
+
+  it('should update dom when signal changes during workLoop yield (before processed node)', async () => {
+    // 核心回归测试：workLoop yield 后，已处理节点的信号变更必须触发重渲染
+    //
+    // Bug 场景：
+    //   1. workLoop 处理了树前半段（含 Counter）后 yield
+    //   2. yield 期间 counter 信号变更 → needRestartFromRoot = true
+    //   3. 下一次 idle callback 进来，由于原代码有 `nextUnitOfWork == null` 的错误条件
+    //      needRestartFromRoot 被清除但 nextUnitOfWork 未重置到 root
+    //   4. workLoop 从 yield 点继续，跳过 Counter → DOM 不更新
+    const counter = createState(0)
+
+    function Counter() {
+      return () => createElement('span', { id: 'counter' }, String(counter.get()))
+    }
+
+    function Filler() {
+      return () => createElement('div', {})
+    }
+
+    function App() {
+      return () => createElement('div', {},
+        createElement(Counter, {}),
+        createElement(Filler, {}),
+        createElement(Filler, {}),
+        createElement(Filler, {}),
+        createElement(Filler, {}),
+      )
+    }
+
+    // 第一次 idle callback：正常完整渲染
+    // 第二次 idle callback：模拟极短 deadline，只处理 1 个节点就 yield
+    //   此时 Counter 已被处理（位于树前部），之后才 yield
+    //   在 yield 后 counter 信号变更 → 检验 needRestartFromRoot 能否正确重置到 root
+    let idleCallCount = 0
+    Object.defineProperty(globalThis, 'requestIdleCallback', {
+      writable: true,
+      value: (callback: IdleRequestCallback) => {
+        idleCallCount++
+        if (idleCallCount === 1) {
+          // 初始渲染：给足够时间
+          callback({ didTimeout: false, timeRemaining: () => 50 } as IdleDeadline)
+        } else if (idleCallCount === 2) {
+          // 第二次：处理 1 个节点后立即 yield（timeRemaining 归零）
+          let called = 0
+          callback({
+            didTimeout: false,
+            timeRemaining: () => called++ === 0 ? 50 : 0
+          } as IdleDeadline)
+        } else {
+          // 后续：正常执行
+          callback({ didTimeout: false, timeRemaining: () => 50 } as IdleDeadline)
+        }
+        return idleCallCount
+      }
+    })
+
+    const root = document.createElement('div')
+    render(new PluginContext(), createElement(App, {}), root as Element)
+    expect(root.querySelector('#counter')?.textContent).toBe('0')
+
+    // 触发第二次 workLoop（短 deadline），处理部分节点后 yield
+    // 然后在 yield 后变更 counter，验证是否能触发重渲染
+    counter.set(42)
+
+    await new Promise(resolve => setTimeout(resolve, 20))
+    expect(root.querySelector('#counter')?.textContent).toBe('42')
+  })
 })

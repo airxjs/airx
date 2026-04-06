@@ -277,9 +277,13 @@ export function render(pluginContext: PluginContext, element: AirxElement, domRe
     }
 
     // yield 期间有信号变更命中了已处理的实例，需要从 root 重新遍历
+    // 注意：无论是 yield 中还是 workLoop 刚完成，只要有 needRestartFromRoot
+    // 都必须重置到 root，不能依赖 nextUnitOfWork == null 的条件
+    // 若 yield 时（nextUnitOfWork != null）不重置，下一次 workLoop 会从
+    // yield 点继续，跳过已变化的实例，导致 DOM 不更新
     if (context.needRestartFromRoot) {
       context.needRestartFromRoot = false
-      if (context.nextUnitOfWork == null && context.rootInstance.child) {
+      if (context.rootInstance.child) {
         context.nextUnitOfWork = context.rootInstance.child
         logger.info('workLoop: restart from root due to signal change during yield')
       }
