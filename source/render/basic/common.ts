@@ -486,16 +486,24 @@ export function performUnitOfWork<E extends AbstractElement>(pluginContext: Plug
         if (instance.signalWatcher == null) {
           const componentLogger = createLogger('signal')
           // Watch 是惰性的，只有当 Signal 被读取时才会触发 --！
-          const signalWatcher = signal.createWatch(async () => {
+          let microtaskScheduled = false
+          const signalWatcher = signal.createWatch(() => {
             instance.needReRender = true
             componentLogger.info('notify:', getInstanceLabel(instance))
 
-            queueMicrotask(() => {
-              signalWatcher.watch()
-              const paddings = signalWatcher.getPending()
-              for (const padding of paddings) padding.get()
-              onUpdateRequire?.(instance)
-            })
+            // 立即重新订阅，确保连续信号变更不会被遗漏
+            // 若放在 microtask 内，两次 watch() 调用之间发生的变更将全部丢失
+            signalWatcher.watch()
+
+            if (!microtaskScheduled) {
+              microtaskScheduled = true
+              queueMicrotask(() => {
+                microtaskScheduled = false
+                const paddings = signalWatcher.getPending()
+                for (const padding of paddings) padding.get()
+                onUpdateRequire?.(instance)
+              })
+            }
           })
 
           instance.signalWatcher = signalWatcher

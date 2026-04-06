@@ -1,6 +1,6 @@
 {
   "name": "airx",
-  "version": "0.7.8",
+  "version": "0.7.9",
   "description": "a front framework with jsx",
   "type": "module",
   "types": "./output/index.d.ts",

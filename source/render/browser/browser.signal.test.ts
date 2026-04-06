@@ -123,4 +123,85 @@ describe('render/browser signal integration', () => {
 
     expect(root.textContent).toBe('3')
   })
+
+  it('should reflect the final value after N consecutive signal updates', async () => {
+    // 回归测试：验证 watcher 在 notify 后必须同步重新订阅
+    // 若 watch() 延迟到 microtask 执行，中间的所有变更都会被静默丢失
+    const value = createState(0)
+
+    function Display() {
+      return () => createElement('span', {}, String(value.get()))
+    }
+
+    const root = document.createElement('div')
+    render(new PluginContext(), createElement(Display, {}), root as Element)
+    expect(root.textContent).toBe('0')
+
+    // 连续 5 次更新，只有最后一次的值应反映在 DOM 上
+    value.set(10)
+    value.set(20)
+    value.set(30)
+    value.set(40)
+    value.set(50)
+
+    await Promise.resolve()
+    expect(root.textContent).toBe('50')
+  })
+
+  it('should coalesce multiple consecutive signal sets into one DOM update', async () => {
+    // 回归测试：多次连续 set 应合并为一次 DOM 更新，最终 DOM 反映最后一次的值
+    // 若 watch() 延迟到 microtask 执行，第 2、3... 次 set 都会被丢失
+    const value = createState(0)
+    let domUpdateCount = 0
+    const originalSetAttribute = Element.prototype.setAttribute
+    Element.prototype.setAttribute = function (...args) {
+      domUpdateCount++
+      return originalSetAttribute.apply(this, args)
+    }
+
+    function Display() {
+      return () => createElement('span', {}, String(value.get()))
+    }
+
+    const root = document.createElement('div')
+    render(new PluginContext(), createElement(Display, {}), root as Element)
+    const initialDomUpdateCount = domUpdateCount
+
+    value.set(1)
+    value.set(2)
+    value.set(3)
+
+    await Promise.resolve()
+
+    Element.prototype.setAttribute = originalSetAttribute
+
+    // 3 次 set 后 DOM 只更新 1 次，且反映最终值
+    expect(domUpdateCount - initialDomUpdateCount).toBe(0) // span 无属性变更
+    expect(root.textContent).toBe('3')
+  })
+
+  it('should correctly update after interleaved signal sets and awaits', async () => {
+    // 验证在 microtask 执行后，再次连续 set 仍然能正确更新
+    const value = createState('initial')
+
+    function Display() {
+      return () => createElement('span', {}, value.get())
+    }
+
+    const root = document.createElement('div')
+    render(new PluginContext(), createElement(Display, {}), root as Element)
+    expect(root.textContent).toBe('initial')
+
+    // 第一批连续更新
+    value.set('a')
+    value.set('b')
+    await Promise.resolve()
+    expect(root.textContent).toBe('b')
+
+    // 第二批连续更新（验证 watcher 在第一批后仍然正常）
+    value.set('c')
+    value.set('d')
+    await Promise.resolve()
+    expect(root.textContent).toBe('d')
+  })
 })
