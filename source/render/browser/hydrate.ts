@@ -95,17 +95,20 @@ export function hydrate(
 
   rootInstance.child = appInstance
 
+  // Create plugin context once and reuse for tree building and event binding
+  const pluginContext = createPluginContextWithHydration()
+
   // Build the instance tree
   let currentInstance: Instance<HTMLElement> | null = appInstance
   while (currentInstance) {
     currentInstance = performUnitOfWork(
-      createPluginContextWithHydration(),
+      pluginContext,
       currentInstance
     ) as Instance<HTMLElement> | null
   }
 
-  // Connect instance tree to existing DOM
-  connectInstanceTreeToDom(appInstance, container)
+  // Connect instance tree to existing DOM and bind events
+  connectInstanceTreeToDom(pluginContext, appInstance, container)
 
   // Set up reactive updates
   const context = setupReactiveUpdates(rootInstance)
@@ -130,14 +133,24 @@ function createPluginContextWithHydration(): PluginContext {
 
 /**
  * Connect instance tree to existing DOM nodes
- * This traverses the instance tree and matches it to existing DOM
+ * This traverses the instance tree and matches it to existing DOM,
+ * and binds events via plugin.updateDom for each connected node.
  */
 function connectInstanceTreeToDom(
+  pluginContext: PluginContext,
   appInstance: Instance<HTMLElement>,
   container: HTMLElement
 ): void {
   const logger = createLogger('hydrate:connectInstanceTree')
-  
+
+  type PropsType = Record<string, unknown>
+
+  function updateDomProperties(dom: Element, nextProps: PropsType, prevProps: PropsType = {}) {
+    for (const plugin of pluginContext.plugins) {
+      if (plugin.updateDom) plugin.updateDom(dom, nextProps, prevProps)
+    }
+  }
+
   // Walk the instance tree and connect to existing DOM
   function walkAndConnect(instance: Instance<HTMLElement>, parentDom: HTMLElement) {
     if (!instance.element) return
@@ -150,6 +163,10 @@ function connectInstanceTreeToDom(
         instance.domRef = childDom as HTMLElement
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ;(childDom as any).airxInstance = instance
+
+        // Bind events via plugins — SSR nodes have no pre-existing event listeners,
+        // so passing {} as prevProps is safe (no old handlers to remove).
+        updateDomProperties(childDom, instance.element.props as PropsType, {})
       }
     }
 

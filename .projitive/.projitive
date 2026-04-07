@@ -782,6 +782,19 @@
         "ROADMAP-0003"
       ],
       "recordVersion": 3
+    },
+    {
+      "id": "TASK-0052",
+      "title": "改进 hydrate 中 SSR 节点的事件绑定能力",
+      "status": "IN_PROGRESS",
+      "owner": "",
+      "summary": "Derived from TASK-0051 completion report known limitation: SSR 节点在 hydrate 后不会自动绑定事件。需要在 connectInstanceTreeToDom 后对需要绑定事件的节点调用 updateDom，使 SSR 输出的交互元素能正常工作。",
+      "updatedAt": "2026-04-07T10:41:55.453Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0003"
+      ],
+      "recordVersion": 2
     }
   ],
   "roadmaps": [
@@ -810,7 +823,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 169,
+    "tasks_version": 171,
     "roadmaps_version": 7,
     "store_schema_version": 3
   },
@@ -818,9 +831,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 169,
-      "lastBuiltAt": "2026-04-07T09:24:43.061Z",
-      "recordVersion": 503
+      "lastSourceVersion": 171,
+      "lastBuiltAt": "2026-04-07T10:41:55.464Z",
+      "recordVersion": 509
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",

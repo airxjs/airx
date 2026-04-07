@@ -246,7 +246,7 @@ describe('hydrate (integration)', () => {
   })
 
   describe('事件绑定', () => {
-    it('带 onClick 处理程序的元素应能被 hydrate（当前实现不自动重绑 SSR 节点事件）', () => {
+    it('带 onClick 处理程序的元素应能被 hydrate 并正确触发事件', () => {
       container.innerHTML = '<div><button>Click me</button></div>'
       const clickHandler = vi.fn()
 
@@ -259,16 +259,11 @@ describe('hydrate (integration)', () => {
       // hydrate 应成功执行，不抛出
       expect(result).toBeDefined()
 
-      // 注意：当前 hydrate 实现中，SSR 输出的已有 DOM 节点不会自动
-      // 通过 updateDom 重新绑定事件。事件绑定依赖于 performUnitOfWork
-      // 的 commitDom 流程，但 connectInstanceTreeToDom 仅设置 domRef
-      // 而不触发 updateDom。这是当前实现的已知行为，0.8.x 中应改进。
+      // 修复后：SSR 节点应在 hydrate 时通过 updateDom 绑定事件
       const button = container.querySelector('button')
-      if (button) {
-        button.click()
-        // 当前实现：事件不会被触发
-        // expect(clickHandler).toHaveBeenCalled()
-      }
+      expect(button).not.toBeNull()
+      button!.click()
+      expect(clickHandler).toHaveBeenCalled()
     })
 
     it('hydrate 应在有事件处理程序的情况下正常完成', () => {
