@@ -755,6 +755,33 @@
         "ROADMAP-0003"
       ],
       "recordVersion": 3
+    },
+    {
+      "id": "TASK-0050",
+      "title": "Fix lint error: remove unused restoreSignalStates function",
+      "status": "DONE",
+      "owner": "",
+      "summary": "Removed unused restoreSignalStates stub function from hydrate.ts that was causing @typescript-eslint/no-unused-vars lint error. The function was defined but never called - signal state restoration will be properly implemented in 0.8.x SSR integration.",
+      "updatedAt": "2026-04-07T07:23:30.872Z",
+      "links": [],
+      "roadmapRefs": [],
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0051",
+      "title": "补强 hydrate() 集成测试覆盖",
+      "status": "DONE",
+      "owner": "",
+      "summary": "当前 hydrate 集成测试仅验证函数签名，未覆盖实际 hydration 行为（事件绑定、状态恢复、DOM reconciliation）。需要为 hydrate 添加端到端集成测试，确保 SSR 输出能被客户端正确激活。产物：hydrate.integration.test.ts + 验收报告。",
+      "updatedAt": "2026-04-07T09:24:43.054Z",
+      "links": [
+        ".projitive/reports/TASK-0051-completion-report.md",
+        "source/render/browser/hydrate.integration.test.ts"
+      ],
+      "roadmapRefs": [
+        "ROADMAP-0003"
+      ],
+      "recordVersion": 3
     }
   ],
   "roadmaps": [
@@ -783,7 +810,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 163,
+    "tasks_version": 169,
     "roadmaps_version": 7,
     "store_schema_version": 3
   },
@@ -791,9 +818,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 163,
-      "lastBuiltAt": "2026-04-07T05:14:54.706Z",
-      "recordVersion": 485
+      "lastSourceVersion": 169,
+      "lastBuiltAt": "2026-04-07T09:24:43.061Z",
+      "recordVersion": 503
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
