@@ -78,11 +78,6 @@ export function hydrate(
   const logger = createLogger('hydrate')
   logger.debug('hydrate starting', { element, container, options })
 
-  // Restore signal states from snapshot if provided and not forcing reset
-  if (options?.stateSnapshot && !options.forceReset) {
-    restoreSignalStates(options.stateSnapshot)
-  }
-
   // Build the instance tree using performUnitOfWork
   const rootInstance: Instance<HTMLElement> = {
     domRef: container,
@@ -131,6 +126,17 @@ export function hydrate(
 function restoreSignalStates(snapshot: StateSnapshot): void {
   const logger = createLogger('hydrate:restoreSignalStates')
   logger.debug('restoring signal states', snapshot)
+
+  // TODO(0.8.x): Signal state restoration is not yet implemented.
+  // This is a placeholder — signal states are recalculated from scratch.
+  // Related: airx 0.8.x roadmap - Hydration support.
+  if (process?.env?.NODE_ENV !== 'production') {
+    console.warn(
+      '[airx] hydrate: stateSnapshot restore is not yet implemented. ' +
+      'Signal states will be recalculated from scratch. ' +
+      'See airx 0.8.x roadmap for hydration progress.'
+    )
+  }
   // Signal state restoration would be implemented here
   // This requires access to the actual Signal instances
   // For now, this is a placeholder that will be fully implemented
