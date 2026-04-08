@@ -11,6 +11,7 @@ import {
   getParentDom,
   getChildDoms,
 } from '../basic/common.js'
+import { createCommitWalker } from '../basic/commit-walker.js'
 
 class BrowserElement extends Element implements AbstractElement {}
 
@@ -168,51 +169,13 @@ export function render(pluginContext: PluginContext, element: AirxElement, domRe
       }
     }
 
-    function commitWalkV2(initInstance: Instance<BrowserElement>, initNode?: ChildNode) {
-      // 创建一个栈，将根节点压入栈中
+    const commitWalk = createCommitWalker<BrowserElement, ChildNode>({
+      commitInstanceDom,
+      getNextSibling: (instance, node) => instance.domRef?.nextSibling ?? node?.nextSibling,
+      getFirstChild: (instance, node) => instance.domRef?.firstChild ?? node,
+    })
 
-      type StackLayer = [Instance<BrowserElement>, ChildNode | undefined] | (() => void)
-      const stack: StackLayer[] = [[initInstance, initNode]]
-
-      while (stack.length > 0) {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const stackLayer = stack.pop()!
-        if (typeof stackLayer === 'function') {
-          stackLayer()
-          continue
-        }
-
-        const [instance, node] = stackLayer
-        commitInstanceDom(instance, node)
-
-        // stack 是先入后出
-        // 实际上是先渲染 child
-        // 这里然后再渲染 sibling
-
-        // 执行生命周期的 Mount
-        stack.push(() => instance.context.triggerMounted())
-
-        // 更新下一个兄弟节点
-        if (instance.sibling != null) {
-          const siblingNode = instance.domRef
-            ? instance.domRef.nextSibling
-            : node?.nextSibling
-
-          stack.push([instance.sibling, siblingNode || undefined])
-        }
-
-        // 更新下一个子节点
-        if (instance.child != null) {
-          const childNode = instance.domRef
-            ? instance.domRef.firstChild
-            : node
-
-          stack.push([instance.child, childNode || undefined])
-        }
-      }
-    }
-
-    commitWalkV2(rootInstance, rootNode)
+    commitWalk(rootInstance, rootNode)
   }
 
   function scheduleWorkLoop() {
