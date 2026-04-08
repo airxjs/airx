@@ -786,15 +786,41 @@
     {
       "id": "TASK-0052",
       "title": "改进 hydrate 中 SSR 节点的事件绑定能力",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "owner": "",
       "summary": "Derived from TASK-0051 completion report known limitation: SSR 节点在 hydrate 后不会自动绑定事件。需要在 connectInstanceTreeToDom 后对需要绑定事件的节点调用 updateDom，使 SSR 输出的交互元素能正常工作。",
-      "updatedAt": "2026-04-07T10:41:55.453Z",
+      "updatedAt": "2026-04-07T10:43:53.735Z",
       "links": [],
       "roadmapRefs": [
         "ROADMAP-0003"
       ],
-      "recordVersion": 2
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0053",
+      "title": "补充 SSR hydrate 示例文档",
+      "status": "DONE",
+      "owner": "",
+      "summary": "当前 SSR hydrate 实现已完成（见最近 commit 3789d45），但 designs/ssr-test-checklist.md 指出文档示例仅 60% 完成。建议补充 hydrate 使用示例和 SSRContext 传递示例，完善 README 中 SSR 章节。",
+      "updatedAt": "2026-04-07T21:52:16.359Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0003"
+      ],
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0054",
+      "title": "分析 browser/server commit 提交流程重叠",
+      "status": "DONE",
+      "owner": "",
+      "summary": "根据 optimization-roadmap-0.8.md Iteration B，当前 browser 和 server 的 commit 提交逻辑存在大量重复。需要先分析两份代码的共同点和差异，形成研究报告，再制定收敛计划。",
+      "updatedAt": "2026-04-07T21:50:40.047Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0003"
+      ],
+      "recordVersion": 3
     }
   ],
   "roadmaps": [
@@ -823,7 +849,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 171,
+    "tasks_version": 178,
     "roadmaps_version": 7,
     "store_schema_version": 3
   },
@@ -831,9 +857,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 171,
-      "lastBuiltAt": "2026-04-07T10:41:55.464Z",
-      "recordVersion": 509
+      "lastSourceVersion": 178,
+      "lastBuiltAt": "2026-04-07T21:52:16.366Z",
+      "recordVersion": 530
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
