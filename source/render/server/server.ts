@@ -1,7 +1,19 @@
 import { CSSProperties } from '../../types/index.js'
-import { AirxElement } from '../../element/index.js'
-import { InnerAirxComponentContext, Instance, performUnitOfWork, AbstractElement } from '../basic/common.js'
+import { AirxElement, createElement, AirxComponent } from '../../element/index.js'
+import { createLogger } from '../../logger/index.js'
+import {
+  InnerAirxComponentContext,
+  Instance,
+  performUnitOfWork,
+  AbstractElement,
+  INTERNAL_COMMENT_NODE_TYPE,
+  INTERNAL_TEXT_NODE_TYPE,
+  getParentDom,
+  getChildDoms,
+} from '../basic/common.js'
+import { createCommitWalker } from '../basic/commit-walker.js'
 import { PluginContext } from '../basic/plugins/index.js'
+import { hydrate as clientHydrate, type HydrateOptions } from '../browser/index.js'
 
 function camelToKebab(str: string): string {
   return str.replace(/([A-Z])/g, (match, p1, offset) => {
@@ -11,21 +23,6 @@ function camelToKebab(str: string): string {
       return '-' + p1.toLowerCase()
     }
   })
-}
-
-function escapeHtml(str: string): string {
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-}
-
-function escapeAttr(str: string): string {
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/"/g, '&quot;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
 }
 
 class ServerElement implements AbstractElement {
@@ -50,7 +47,6 @@ class ServerElement implements AbstractElement {
     this.content = ''
     this.children = []
     this.className = ''
-    this.innerHTML = ''
     this.attributes = new Map()
   }
 
@@ -61,7 +57,6 @@ class ServerElement implements AbstractElement {
 
   readonly className: string
   readonly style: CSSProperties
-  innerHTML: string
   private content: string
   private children: ServerElement[]
   private attributes: Map<string, string>
@@ -95,16 +90,42 @@ class ServerElement implements AbstractElement {
     /* eslint-enable @typescript-eslint/ban-ts-comment */
   }
 
+  insertBefore(dom: ServerElement, refNode: ServerElement | null) {
+    /* eslint-disable @typescript-eslint/ban-ts-comment */
+    if (refNode === null) {
+      return this.appendChild(dom)
+    }
+    const refIndex = this.children.findIndex(v => v === refNode)
+    if (refIndex === -1) {
+      return this.appendChild(dom)
+    }
+    // @ts-ignore
+    dom.parentNode = this
+    // Update nextSibling of previous sibling
+    if (refIndex > 0) {
+      // @ts-ignore
+      this.children[refIndex - 1].nextSibling = dom
+    } else {
+      // @ts-ignore
+      this.firstChild = dom
+    }
+    // Set nextSibling of new node to refNode
+    // @ts-ignore
+    dom.nextSibling = refNode
+    this.children.splice(refIndex, 0, dom)
+    /* eslint-enable @typescript-eslint/ban-ts-comment */
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setAttribute(name: string, value: any) {
-    if (value === false || value == null) return this.attributes.delete(name)
+    if (value === '') return this.attributes.delete(name)
     /* eslint-disable @typescript-eslint/ban-ts-comment */
     // @ts-ignore
     if (name === 'class') return this.className = value
     // @ts-ignore
     if (name === 'style') return this.style = value
     /* eslint-enable @typescript-eslint/ban-ts-comment */
-    this.attributes.set(name, value === true ? '' : value)
+    this.attributes.set(name, value)
   }
 
   removeAttribute(name: string) {
@@ -112,8 +133,8 @@ class ServerElement implements AbstractElement {
   }
 
   toString(): string {
-    if (this.nodeName === '#text') return escapeHtml(this.content)
-    if (this.nodeName === '#comment') return `<!--${this.content}-->`
+    if (this.nodeName === '#text') return this.content
+    if (this.nodeName === '#comment') return this.content
 
     const styleString = Object.entries(this.style)
       .map(([key, value]) => `${camelToKebab(key)}:${value}`)
@@ -122,9 +143,8 @@ class ServerElement implements AbstractElement {
     const attributes = [...this.attributes.entries()]
     if (styleString.length > 0) attributes.push(['style', styleString])
     if (this.className.length > 0) attributes.push(['class', this.className])
-    const attributesString = attributes.map(([name, value]) => ` ${name}="${escapeAttr(String(value))}"`).join('')
-    const innerContent = this.innerHTML || this.children.map(child => child.toString()).join('')
-    return `<${this.nodeName}${attributesString}>${innerContent}</${this.nodeName}>`
+    const attributesString = attributes.map(([name, value]) => ` ${name}="${value}"`).join('')
+    return `<${this.nodeName}${attributesString}>${this.children.map(child => child.toString()).join('')}</${this.nodeName}>`
   }
 }
 
@@ -165,6 +185,9 @@ export function render(pluginContext: PluginContext, element: AirxElement, onCom
    * 提交 Dom 变化
    */
   function commitDom(rootInstance: Instance<ServerElement>, rootNode?: ServerElement) {
+    const logger = createLogger('commitDom')
+    logger.debug('commitDom', rootInstance)
+
     type PropsType = Record<string, unknown>
 
     function updateDomProperties(dom: ServerElement, nextProps: PropsType, prevProps: PropsType = {}) {
@@ -174,10 +197,9 @@ export function render(pluginContext: PluginContext, element: AirxElement, onCom
       const isClass = (key: string) => key === 'class'
       const isEvent = (key: string) => key.startsWith("on")
       const isChildren = (key: string) => key === 'children'
-      const isInnerHTML = (key: string) => key === 'innerHTML'
       const isGone = (_prev: PropsType, next: PropsType) => (key: string) => !(key in next)
       const isNew = (prev: PropsType, next: PropsType) => (key: string) => prev[key] !== next[key]
-      const isProperty = (key: string) => !isChildren(key) && !isEvent(key) && !isStyle(key) && !isClass(key) && !isKey(key) && !isRef(key) && !isInnerHTML(key)
+      const isProperty = (key: string) => !isChildren(key) && !isEvent(key) && !isStyle(key) && !isClass(key) && !isKey(key) && !isRef(key)
 
       // https://developer.mozilla.org/zh-CN/docs/Web/API/Node
       if (dom.nodeName === '#text' || dom.nodeName === '#comment') {
@@ -186,14 +208,6 @@ export function render(pluginContext: PluginContext, element: AirxElement, onCom
           textNode.nodeValue = String(nextProps.textContent)
         }
         return
-      }
-
-      // innerHTML injects raw HTML on server side
-      if ('innerHTML' in nextProps || 'innerHTML' in prevProps) {
-        /* eslint-disable @typescript-eslint/ban-ts-comment */
-        // @ts-ignore
-        dom.innerHTML = nextProps.innerHTML == null || nextProps.innerHTML === false ? '' : String(nextProps.innerHTML)
-        /* eslint-enable @typescript-eslint/ban-ts-comment */
       }
 
       // remove old style
@@ -235,64 +249,24 @@ export function render(pluginContext: PluginContext, element: AirxElement, onCom
       Object.keys(nextProps)
         .filter(isProperty)
         .filter(isNew(prevProps, nextProps))
-        .forEach(name => {
-          const value = nextProps[name]
-          if (value === false || value == null) {
-            dom.removeAttribute(name)
-          } else if (value === true) {
-            dom.setAttribute(name, '')
-          } else {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            dom.setAttribute(name, value as any)
-          }
-        })
-    }
-
-    function getParentDom(instance: Instance<ServerElement>): ServerElement {
-      if (instance.parent?.domRef != null) {
-        return instance.parent.domRef
-      }
-      if (instance.parent) {
-        return getParentDom(instance.parent)
-      }
-
-      throw new Error('Cant find dom')
-    }
-
-    /**
-     * 查找 instance 下所有的一级 dom
-     * @param instance 
-     * @returns 
-     */
-    function getChildDoms(instance: Instance<ServerElement>): ServerElement[] {
-      const domList: ServerElement[] = []
-      const todoList: Instance<ServerElement>[] = [instance]
-
-      while (todoList.length > 0) {
-        const current = todoList.pop()
-
-        // 找到真实 dom 直接提交
-        if (current?.domRef != null) {
-          domList.push(current.domRef)
-        }
-
-        // 有子节点但是无真实 dom，向下继续查找
-        if (current?.domRef == null) {
-          if (current?.child != null) {
-            todoList.push(current.child)
-          }
-        }
-
-        // 可能有兄弟节点，则需要继续查找
-        if (current?.sibling != null) {
-          todoList.push(current.sibling)
-        }
-      }
-
-      return domList
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .forEach(name => dom.setAttribute(name, nextProps[name] as any))
     }
 
     function commitInstanceDom(nextInstance: Instance<ServerElement>, oldNode?: ServerElement) {
+      const getDebugElementName = (instance?: Instance<ServerElement>): string => {
+        if (typeof instance?.element?.type === 'string') {
+          return `<${instance.element.type}>`
+        }
+
+        if (typeof instance?.element?.type === 'function') {
+          const componentName = instance.element.type.name || 'AnonymousComponent'
+          return `Component(${componentName})`
+        }
+
+        return '<unknown>'
+      }
+
       // 移除标删元素
       if (nextInstance.deletions) {
         for (const deletion of nextInstance.deletions) {
@@ -311,11 +285,11 @@ export function render(pluginContext: PluginContext, element: AirxElement, onCom
       if (nextInstance.domRef == null) {
         if (nextInstance.element == null) throw new Error('???')
         if (typeof nextInstance.element.type === 'string') {
-          if (nextInstance.element.type === 'text') {
+          if (nextInstance.element.type === INTERNAL_TEXT_NODE_TYPE) {
             const textContent = nextInstance.element.props.textContent
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             nextInstance.domRef = ServerElement.createTextNode(textContent as string) as any
-          } else if (nextInstance.element.type === 'comment') {
+          } else if (nextInstance.element.type === INTERNAL_COMMENT_NODE_TYPE) {
             const textContent = nextInstance.element.props.textContent
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             nextInstance.domRef = ServerElement.createComment(textContent as string) as any
@@ -335,64 +309,36 @@ export function render(pluginContext: PluginContext, element: AirxElement, onCom
       }
 
       // 插入 parent
-      // TODO: 针对仅移动时优化
       if (nextInstance.domRef != null) {
         if (oldNode !== nextInstance.domRef) {
-          if (nextInstance.domRef.parentNode) {
-            nextInstance.domRef.parentNode.removeChild(nextInstance.domRef)
+          const parentDom = getParentDom(nextInstance)
+          if (parentDom.nodeName === '#text' || parentDom.nodeName === '#comment') {
+            throw new Error(
+              `[airx] Invalid DOM hierarchy: cannot append ${getDebugElementName(nextInstance)} to ${getDebugElementName(nextInstance.parent)}. `
+              + 'A text/comment node cannot contain child nodes.'
+            )
           }
 
-          const parentDom = getParentDom(nextInstance)
-          parentDom.appendChild(nextInstance.domRef)
+          // 优化：同父节点内移动使用 insertBefore，避免 remove + append
+          if (nextInstance.domRef.parentNode === parentDom) {
+            parentDom.insertBefore(nextInstance.domRef, oldNode ?? null)
+          } else {
+            if (nextInstance.domRef.parentNode) {
+              nextInstance.domRef.parentNode.removeChild(nextInstance.domRef)
+            }
+            parentDom.appendChild(nextInstance.domRef)
+          }
         }
       }
     }
 
-    function commitWalkV2(initInstance: Instance<ServerElement>, initNode?: ServerElement) {
-      // 创建一个栈，将根节点压入栈中
+    const commitWalk = createCommitWalker<ServerElement, ServerElement>({
+      commitInstanceDom,
+      getNextSibling: (instance, node) => instance.domRef?.nextSibling ?? node?.nextSibling,
+      getFirstChild: (instance, node) => instance.domRef?.firstChild ?? node,
+    })
 
-      type StackLayer = [Instance<ServerElement>, ServerElement | undefined] | (() => void)
-      const stack: StackLayer[] = [[initInstance, initNode]]
-
-      while (stack.length > 0) {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const stackLayer = stack.pop()!
-        if (typeof stackLayer === 'function') {
-          stackLayer()
-          continue
-        }
-
-        const [instance, node] = stackLayer
-        commitInstanceDom(instance, node)
-
-        // stack 是先入后出
-        // 实际上是先渲染 child
-        // 这里然后再渲染 sibling
-
-        // 执行生命周期的 Mount
-        stack.push(() => instance.context.triggerMounted())
-
-        // 更新下一个兄弟节点
-        if (instance.sibling != null) {
-          const siblingNode = instance.domRef
-            ? instance.domRef.nextSibling
-            : node?.nextSibling
-
-          stack.push([instance.sibling, siblingNode || undefined])
-        }
-
-        // 更新下一个子节点
-        if (instance.child != null) {
-          const childNode = instance.domRef
-            ? instance.domRef.firstChild
-            : node
-
-          stack.push([instance.child, childNode || undefined])
-        }
-      }
-    }
-
-    commitWalkV2(rootInstance, rootNode)
+    commitWalk(rootInstance, rootNode)
   }
 
   while (context.nextUnitOfWork) {
@@ -409,3 +355,77 @@ export function render(pluginContext: PluginContext, element: AirxElement, onCom
 
   onComplete(context.rootInstance.domRef?.toString() || '')
 }
+
+/**
+ * SSR 应用实例
+ */
+export interface SSRApp {
+  /**
+   * 将应用渲染为 HTML 字符串
+   */
+  renderToString(): Promise<string>
+  /**
+   * 客户端激活 SSR 输出的 HTML
+   * @param container 服务端渲染时使用的容器元素
+   * @param options Hydrate 选项
+   */
+  hydrate(container: HTMLElement, options?: HydrateOptions): void
+}
+
+/**
+ * 创建 SSR 应用实例
+ * @param element 根组件或根元素
+ */
+export function createSSRApp(element: AirxElement | AirxComponent): SSRApp {
+  const appContext = new PluginContext()
+
+  const ensureAsElement = (element: AirxElement | AirxComponent): AirxElement => {
+    if (typeof element === 'function') {
+      return createElement(element, {})
+    }
+    return element
+  }
+
+  const rootElement = ensureAsElement(element)
+
+  return {
+    renderToString(): Promise<string> {
+      return new Promise<string>((resolve) => {
+        render(appContext, rootElement, resolve)
+      })
+    },
+
+    hydrate(container: HTMLElement, options?: HydrateOptions): void {
+      const logger = createLogger('SSRApp:hydrate')
+      logger.debug('hydrating SSR app', { container, options })
+      
+      // Use the client-side hydrate function
+      clientHydrate(rootElement, container, options)
+    }
+  }
+}
+
+/**
+ * 将 SSR 应用渲染为 HTML 字符串
+ * @param app SSR 应用实例
+ */
+export function renderToString(app: SSRApp): Promise<string> {
+  return app.renderToString()
+}
+
+/**
+ * 客户端激活 SSR 输出的 HTML
+ * @param _html 服务端渲染的 HTML 字符串（暂未使用，DOM already in container）
+ * @param container 容器元素
+ * @param app SSR 应用实例
+ * @param options Hydrate 选项
+ */
+export function hydrate(_html: string, container: HTMLElement, app: SSRApp, options?: HydrateOptions): void {
+  const logger = createLogger('hydrate')
+  logger.debug('top-level hydrate called')
+  app.hydrate(container, options)
+}
+
+// Re-export HydrateOptions type for public API
+export type { HydrateOptions } from '../browser/index.js'
+

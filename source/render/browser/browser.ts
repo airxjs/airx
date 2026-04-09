@@ -1,7 +1,17 @@
 import { AirxElement } from '../../element/index.js'
 import { createLogger } from '../../logger/index.js'
 import { PluginContext } from '../basic/plugins/index.js'
-import { AbstractElement, InnerAirxComponentContext, Instance, getInstanceLabel, performUnitOfWork } from '../basic/common.js'
+import {
+  AbstractElement,
+  InnerAirxComponentContext,
+  INTERNAL_COMMENT_NODE_TYPE,
+  INTERNAL_TEXT_NODE_TYPE,
+  Instance,
+  performUnitOfWork,
+  getParentDom,
+  getChildDoms,
+} from '../basic/common.js'
+import { createCommitWalker } from '../basic/commit-walker.js'
 
 class BrowserElement extends Element implements AbstractElement {}
 
@@ -10,7 +20,6 @@ interface RenderContext {
   needCommitDom: boolean
   nextUnitOfWork: Instance<BrowserElement> | null
   isWorkLoopScheduled: boolean
-  needRestartFromRoot: boolean
 }
 
 function createIdleDeadline(): IdleDeadline {
@@ -40,8 +49,7 @@ export function render(pluginContext: PluginContext, element: AirxElement, domRe
     rootInstance,
     nextUnitOfWork: null,
     needCommitDom: false,
-    isWorkLoopScheduled: false,
-    needRestartFromRoot: false
+    isWorkLoopScheduled: false
   }
 
   const appInstance: Instance<BrowserElement> = {
@@ -56,12 +64,12 @@ export function render(pluginContext: PluginContext, element: AirxElement, domRe
   context.rootInstance.child = appInstance
   context.nextUnitOfWork = appInstance
 
-  const logger = createLogger('renderer')
-
   /**
    * 提交 Dom 变化
    */
   function commitDom(rootInstance: Instance<BrowserElement>, rootNode?: ChildNode) {
+    const logger = createLogger('commitDom')
+    logger.debug('commitDom', rootInstance)
 
     type PropsType = Record<string, unknown>
 
@@ -71,51 +79,20 @@ export function render(pluginContext: PluginContext, element: AirxElement, domRe
       }
     }
 
-    function getParentDom(instance: Instance<BrowserElement>): BrowserElement {
-      if (instance.parent?.domRef != null) {
-        return instance.parent.domRef
-      }
-      if (instance.parent) {
-        return getParentDom(instance.parent)
-      }
-
-      throw new Error('Cant find dom')
-    }
-
-    /**
-     * 查找 instance 下所有的一级 dom
-     * @param instance 
-     * @returns 
-     */
-    function getChildDoms(instance: Instance<BrowserElement>): BrowserElement[] {
-      const domList: BrowserElement[] = []
-      const todoList: Instance<BrowserElement>[] = [instance]
-
-      while (todoList.length > 0) {
-        const current = todoList.pop()
-
-        // 找到真实 dom 直接提交
-        if (current?.domRef != null) {
-          domList.push(current.domRef)
-        }
-
-        // 有子节点但是无真实 dom，向下继续查找
-        if (current?.domRef == null) {
-          if (current?.child != null) {
-            todoList.push(current.child)
-          }
-        }
-
-        // 可能有兄弟节点，则需要继续查找
-        if (current?.sibling != null) {
-          todoList.push(current.sibling)
-        }
-      }
-
-      return domList
-    }
-
     function commitInstanceDom(nextInstance: Instance<BrowserElement>, oldNode?: ChildNode) {
+      const getDebugElementName = (instance?: Instance<BrowserElement>): string => {
+        if (typeof instance?.element?.type === 'string') {
+          return `<${instance.element.type}>`
+        }
+
+        if (typeof instance?.element?.type === 'function') {
+          const componentName = instance.element.type.name || 'AnonymousComponent'
+          return `Component(${componentName})`
+        }
+
+        return '<unknown>'
+      }
+
       // 移除标删元素
       if (nextInstance.deletions) {
         for (const deletion of nextInstance.deletions) {
@@ -134,11 +111,11 @@ export function render(pluginContext: PluginContext, element: AirxElement, domRe
       if (nextInstance.domRef == null) {
         if (nextInstance.element == null) throw new Error('???')
         if (typeof nextInstance.element.type === 'string') {
-          if (nextInstance.element.type === 'text') {
+          if (nextInstance.element.type === INTERNAL_TEXT_NODE_TYPE) {
             const textContent = nextInstance.element.props.textContent
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             nextInstance.domRef = document.createTextNode(textContent as string) as any
-          } else if (nextInstance.element.type === 'comment') {
+          } else if (nextInstance.element.type === INTERNAL_COMMENT_NODE_TYPE) {
             const textContent = nextInstance.element.props.textContent
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             nextInstance.domRef = document.createComment(textContent as string) as any
@@ -165,64 +142,40 @@ export function render(pluginContext: PluginContext, element: AirxElement, domRe
       }
 
       // 插入 parent
-      // TODO: 针对仅移动时优化
       if (nextInstance.domRef != null) {
         if (oldNode !== nextInstance.domRef) {
-          if (nextInstance.domRef.parentNode) {
-            nextInstance.domRef.parentNode.removeChild(nextInstance.domRef)
+          const parentDom = getParentDom(nextInstance)
+          if (
+            parentDom.nodeType === Node.TEXT_NODE
+            || parentDom.nodeType === Node.COMMENT_NODE
+          ) {
+            const parentInstance = (parentDom as { airxInstance?: Instance<BrowserElement> }).airxInstance
+            throw new Error(
+              `[airx] Invalid DOM hierarchy: cannot append ${getDebugElementName(nextInstance)} to ${getDebugElementName(parentInstance)}. `
+              + 'A text/comment node cannot contain child nodes.'
+            )
           }
 
-          const parentDom = getParentDom(nextInstance)
-          parentDom.appendChild(nextInstance.domRef)
+          // 优化：同父节点内移动使用 insertBefore，避免 remove + append
+          if (nextInstance.domRef.parentNode === parentDom) {
+            parentDom.insertBefore(nextInstance.domRef, oldNode ?? null)
+          } else {
+            if (nextInstance.domRef.parentNode) {
+              nextInstance.domRef.parentNode.removeChild(nextInstance.domRef)
+            }
+            parentDom.appendChild(nextInstance.domRef)
+          }
         }
       }
     }
 
-    function commitWalkV2(initInstance: Instance<BrowserElement>, initNode?: ChildNode) {
-      // 创建一个栈，将根节点压入栈中
+    const commitWalk = createCommitWalker<BrowserElement, ChildNode>({
+      commitInstanceDom,
+      getNextSibling: (instance, node) => instance.domRef?.nextSibling ?? node?.nextSibling,
+      getFirstChild: (instance, node) => instance.domRef?.firstChild ?? node,
+    })
 
-      type StackLayer = [Instance<BrowserElement>, ChildNode | undefined] | (() => void)
-      const stack: StackLayer[] = [[initInstance, initNode]]
-
-      while (stack.length > 0) {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const stackLayer = stack.pop()!
-        if (typeof stackLayer === 'function') {
-          stackLayer()
-          continue
-        }
-
-        const [instance, node] = stackLayer
-        commitInstanceDom(instance, node)
-
-        // stack 是先入后出
-        // 实际上是先渲染 child
-        // 这里然后再渲染 sibling
-
-        // 执行生命周期的 Mount
-        stack.push(() => instance.context.triggerMounted())
-
-        // 更新下一个兄弟节点
-        if (instance.sibling != null) {
-          const siblingNode = instance.domRef
-            ? instance.domRef.nextSibling
-            : node?.nextSibling
-
-          stack.push([instance.sibling, siblingNode || undefined])
-        }
-
-        // 更新下一个子节点
-        if (instance.child != null) {
-          const childNode = instance.domRef
-            ? instance.domRef.firstChild
-            : node
-
-          stack.push([instance.child, childNode || undefined])
-        }
-      }
-    }
-
-    commitWalkV2(rootInstance, rootNode)
+    commitWalk(rootInstance, rootNode)
   }
 
   function scheduleWorkLoop() {
@@ -237,15 +190,9 @@ export function render(pluginContext: PluginContext, element: AirxElement, domRe
     })
   }
 
-  function onUpdateRequire(instance: Instance<BrowserElement>) {
+  function onUpdateRequire() {
     if (context.nextUnitOfWork == null && context.rootInstance.child) {
       context.nextUnitOfWork = context.rootInstance.child
-      logger.info('onUpdateRequire: schedule from root', getInstanceLabel(instance))
-    } else {
-      // workLoop 正在进行中（yield 状态），标记需要重新从 root 开始
-      // 以确保 yield 点之前被标记 needReRender 的实例不会被遗漏
-      context.needRestartFromRoot = true
-      logger.info('onUpdateRequire: mark restart (workLoop in progress)', getInstanceLabel(instance))
     }
 
     scheduleWorkLoop()
@@ -256,40 +203,25 @@ export function render(pluginContext: PluginContext, element: AirxElement, domRe
    */
   function workLoop(deadline: IdleDeadline = createIdleDeadline()) {
     let shouldYield = false
-    let processedCount = 0
+    const logger = createLogger('workLoop')
     while (context.nextUnitOfWork && !shouldYield) {
+      logger.debug('nextUnitOfWork', context.nextUnitOfWork)
       context.nextUnitOfWork = performUnitOfWork(pluginContext, context.nextUnitOfWork, onUpdateRequire) as Instance<BrowserElement>
-      processedCount++
       if (context.nextUnitOfWork == null) context.needCommitDom = true
       if (deadline) shouldYield = deadline.timeRemaining() < 1
     }
 
-    if (shouldYield && context.nextUnitOfWork) {
-      logger.info('workLoop: yield after', processedCount, 'units, paused at', getInstanceLabel(context.nextUnitOfWork))
-    }
-
     if (context.needCommitDom && context.rootInstance.child) {
-      logger.info('workLoop: commit DOM after', processedCount, 'units')
       commitDom(context.rootInstance.child,
         context.rootInstance.domRef?.firstChild || undefined
       )
       context.needCommitDom = false
     }
 
-    // yield 期间有信号变更命中了已处理的实例，需要从 root 重新遍历
-    // 注意：无论是 yield 中还是 workLoop 刚完成，只要有 needRestartFromRoot
-    // 都必须重置到 root，不能依赖 nextUnitOfWork == null 的条件
-    // 若 yield 时（nextUnitOfWork != null）不重置，下一次 workLoop 会从
-    // yield 点继续，跳过已变化的实例，导致 DOM 不更新
-    if (context.needRestartFromRoot) {
-      context.needRestartFromRoot = false
-      if (context.rootInstance.child) {
-        context.nextUnitOfWork = context.rootInstance.child
-        logger.info('workLoop: restart from root due to signal change during yield')
-      }
+    // Only schedule follow-up work if there actually is more work
+    if (context.nextUnitOfWork != null) {
+      scheduleWorkLoop()
     }
-
-    scheduleWorkLoop()
   }
 
   // 开始调度

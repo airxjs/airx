@@ -20,6 +20,10 @@ import {
 import { PluginContext } from './plugins/index.js'
 import { globalContext } from './hooks/hooks.js'
 
+// Internal element types for text and comment nodes
+export const INTERNAL_TEXT_NODE_TYPE = '__airx_text__'
+export const INTERNAL_COMMENT_NODE_TYPE = '__airx_comment__'
+
 export function getInstanceLabel<E extends AbstractElement>(instance: Instance<E>): string {
   const type = instance.element?.type
   if (typeof type === 'function') {
@@ -177,6 +181,55 @@ export interface AbstractElement { }
  *  ↓    |                 |
  * instance  -sibling→  instance...
  */
+/**
+ * 查找 instance 的父级 DOM
+ * @param instance 
+ * @returns 父级 DOM 引用
+ */
+export function getParentDom<E extends AbstractElement>(instance: Instance<E>): E {
+  if (instance.parent?.domRef != null) {
+    return instance.parent.domRef
+  }
+  if (instance.parent) {
+    return getParentDom(instance.parent)
+  }
+
+  throw new Error('Cant find dom')
+}
+
+/**
+ * 查找 instance 下所有的一级 DOM
+ * @param instance 
+ * @returns DOM 列表
+ */
+export function getChildDoms<E extends AbstractElement>(instance: Instance<E>): E[] {
+  const domList: E[] = []
+  const todoList: Instance<E>[] = [instance]
+
+  while (todoList.length > 0) {
+    const current = todoList.pop()
+
+    // 找到真实 dom 直接提交
+    if (current?.domRef != null) {
+      domList.push(current.domRef)
+    }
+
+    // 有子节点但是无真实 dom，向下继续查找
+    if (current?.domRef == null) {
+      if (current?.child != null) {
+        todoList.push(current.child)
+      }
+    }
+
+    // 可能有兄弟节点，则需要继续查找
+    if (current?.sibling != null) {
+      todoList.push(current.sibling)
+    }
+  }
+
+  return domList
+}
+
 export interface Instance<E extends AbstractElement = AbstractElement> {
   domRef?: E
 
@@ -450,7 +503,7 @@ export function performUnitOfWork<E extends AbstractElement>(pluginContext: Plug
       }
 
       if (isValidElement(element)) return element
-      const elementType = isComment(element) ? 'comment' : 'text'
+      const elementType = isComment(element) ? INTERNAL_COMMENT_NODE_TYPE : INTERNAL_TEXT_NODE_TYPE
       const textContent = element === '' ? 'empty-string' : String(element)
       return createElement(elementType, { textContent })
     })
@@ -545,7 +598,7 @@ export function performUnitOfWork<E extends AbstractElement>(pluginContext: Plug
       }
 
       reconcileChildren(pluginContext, instance, childrenAsElements(children))
-      delete instance.needReRender
+      instance.needReRender = false
     }
   }
 
@@ -557,7 +610,8 @@ export function performUnitOfWork<E extends AbstractElement>(pluginContext: Plug
   }
 
   // 优先处理 child
-  if (instance.child) {
+  // 如果 needReRender 为 true，需要先执行重渲染逻辑，不能提前返回 child
+  if (instance.child && !instance.needReRender) {
     return instance.child
   }
 
