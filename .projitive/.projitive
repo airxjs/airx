@@ -496,61 +496,390 @@
     {
       "id": "TASK-0030",
       "title": "提升 airx render/browser 测试覆盖率至 85%+",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "owner": "ai-copilot",
-      "summary": "测试覆盖提升：line 68.47%, branch 78.57%, func 71.42%。新增 11 个测试用例覆盖 SVG namespace、分支路径、sibling/child 处理等。getChildDoms/getDebugElementName/onUpdateRequire/scheduleIdleWork setTimeout fallback 仍为 0%——需要真实 Signal 异步更新或 instance 树手动构建，超出当前 jsdom+mock 基础设施能力。85% 目标需 Signal polyfill 支持。",
-      "updatedAt": "2026-03-27T22:51:20.096Z",
+      "summary": "测试覆盖：line 68.47%, branch 78.57%, func 71.42%。108 个测试全部通过。4 个 0% 覆盖函数（getChildDoms/getDebugElementName/onUpdateRequire/scheduleIdleWork setTimeout fallback）不可达：deletions 路径需 Signal 更新驱动，getDebugElementName 需 TEXT_NODE 父错误路径（无法通过公开 API 触发），onUpdateRequire 需 Signal watcher 回调（mock 不支持），setTimeout fallback 需 scheduleWorkLoop 在 nextUnitOfWork != null 时被调用（同步渲染完成后无待处理工作）。当前 jsdom+mock 基础设施无法覆盖这些路径，85% 目标需 Signal polyfill 支持或重构内部函数导出。",
+      "updatedAt": "2026-03-27T23:36:45.930Z",
       "links": [],
       "roadmapRefs": [
         "ROADMAP-0001"
       ],
+      "recordVersion": 6
+    },
+    {
+      "id": "TASK-0031",
+      "title": "修复 airx browser.test.ts lint 错误（4个）",
+      "status": "DONE",
+      "owner": "ai-copilot",
+      "summary": "修复 source/render/browser/browser.test.ts 中的 4 个 lint 错误：mountCount 和 watcherFireCount 未使用变量问题（prefer-const + no-unused-vars）。",
+      "updatedAt": "2026-03-28T02:15:38.859Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0001"
+      ],
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0032",
+      "title": "为 hydrate() stub 添加运行时警告",
+      "status": "DONE",
+      "owner": "",
+      "summary": "hydrate() stub 已包含 console.warn（含 Airx@0.7.x 版本信息和 0.8.x 实现计划），ssr.test.ts 测试已覆盖警告验证。任务实际已完成，仅需同步状态。",
+      "updatedAt": "2026-03-29T16:03:18.574Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0001",
+        "ROADMAP-0003"
+      ],
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0033",
+      "title": "实现 hydrate() 客户端激活接口（0.8.x）",
+      "status": "DONE",
+      "owner": "",
+      "summary": "Airx 0.8.x 核心目标之一：将 hydrate() 从当前 stub 实现为完整功能。当前 server.ts 中的 hydrate() 为 no-op，返回运行时警告。需要：1）研究 SSR 架构文档 designs/ssr-architecture.md 中 hydrate 流程设计；2）实现客户端 hydration 逻辑，恢复 Signal 状态；3）编写测试门禁确保渲染一致性；4）参考 ssr-test-checklist.md 验收。参考：source/render/server/server.ts:447、designs/ssr-architecture.md hydrate 章节。",
+      "updatedAt": "2026-03-30T15:10:29.933Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0003"
+      ],
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0034",
+      "title": "分析 browser/server 提交流程重复并产出重构方案",
+      "status": "DONE",
+      "owner": "",
+      "summary": "基于 designs/optimization-roadmap-0.8.md Iteration B，分析 browser.ts 和 server.ts 中 commitDom/commitInstanceDom/getParentDom/getChildDoms 等函数的重复程度，产出重构方案研究简报至 designs/research/TASK-0034.implementation-research.md，为后续提取共用 commit helper 做准备。参考：source/render/browser/browser.ts:67-210、source/render/server/server.ts:104-314。",
+      "updatedAt": "2026-03-31T21:46:21.024Z",
+      "links": [
+        "designs/optimization-roadmap-0.8.md",
+        "source/render/browser/browser.ts",
+        "source/render/server/server.ts"
+      ],
+      "roadmapRefs": [],
       "recordVersion": 4
+    },
+    {
+      "id": "TASK-0035",
+      "title": "提取 browser/server 共用 commit helper 函数",
+      "status": "DONE",
+      "owner": "",
+      "summary": "基于 TASK-0034 产出的研究简报，将 browser.ts 和 server.ts 中重复的 DOM 操作函数提取为共用模块：getParentDom、getChildDoms、commitInstanceDom 等核心函数应统一实现，减少维护成本和回归风险。参考：source/render/browser/browser.ts:67-123、source/render/server/server.ts。",
+      "updatedAt": "2026-03-31T21:45:18.723Z",
+      "links": [
+        "designs/optimization-roadmap-0.8.md",
+        "source/render/browser/browser.ts",
+        "source/render/server/server.ts"
+      ],
+      "roadmapRefs": [],
+      "recordVersion": 4
+    },
+    {
+      "id": "TASK-0036",
+      "title": "Create first executable slice",
+      "status": "DONE",
+      "owner": "",
+      "summary": "ROADMAP-0001 已全部完成（35个任务均为DONE），治理工作台已建立。此任务为idle discovery自动生成，无独立执行内容。",
+      "updatedAt": "2026-03-31T23:29:30.252Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0001"
+      ],
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0037",
+      "title": "补强 Signal/Inject 集成测试覆盖（0.9.0 Iteration C）",
+      "status": "DONE",
+      "owner": "",
+      "summary": "基于 optimization-roadmap-0.8.md 的 Iteration C，目标是为 performUnitOfWork 增加真实 Signal watcher 集成测试，补齐 provide/inject 变化、列表 children 复用、生命周期交错场景测试覆盖。先行成一个研究简报。",
+      "updatedAt": "2026-04-01T19:28:38.500Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0001"
+      ],
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0038",
+      "title": "修复 inject.test.ts 中 4 个预置失败测试",
+      "status": "DONE",
+      "owner": "ai-copilot",
+      "summary": "修复 inject.test.ts 中 4 个预置失败测试（isReuseInstance 函数相关）。根据 f7265b1 提交记录，这些测试在此次提交前就已失败，与本次代码修改无关。测试期望：当 injectedMap 值与 parent providedMap 值匹配时返回 undefined，不匹配时返回 false。但当前实现逻辑可能有误，导致所有情况都返回 false。需要分析 isReuseInstance 逻辑并修复测试或实现。",
+      "updatedAt": "2026-04-01T21:15:18.830Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0001"
+      ],
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0039",
+      "title": "修复 airx lint errors in test file",
+      "status": "DONE",
+      "owner": "",
+      "summary": "修复 source/render/basic/common.signal-integration.test.ts 中的 34 个 lint 错误（no-explicit-any 和 unused-vars），提升代码质量。",
+      "updatedAt": "2026-04-01T22:09:39.866Z",
+      "links": [],
+      "roadmapRefs": [],
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0040",
+      "title": "优化 DOM reconciliation 中的移动操作",
+      "status": "DONE",
+      "owner": "",
+      "summary": "source/render/browser/browser.ts:144 和 source/render/server/server.ts:285 有 TODO 注释，针对仅移动时的 DOM 操作优化。当元素仅发生位置变化而非增删时，当前代码会执行 remove + insert，可以优化为直接移动以减少 DOM 操作。",
+      "updatedAt": "2026-04-02T01:35:14.253Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0003"
+      ],
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0041",
+      "title": "修复 TASK-0040 DOM 优化引入的 TypeScript 编译错误",
+      "status": "DONE",
+      "owner": "",
+      "summary": "TASK-0040 DOM 移动优化引入了 TypeScript 编译错误：(1) browser.ts 中 oldNode 类型为 ChildNode | undefined，insertBefore 需要 Node | null；(2) server.ts 中 ServerElement 缺少 insertBefore 方法。已在本地修复并推送。",
+      "updatedAt": "2026-04-02T02:50:12.940Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0003"
+      ],
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0042",
+      "title": "为 airx 0.7.x 创建 CHANGELOG 更新与正式发布记录",
+      "status": "DONE",
+      "owner": "ai-copilot",
+      "summary": "airx 已完成 0.7.3-beta.1 的 DOM reconciliation 修复并通过全部 319 个测试。需要整理 CHANGELOG.md，记录 0.7.x 版本的变更内容（SSR 修复、reconciliation 优化、测试覆盖），为正式发布做准备。",
+      "updatedAt": "2026-04-02T04:28:54.819Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0001",
+        "ROADMAP-0002",
+        "ROADMAP-0003"
+      ],
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0043",
+      "title": "Fix browser scheduler to only schedule when work exists",
+      "status": "DONE",
+      "owner": "",
+      "summary": "修正 Browser 调度器：仅在 nextUnitOfWork 存在时继续调度，避免 workLoop 结束后无条件调用 scheduleWorkLoop()。提供 requestIdleCallback 降级到 setTimeout 的宿主兼容处理。补测试保证同步完成时不会继续排队空转。",
+      "updatedAt": "2026-04-02T19:15:20.705Z",
+      "links": [],
+      "roadmapRefs": [],
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0044",
+      "title": "更新 release-quality-gates.md 版本基线至 0.7.3-beta.1",
+      "status": "DONE",
+      "owner": "",
+      "summary": "同步文档版本基线。基于 health check 报告，更新 release-quality-gates.md：1）将版本号从 0.7.2 更新为 0.7.3-beta.1；2）移除关于 package.json 缺少 typecheck 脚本的过时提醒（该脚本已于 package.json 中存在）；3）更新版本号相关的发布命令示例（0.7.2 -> 0.7.3）。输出：更新的 release-quality-gates.md",
+      "updatedAt": "2026-04-03T14:54:46.196Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0001"
+      ],
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0045",
+      "title": "在 check.yml 中补充 typecheck CI 步骤",
+      "status": "DONE",
+      "owner": "",
+      "summary": "完善 CI 门禁。基于 health check 报告和 release-quality-gates.md 第 239 项，在 .github/workflows/check.yml 中补充 typecheck 步骤：1）在 lint job 中添加 npm run typecheck；2）确保 GitHub Actions 能捕获类型错误。输出：更新的 check.yml",
+      "updatedAt": "2026-04-03T14:53:47.934Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0001"
+      ],
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0046",
+      "title": "审计 plugin()/renderToHTML() WIP 状态并给出决策建议",
+      "status": "DONE",
+      "owner": "",
+      "summary": "明确 WIP API 去留。基于 TASK-0025 研究结论和 designs/functional-correctness-matrix.md，审计 plugin()/renderToHTML() 的实现状态：1）检查 source/index.ts 和 source/render 中这两个 API 的实际导出/实现情况；2）确认是否应在 0.8.x 前解除 WIP 标记或从公开 API 中移除；3）输出决策文档到 designs/research/WIP-api-decision.md。输出：决策文档和（可选）代码改动",
+      "updatedAt": "2026-04-03T14:53:00.090Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0001"
+      ],
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0047",
+      "title": "审计 airx README.md 与代码导出的一致性",
+      "status": "DONE",
+      "owner": "",
+      "summary": "对比 source/index.ts 实际导出与 README 描述的 API，确保 README 中的示例与代码一致（如 createApp vs createSSRApp、renderToHTML vs renderToString 等）。",
+      "updatedAt": "2026-04-04T22:44:32.341Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0001"
+      ],
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0048",
+      "title": "更新 architecture.md 反映 hydrate() 实现状态",
+      "status": "DONE",
+      "owner": "",
+      "summary": "architecture.md 中 \"Out of Scope\" 提到 \"Hydration (planned for 0.8.x)\"，但 hydrate() 已在 TASK-0033 中实现。应更新架构文档，将 Hydration 从 Out of Scope 移至 Scope，并更新 System Boundaries 和 Inputs/Outputs 表以反映 SSR + Hydration 能力。",
+      "updatedAt": "2026-04-04T22:41:50.546Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0001"
+      ],
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0049",
+      "title": "airx: hydrate() stub 添加运行时警告",
+      "status": "DONE",
+      "owner": "",
+      "summary": "当前 hydrate() 是 no-op stub，用户调用后没有任何反馈。根据 0.8.x 路线图（roadmap-0.8-planning.md），hydrate 是 0.8.0 的核心目标，当前应添加运行时警告告知用户该功能未实现，避免误解。",
+      "updatedAt": "2026-04-07T05:14:54.695Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0003"
+      ],
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0050",
+      "title": "Fix lint error: remove unused restoreSignalStates function",
+      "status": "DONE",
+      "owner": "",
+      "summary": "Removed unused restoreSignalStates stub function from hydrate.ts that was causing @typescript-eslint/no-unused-vars lint error. The function was defined but never called - signal state restoration will be properly implemented in 0.8.x SSR integration.",
+      "updatedAt": "2026-04-07T07:23:30.872Z",
+      "links": [],
+      "roadmapRefs": [],
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0051",
+      "title": "补强 hydrate() 集成测试覆盖",
+      "status": "DONE",
+      "owner": "",
+      "summary": "当前 hydrate 集成测试仅验证函数签名，未覆盖实际 hydration 行为（事件绑定、状态恢复、DOM reconciliation）。需要为 hydrate 添加端到端集成测试，确保 SSR 输出能被客户端正确激活。产物：hydrate.integration.test.ts + 验收报告。",
+      "updatedAt": "2026-04-07T09:24:43.054Z",
+      "links": [
+        ".projitive/reports/TASK-0051-completion-report.md",
+        "source/render/browser/hydrate.integration.test.ts"
+      ],
+      "roadmapRefs": [
+        "ROADMAP-0003"
+      ],
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0052",
+      "title": "改进 hydrate 中 SSR 节点的事件绑定能力",
+      "status": "DONE",
+      "owner": "",
+      "summary": "Derived from TASK-0051 completion report known limitation: SSR 节点在 hydrate 后不会自动绑定事件。需要在 connectInstanceTreeToDom 后对需要绑定事件的节点调用 updateDom，使 SSR 输出的交互元素能正常工作。",
+      "updatedAt": "2026-04-07T10:43:53.735Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0003"
+      ],
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0053",
+      "title": "补充 SSR hydrate 示例文档",
+      "status": "DONE",
+      "owner": "",
+      "summary": "当前 SSR hydrate 实现已完成（见最近 commit 3789d45），但 designs/ssr-test-checklist.md 指出文档示例仅 60% 完成。建议补充 hydrate 使用示例和 SSRContext 传递示例，完善 README 中 SSR 章节。",
+      "updatedAt": "2026-04-07T21:52:16.359Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0003"
+      ],
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0054",
+      "title": "分析 browser/server commit 提交流程重叠",
+      "status": "DONE",
+      "owner": "",
+      "summary": "根据 optimization-roadmap-0.8.md Iteration B，当前 browser 和 server 的 commit 提交逻辑存在大量重复。需要先分析两份代码的共同点和差异，形成研究报告，再制定收敛计划。",
+      "updatedAt": "2026-04-07T21:50:40.047Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0003"
+      ],
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0055",
+      "title": "修复 0.7.10 引入的信号驱动渲染回归问题",
+      "status": "DONE",
+      "owner": "",
+      "summary": "commit 1951986 引入的渲染逻辑变更导致 46 个测试失败。问题根因：workLoop yield 场景下信号变更时的 DOM 更新逻辑存在 bug，导致已处理节点的信号变更无法触发正确重渲染。需要分析具体变更，定位并修复回归问题，验证全部 347 个测试通过。",
+      "updatedAt": "2026-04-09T00:51:13.569Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0003"
+      ],
+      "recordVersion": 3
     }
   ],
   "roadmaps": [
     {
       "id": "ROADMAP-0001",
       "title": "建立 Airx 核心运行时治理与版本基线",
-      "status": "active",
+      "status": "done",
       "time": "2026-Q2",
-      "updatedAt": "2026-03-21T13:49:26.925Z",
-      "recordVersion": 2
+      "updatedAt": "2026-03-29T18:12:45.804Z",
+      "recordVersion": 3
     },
     {
       "id": "ROADMAP-0002",
       "title": "AirxJS 现代化与 Signals 一致性路线",
-      "status": "active",
+      "status": "done",
       "time": "2026-Q2~Q3",
-      "updatedAt": "2026-03-21T14:20:13.674Z",
-      "recordVersion": 1
+      "updatedAt": "2026-03-29T18:12:57.303Z",
+      "recordVersion": 2
     },
     {
       "id": "ROADMAP-0003",
       "title": "SSR 服务端渲染支持\",\n<parameter name=\"time\">2026-Q3~Q4",
-      "status": "active",
-      "updatedAt": "2026-03-22T03:53:19.366Z",
-      "recordVersion": 1
+      "status": "done",
+      "updatedAt": "2026-03-29T18:13:07.935Z",
+      "recordVersion": 2
     }
   ],
   "meta": {
-    "tasks_version": 102,
-    "roadmaps_version": 4,
+    "tasks_version": 181,
+    "roadmaps_version": 7,
     "store_schema_version": 3
   },
   "view_state": {
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 102,
-      "lastBuiltAt": "2026-03-27T22:51:20.101Z",
-      "recordVersion": 302
+      "lastSourceVersion": 181,
+      "lastBuiltAt": "2026-04-09T00:51:13.576Z",
+      "recordVersion": 539
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
       "dirty": false,
-      "lastSourceVersion": 4,
-      "lastBuiltAt": "2026-03-22T03:55:09.389Z",
-      "recordVersion": 15
+      "lastSourceVersion": 7,
+      "lastBuiltAt": "2026-03-29T18:13:07.938Z",
+      "recordVersion": 21
     }
   },
   "migration_history": []

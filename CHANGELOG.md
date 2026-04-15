@@ -4,6 +4,30 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.7.3] - 2026-04-02
+
+### Fixed
+
+- **DOM Reconciliation `insertBefore`** — Added `ServerElement.insertBefore` method to fix DOM reconciliation in SSR hydration scenarios
+- **Re-render Logic** — Corrected `performUnitOfWork` re-render logic for reactive components to prevent unnecessary re-renders
+- **Provide/Inject Value Changes** — Fixed `inject.test.ts` to correctly handle provide/inject value change scenarios
+- **Type Errors** — Fixed TypeScript type errors in DOM reconciliation code
+
+### Performance
+
+- **DOM Move Optimization** — Optimized DOM `move` operation in reconciliation algorithm, reducing unnecessary DOM mutations
+
+### Refactor
+
+- **Common Utilities** — Extracted `getParentDom` / `getChildDoms` helper functions to `common.ts` for better code reuse
+
+### Testing
+
+- **Lint Fixes** — Resolved lint errors in `common.signal-integration.test.ts`
+- **Test Coverage** — All 319 tests passing
+
+---
+
 ## [0.7.0] - 2026-03-22
 
 ### Breaking Changes

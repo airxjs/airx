@@ -1,179 +1,255 @@
-# Airx Architecture
+# Project Architecture
 
-> 项目架构文档，描述 Airx 当前版本的公开 API、运行时处理流程与演进边界。
->
-> **当前版本基线: 0.7.2**（2026-03-24）
+## Mission and Scope
 
-## 1. 项目定位
+**Mission**: `airx` is a lightweight, Signal-driven JSX web application framework. It provides reactive state management via TC39 Signal primitives, functional component model, virtual DOM diffing, and both browser and server-side rendering.
 
-**airx** 是一个基于 JSX 的视图层框架，核心关注以下能力：
-- 声明式元素与函数式组件
-- 基于 Signal 的响应式渲染
-- 依赖注入与组件生命周期
-- Browser / Server 双环境渲染
+**Scope**:
+- JSX component development and rendering
+- Signal-based reactive state management (State, Computed, Effect)
+- Component lifecycle (onMounted, onUnmounted)
+- Dependency injection via provide/inject
+- Context propagation through component tree
+- Browser DOM rendering
+- Server-side rendering (SSR) to HTML strings
+- Plugin system for extensibility
+- Hydration (client-side activation of SSR HTML)
+- TypeScript-first development
 
-**不提供**：路由、全局状态方案、打包链路与服务端框架集成层。
+**Out of Scope**:
+- Built-in routing (delegated to `airx-router`)
+- Built-in styling (delegate to CSS/Tailwind)
+- Server-side data fetching (delegate to user)
+- Concurrent SSR (thread-local context limitation)
+- Production SSR streaming (current serverRender is string-based)
 
-## 2. 当前技术基线
+---
 
-| 类别 | 技术 |
-|------|------|
-| 语言 | TypeScript strict mode |
-| 构建 | Vite 7 + Rollup |
-| 类型产物 | vite-plugin-dts |
-| 测试 | Vitest + jsdom |
-| Signal | signal-polyfill |
-| 发布格式 | ESM + UMD/CJS + d.ts |
+## System Boundaries
 
-当前包版本基线为 **0.7.2**（2026-03-24）。
+### Inputs
 
-## 3. 模块划分
+| Input | Source | Description |
+|-------|--------|-------------|
+| JSX/TSX source | Developer | Component definitions with JSX syntax |
+| Component tree | JSX transform | Virtual DOM element tree |
+| Signal state | Developer | `Signal.State`, `Signal.Computed`, `Signal.Effect` |
+| Plugin | Developer | Plugin objects implementing `Plugin.install()` |
+| Pre-rendered HTML | SSR step | SSR output to be hydrated via `hydrate()` |
+
+### Outputs
+
+| Output | Target | Description |
+|--------|--------|-------------|
+| DOM mutations | Browser | Real DOM updates via `browserRender()` / `hydrate()` |
+| HTML string | Server | SSR output via `serverRender()` / `renderToString()` |
+| Type definitions | TypeScript | `output/*.d.ts` for consumer type safety |
+
+### External Integrations
+
+| Integration | Role |
+|-------------|------|
+| TC39 Signal | Reactive primitives (`Signal.State`, `Computed`, `Effect`, `Watcher`) |
+| `csstype` | CSS property TypeScript types |
+| esbuild / Vite | JSX transformation (via `vite-plugin-airx`) |
+| Browser DOM | Rendering target |
+
+### Ownership Boundaries
+
+- **airx** owns: Component model, rendering, reactivity, provide/inject, plugin context
+- **airx-router** owns: Route management, history integration
+- **vite-plugin-airx** owns: JSX-to-esbuild configuration
+- **Developer** owns: Component logic, state management, styling
+
+---
+
+## Modules and Responsibilities
+
+### `source/app/` — Application Layer
+
+**`app.ts`** (~95 lines):
+- Defines `AirxApp` interface
+- `createApp(element)` factory creates app instance with:
+  - `mount(container)` → browser rendering
+  - `plugin(...plugins)` → plugin registration
+  - `renderToHTML()` → SSR rendering
+
+### `source/element/` — Virtual DOM and Component Model
+
+**`element.ts`** (~500 lines):
+- Core type definitions: `AirxElement`, `AirxComponent`, `AirxChildren`, `Props`
+- `createElement(type, props, ...children)` — Creates virtual DOM nodes
+- `component(fn)` — Higher-order function wrapping component with lifecycle hooks
+- `Fragment` — Container that renders children without wrapper DOM node
+- `AirxComponentContext` — Per-component instance data (props, refs, mounted callbacks)
+- `AirxComponentRender` — Return type of component render function
+- `createErrorRender()` — Error boundary rendering
+- `isValidElement()` — Element type guard
+
+### `source/render/` — Rendering Engine
+
+#### `render/basic/` — Core Rendering Logic
+
+**`common.ts`** (~300 lines):
+- `reconcile()` — Virtual DOM diffing algorithm; computes minimal DOM operations
+- `processComponent()` — Instantiates components, manages render cycle
+- `createWatcher()` — Sets up Signal watcher for reactive updates
+- `scheduleUpdate()` — Batched update scheduling (prevents redundant renders)
+
+**`hooks/hooks.ts`** (~200 lines):
+- `provide(key, value)` — Registers value in current component context
+- `inject<T>(key)` — Retrieves nearest ancestor's provided value
+- `onMounted(listener)` — Registers callback to run after component mounts
+- `onUnmounted(listener)` — Registers callback to run before component unmounts
+- `currentComponentContext` — Thread-local accessor for component context
+
+**`plugins/index.ts`**:
+- `Plugin` interface — `{ install(ctx: PluginContext): void }`
+- `PluginContext` — Central plugin registry; passed to plugins on app creation
+
+#### `render/browser/` — Browser Renderer
+
+**`browser.ts`** (~200 lines):
+- `browserRender(ctx, element, container)` — Renders to live DOM
+- `insertHTML()` — Safe HTML insertion (avoids script injection)
+- Handles: element creation, DOM insertion, attribute updates, text updates, event listeners
+- Cleanup: unmount callbacks, watcher teardown
+
+#### `render/server/` — SSR Renderer
+
+**`server.ts`** (~200 lines):
+- `serverRender(ctx, element, callback)` — Renders to string via callback
+- `SSRApp` interface: `renderToString()` → Promise\<string\>
+- `createSSRApp(element)` — Creates SSR app instance
+- `hydrate()` — Activates SSR-rendered HTML on the client for interactive updates
+- Limitation: String-based, not streaming
+
+### `source/signal/` — Signal Integration
+
+**`signal.ts`** (~50 lines):
+- Thin wrapper around global `Signal` constructor
+- `getSignal()` — Lazy loads global `Signal`, enforces single-instance policy
+- Re-exports: `Signal.State`, `Signal.Computed`, `Signal.Effect`, `Signal.subtle.Watcher`
+
+### `source/symbol/` — Internal Symbols
+
+- Provider/injection symbols
+- Internal airx symbols for private properties
+
+### `source/logger/` — Internal Logging
+
+- Development-time logging utilities
+
+### JSX Runtime Exports
+
+- **`jsx-runtime.ts`** — Automatic JSX runtime (`__jsx`, `__jsx Fragment`)
+- **`jsx-dev-runtime.ts`** — Development JSX runtime (with extra checks)
+
+---
+
+## Key Flows
+
+### App Creation and Mount Flow
 
 ```
-source/
-├── app/           # createApp 与应用入口封装
-├── element/       # JSX element、组件类型、错误渲染兜底
-├── render/
-│   ├── basic/     # Instance 树、协调逻辑、hooks、插件系统
-│   ├── browser/   # 浏览器调度与 DOM 提交
-│   └── server/    # SSR 字符串渲染
-├── signal/        # 对 signal-polyfill 的运行时包装
-├── logger/        # 调试日志
-├── symbol/        # 内部标记 Symbol
-├── types/         # JSX / DOM / CSS 类型扩展
-└── index.ts       # 公开 API 出口
+1. createApp(element)
+   ├── Convert component to element if needed (ensureAsElement)
+   ├── Create PluginContext (empty registry)
+   └── Return AirxApp { mount, plugin, renderToHTML }
+   ↓
+2. app.mount(container)
+   ├── container.innerHTML = '' (clear)
+   └── browserRender(appContext, element, container)
+       ↓
+       3. browserRender()
+           ├── processComponent(element) → render component tree
+           │   └── If component: call render function → get children
+           ├── reconcile() → compute DOM operations
+           └── Apply DOM mutations to container
 ```
 
-## 4. 公开 API 边界
-
-### 4.1 对外导出
-
-当前公开 API 以 [source/index.ts](../../source/index.ts) 为准，包含：
-- App API：`createApp`、`AirxApp`、`Plugin`
-- Element API：`createElement`、`component`、`Fragment`
-- 类型：`AirxElement`、`AirxChildren`、`AirxComponent`、`AirxComponentContext`
-- Render Hook API：`provide`、`inject`、`onMounted`、`onUnmounted`
-
-`createRef`、`watch`、`Ref` 已在 0.7.0 代际移除，不再属于公开 API。
-
-### 4.2 内部模块
-
-以下模块是运行时内部实现，不承诺稳定：
-- `source/render/basic/common.ts`：Instance 树与协调逻辑
-- `source/render/basic/plugins/internal/*`：内置插件系统
-- `source/symbol/*`：内部 Symbol
-- `source/logger/*`：日志实现
-
-## 5. 运行时架构
-
-### 5.1 总体关系
+### Reactive Update Flow (Signal Change)
 
 ```
-createApp(element)
-  -> PluginContext(BasicLogic, InjectSystem, user plugins)
-  -> browserRender(...) | serverRender(...)
-  -> performUnitOfWork(...)
-  -> reconcileChildren(...)
-  -> commitDom(...)
+1. Signal.State.set(newValue)
+   ↓
+2. Signal notifies all computed/derived values
+   ↓
+3. Computed re-evaluates → triggers Effect
+   ↓
+4. createWatcher() receives notification
+   ↓
+5. scheduleUpdate() batches the update
+   ↓
+6. Next microtask: processComponent() re-renders affected components
+   ↓
+7. reconcile() diffs old vs new virtual DOM
+   ↓
+8. Minimal DOM operations applied
 ```
 
-### 5.2 App 层
+### provide/inject Flow
 
-`createApp` 负责三件事：
-1. 构造 `PluginContext`
-2. 把函数组件入口标准化为 `AirxElement`
-3. 分发到浏览器渲染或服务端渲染
+```
+1. Parent component calls provide(key, value)
+   └── Inserts into currentComponentContext (thread-local)
+   ↓
+2. Child component calls inject(key)
+   └── Walks up currentComponentContext chain
+   └── Returns first matching value or undefined
+```
 
-这里不持有路由、store 或异步数据层语义，只负责把元素树交给 render 层。
+### SSR Flow
 
-### 5.3 Element 层
+```
+1. createSSRApp(element) → SSRApp instance
+   ↓
+2. app.renderToString()
+   └── serverRender(appContext, element, resolve)
+       ↓
+       3. serverRender() recursively renders elements to string
+          ├── Text nodes → escaped text content
+          ├── Element nodes → `<tag>...children...</tag>`
+          └── Fragment → just children
+```
 
-`createElement` 负责构造统一的 `AirxElement` 结构：
-- `type` 可以是原生标签字符串或函数组件
-- `props.children` 总是被标准化为数组
-- `Fragment` 只是返回 children 的轻量组件
+### Hydration Flow
 
-`createErrorRender` 提供组件渲染异常时的最小 UI 兜底。
+```
+1. SSR HTML injected into DOM
+   ↓
+2. hydrate(container)(appContext, element)
+   └── Attaches event listeners and reactive state to existing DOM
+       ↓
+       3. After hydration, component tree is interactive
+          └── Signal changes trigger targeted re-renders via scheduleUpdate()
+```
 
-### 5.4 Render Basic 层
+### Plugin Installation Flow
 
-`render/basic/common.ts` 是核心执行引擎，负责：
-- `Instance` 树结构维护（parent / child / sibling）
-- `reconcileChildren` 子节点协调
-- `performUnitOfWork` 单步执行与遍历推进
-- 组件上下文与生命周期管理
+```
+1. app.plugin(customPlugin)
+   └── appContext.registerPlugin(customPlugin)
+   ↓
+2. During first render (mount or SSR)
+   └── Each plugin.install(appContext) called in registration order
+   ↓
+3. Plugin has access to:
+   ├── App context for sharing state
+   └── Hooks (future: render hooks, etc.)
+```
 
-关键点：
-- 无 key 时采用内部 key：`airx-element-inner-key:${index}`
-- `memoProps` 维持 props 引用稳定
-- `providedMap` / `injectedMap` 保存依赖注入状态
+---
 
-### 5.5 Signal 集成
+## Change Triggers
 
-函数组件有两种执行路径：
-1. **静态组件**：组件直接返回 `AirxElement`
-2. **响应式组件**：组件返回渲染函数，渲染函数在 `Signal.Watcher` + `Signal.Computed` 中执行
+Update this document when any of the following occur:
 
-响应式组件的依赖收集策略：
-- 初次执行组件函数，拿到 render function
-- 创建 watcher 追踪 Signal 变更
-- Signal 变更时把当前 instance 标记为 `needReRender`
-- 重新进入 `performUnitOfWork`，完成子树协调
-
-### 5.6 Browser 渲染
-
-Browser 渲染由两部分组成：
-1. `workLoop`：消费 `nextUnitOfWork`
-2. `commitDom`：把 Instance 树变化提交到真实 DOM
-
-当前策略：
-- 初次渲染同步启动一轮 `workLoop`
-- 若仍有剩余工作，则通过 `requestIdleCallback` 调度下一轮
-- 若宿主环境不支持 `requestIdleCallback`，降级到 `setTimeout`
-- 仅在存在剩余工作时继续调度，避免空转
-
-### 5.7 Server 渲染
-
-Server 渲染复用大部分协调逻辑，但使用自定义 `ServerElement`：
-- 同步跑完整个 `performUnitOfWork`
-- 提交到 `ServerElement` 树
-- 最终通过 `toString()` 输出 HTML 字符串
-
-这保证了 Browser / Server 共享一套组件与 children 协调模型，但 DOM 提交实现仍各自维护。
-
-## 6. 插件边界
-
-`PluginContext` 默认注册两类内置插件：
-- `BasicLogic`：props 比较、DOM 属性更新、类型复用判断
-- `InjectSystem`：检测注入值是否变化，必要时使组件重新构建
-
-用户插件可以扩展：
-- `isReRender(instance)`
-- `updateDom(dom, nextProps, prevProps)`
-- `isReuseInstance(instance, nextElement)`
-
-插件是 Airx 当前最主要的扩展点。
-
-## 7. 已知技术债
-
-当前版本明确存在以下技术债：
-- Browser / Server 的 `commitDom` 逻辑有较高重复度
-- Signal watcher 的微任务收集策略仍需要更多集成测试验证
-- SSR 与 Browser 的 DOM 属性更新策略尚未完全统一
-- `plugin()` / `renderToHTML()` 仍带有 WIP / 过渡语义
-
-## 8. 演进方向
-
-0.7.x 到 0.10.x 的重点方向：
-1. 提炼通用 DOM 提交流程，消除 Browser / Server 重复逻辑
-2. 强化 Signal 更新路径和调度语义测试
-3. 明确插件与生命周期的稳定边界
-4. 完成对外文档与实现的一致化
-
-## 9. 相关文档
-
-- [发布门禁清单](../../.projitive/designs/release-quality-gates.md)
-- [功能正确性矩阵](../../.projitive/designs/functional-correctness-matrix.md)
-- [Signals 对齐计划](../../.projitive/designs/signals-alignment-test-plan.md)
-- [0.7 迁移指南](../../.projitive/designs/migration-0.7.md)
-- [0.8 优化路线图](../../.projitive/designs/optimization-roadmap-0.8.md)
+1. ~~**Hydration implemented (0.8.x)** — SSR section needs major update~~ ✅ Done in 0.7.x
+2. **Streaming SSR support added** — server renderer architecture changes
+3. **New rendering target** (e.g., native, canvas) — new render module
+4. **Concurrent SSR support** — thread-local context replaced with proper context
+5. **Plugin hook API added** — plugin system section expands significantly
+6. **Signal integration changes** — Signal wrapper layer changes
+7. **Breaking changes to component model** — element.ts section changes
+8. **Routing built-in** — scope expands to include routing
