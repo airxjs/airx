@@ -132,6 +132,14 @@ function createPluginContextWithHydration(): PluginContext {
 }
 
 /**
+ * Create a plugin context ONCE for reuse across the entire hydration lifecycle.
+ * This avoids creating a new PluginContext on every workLoop iteration.
+ */
+function createHydrationPluginContext(): PluginContext {
+  return new PluginContext()
+}
+
+/**
  * Connect instance tree to existing DOM nodes
  * This traverses the instance tree and matches it to existing DOM,
  * and binds events via plugin.updateDom for each connected node.
@@ -244,6 +252,9 @@ function setupReactiveUpdates(
     })
   }
 
+  // Create plugin context once and reuse across all work loop iterations
+  const hydrationPluginContext = createHydrationPluginContext()
+
   function workLoop() {
     const logger = createLogger('hydrate:workLoop')
     let shouldYield = false
@@ -251,7 +262,7 @@ function setupReactiveUpdates(
     while (context.nextUnitOfWork && !shouldYield) {
       logger.debug('nextUnitOfWork', context.nextUnitOfWork)
       context.nextUnitOfWork = performUnitOfWork(
-        createPluginContextWithHydration(),
+        hydrationPluginContext,
         context.nextUnitOfWork,
         onUpdateRequire
       ) as Instance<HTMLElement> | null
