@@ -834,6 +834,32 @@
         "ROADMAP-0003"
       ],
       "recordVersion": 3
+    },
+    {
+      "id": "TASK-0056",
+      "title": "优化 hydrate 工作循环：避免每次迭代重复创建 PluginContext",
+      "status": "DONE",
+      "owner": "",
+      "summary": "修复 hydrate.ts 中 workLoop 在每次迭代都调用 createPluginContextWithHydration() 创建新 PluginContext 的性能浪费问题。改为在 workLoop 开始前创建一次并复用，与 browser.ts 的处理方式一致。",
+      "updatedAt": "2026-04-16T17:34:59.995Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0003"
+      ],
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0057",
+      "title": "修复 app.ts 意外重新引入的 @deprecated WIP 标记",
+      "status": "DONE",
+      "owner": "",
+      "summary": "commit d99656e (2026-03-28) 添加 debug() API 时意外重新引入了 plugin()/renderToHTML() 的 @deprecated WIP 标记，覆盖了 bf2c6f9 中已完成的移除工作。需要重新移除这些标记，恢复 TASK-0046 的实施结果。",
+      "updatedAt": "2026-04-16T18:03:00.493Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0001"
+      ],
+      "recordVersion": 3
     }
   ],
   "roadmaps": [
@@ -862,7 +888,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 181,
+    "tasks_version": 187,
     "roadmaps_version": 7,
     "store_schema_version": 3
   },
@@ -870,9 +896,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 181,
-      "lastBuiltAt": "2026-04-09T00:51:13.576Z",
-      "recordVersion": 539
+      "lastSourceVersion": 187,
+      "lastBuiltAt": "2026-04-16T18:03:00.500Z",
+      "recordVersion": 557
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
