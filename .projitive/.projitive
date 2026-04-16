@@ -821,6 +821,56 @@
         "ROADMAP-0003"
       ],
       "recordVersion": 3
+    },
+    {
+      "id": "TASK-0055",
+      "title": "Iteration B: 分析 browser/server 提交流程重叠并制定收敛计划",
+      "status": "DONE",
+      "owner": "",
+      "summary": "基于 optimization-roadmap-0.8.md Iteration B，当前 browser 和 server 的 commit 提交逻辑存在大量重复（TASK-0054 已分析）。需要先对比 browser.ts 和 server.ts 中 commit 相关代码的共同点和差异，形成研究报告，再制定收敛计划。输出：research brief 记录差异点和收敛建议。",
+      "updatedAt": "2026-04-08T04:08:05.525Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0003"
+      ],
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0056",
+      "title": "Phase 1: 提取 commitWalkV2 为共享函数",
+      "status": "DONE",
+      "owner": "",
+      "summary": "基于 TASK-0055 收敛计划，Phase 1 目标：在 source/render/basic/ 下创建 commit-walker.ts，提取 browser.ts 和 server.ts 中完全重复的 commitWalkV2 算法。通过泛型函数 + 依赖注入的方式实现共享，保持各平台特有的 commitInstanceDom 和 updateDomProperties 实现。验收标准：commitWalkV2 从 browser.ts 和 server.ts 中移除，新增 commit-walker.ts，定向测试通过，SSR 输出无差异。",
+      "updatedAt": "2026-04-08T04:27:40.803Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0003"
+      ],
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0057",
+      "title": "Create first executable slice",
+      "status": "DONE",
+      "owner": "",
+      "summary": "ROADMAP-0001 is fully completed (35 tasks all DONE). This task is a placeholder with no independent execution content.",
+      "updatedAt": "2026-04-08T09:39:50.325Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0001"
+      ],
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0058",
+      "title": "同步 airx 版本基线至 0.7.10（当前 origin/main）并审计新功能",
+      "status": "IN_PROGRESS",
+      "owner": "cron-auto-task",
+      "summary": "本地 airx 停留在 0.7.3-beta.1，但 origin/main 已推进至 0.7.10，存在版本基线不一致。需：1）git merge origin/main；2）解决冲突；3）审计 0.7.4~0.7.10 之间的新功能与变更；4）更新 architecture.md 和 release-quality-gates.md 版本基线；5）确保 lint/typecheck/test 通过。",
+      "updatedAt": "2026-04-08T10:46:28.053Z",
+      "links": [],
+      "roadmapRefs": [],
+      "recordVersion": 2
     }
   ],
   "roadmaps": [
@@ -849,7 +899,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 178,
+    "tasks_version": 189,
     "roadmaps_version": 7,
     "store_schema_version": 3
   },
@@ -857,9 +907,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 178,
-      "lastBuiltAt": "2026-04-07T21:52:16.366Z",
-      "recordVersion": 530
+      "lastSourceVersion": 189,
+      "lastBuiltAt": "2026-04-08T10:46:28.059Z",
+      "recordVersion": 563
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",

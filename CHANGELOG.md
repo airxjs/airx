@@ -4,6 +4,60 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.7.10] - 2026-04-16
+
+### Added
+
+- **Commit Walker Abstraction** — Extracted `commitWalkV2` as shared `createCommitWalker` function for browser and server commit logic reuse
+- **SSR Hydrate Improvements** — Enhanced hydration support with `plugin.updateDom` binding during hydration
+
+### Performance
+
+- **PluginContext Reuse** — Reuse `PluginContext` across `workLoop` iterations to reduce allocation overhead
+
+### Refactor
+
+- **Logger Cleanup** — Removed unused variables and fixed semicolon issues in logger tests
+
+### Fixed
+
+- **DOM Updates During Yield** — Enhanced render logic to ensure DOM updates correctly after signal changes during yield
+- **Dev Mode Hydration Warning** — Added runtime warning in dev mode when hydrate stateSnapshot restore is incomplete
+
+### Testing
+
+- **Hydrate Test Coverage** — Strengthened `hydrate()` integration test coverage (370 tests)
+
+---
+
+## [0.7.8] - 2026-04-12
+
+### Fixed
+
+- **DOM Updates After Signal Yield** — Enhanced render logic to ensure DOM updates correctly after signal changes during yield
+
+---
+
+## [0.7.4] - 2026-04-06
+
+### Added
+
+- **Log Level Support** — Added `AirxApp.debug()` API and log level support (`setLogLevel`)
+- **Boolean/Null Attribute Support** — Enhanced `updateDom` to handle boolean and null attributes
+- **innerHTML Support** — Added innerHTML support in element rendering
+
+### Fixed
+
+- **Reactive Dependency Tracking** — Stabilized reactive dependency tracking
+- **Idle Scheduling** — Prevent unnecessary idle scheduling after work completion
+- **Hydration stateSnapshot Warning** — Warn in dev mode when hydrate stateSnapshot restore is incomplete
+
+### Performance
+
+- **Signal Watcher Optimization** — Optimized signalWatcher to handle immediate re-subscription and avoid missed updates
+
+---
+
 ## [0.7.3] - 2026-04-02
 
 ### Fixed
