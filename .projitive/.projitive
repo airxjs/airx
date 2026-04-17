@@ -901,15 +901,15 @@
     {
       "id": "TASK-0061",
       "title": "Phase 1: 同步文档版本基线 (architecture.md + release-quality-gates.md)",
-      "status": "TODO",
+      "status": "DONE",
       "owner": "",
       "summary": "根据 2026-03-28 健康检查报告，architecture.md 版本声明仍为 0.7.0（实际 0.7.10），release-quality-gates.md 引用 0.4.0（严重过时）。需要更新这些文档至当前版本基线，并废弃或重构过时的 api-compatibility-matrix.md。验收标准：文档版本与实际一致，无新贡献者误解风险。",
-      "updatedAt": "2026-04-17T01:35:37.321Z",
+      "updatedAt": "2026-04-17T01:41:00.260Z",
       "links": [],
       "roadmapRefs": [
         "ROADMAP-0001"
       ],
-      "recordVersion": 1
+      "recordVersion": 3
     },
     {
       "id": "TASK-0062",
@@ -951,7 +951,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 200,
+    "tasks_version": 202,
     "roadmaps_version": 7,
     "store_schema_version": 3
   },
@@ -959,9 +959,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 200,
-      "lastBuiltAt": "2026-04-17T01:38:47.735Z",
-      "recordVersion": 596
+      "lastSourceVersion": 202,
+      "lastBuiltAt": "2026-04-17T01:41:00.268Z",
+      "recordVersion": 602
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
