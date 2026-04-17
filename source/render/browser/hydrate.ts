@@ -6,6 +6,7 @@ import {
   Instance,
   performUnitOfWork
 } from '../basic/common.js'
+import { readStateSnapshotFromDOM } from '../ssr/index.js'
 
 /**
  * Hydrate options for client-side activation
@@ -83,6 +84,13 @@ export function hydrate(
 ): HydratedApp {
   const logger = createLogger('hydrate')
   logger.debug('hydrate starting', { element, container, options })
+
+  // Read state snapshot from DOM if not provided in options
+  // This allows hydrate to work with SSR output that includes state
+  const stateSnapshot = options?.stateSnapshot ?? readStateSnapshotFromDOM(container)
+  if (stateSnapshot && Object.keys(stateSnapshot.signals).length > 0) {
+    logger.debug('found state snapshot', { signalCount: Object.keys(stateSnapshot.signals).length })
+  }
 
   // Build the instance tree using performUnitOfWork
   const rootInstance: Instance<HTMLElement> = {
@@ -173,6 +181,14 @@ function connectInstanceTreeToDom(
         // Bind events via plugins — SSR nodes have no pre-existing event listeners,
         // so passing {} as prevProps is safe (no old handlers to remove).
         updateDomProperties(childDom, instance.element.props as PropsType, {})
+      } else {
+        // Mismatch detected: SSR HTML doesn't have expected DOM node
+        const tagName = instance.element.type.toUpperCase()
+        logger.warn(
+          `[Airx hydrate] Hydration mismatch: expected <${tagName}> in parent <${parentDom.tagName}>, ` +
+          `but not found in SSR output. This may indicate SSR/CSR structure不一致.`,
+          { element: instance.element }
+        )
       }
     }
 

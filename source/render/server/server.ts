@@ -13,6 +13,11 @@ import { createCommitWalker } from '../basic/commit-walker.js'
 import { removeDeletions, insertDomIntoParent, createPropClassifier } from '../basic/commit-helpers.js'
 import { PluginContext } from '../basic/plugins/index.js'
 import { hydrate as clientHydrate, type HydrateOptions } from '../browser/index.js'
+import {
+  generateStateSnapshot,
+  injectStateSnapshotIntoHTML,
+  clearSSRSignals,
+} from '../ssr/index.js'
 
 function camelToKebab(str: string): string {
   return str.replace(/([A-Z])/g, (match, p1, offset) => {
@@ -303,7 +308,11 @@ export function render(pluginContext: PluginContext, element: AirxElement, onCom
     context.rootInstance.domRef?.firstChild || undefined
   )
 
-  onComplete(context.rootInstance.domRef?.toString() || '')
+  const html = context.rootInstance.domRef?.toString() || ''
+  const snapshot = generateStateSnapshot()
+  const htmlWithState = injectStateSnapshotIntoHTML(html, snapshot)
+  clearSSRSignals()
+  onComplete(htmlWithState)
 }
 
 /**

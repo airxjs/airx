@@ -940,15 +940,15 @@
     {
       "id": "TASK-0064",
       "title": "Hydrate 核心实现",
-      "status": "TODO",
+      "status": "IN_PROGRESS",
       "owner": "",
       "summary": "基于 TASK-0063 ADR，实现完整的客户端 Hydration 流程。核心实现：1）实现 hydrate() 函数，从 HTML 中恢复 Signal 状态树；2）实现事件委托机制，为静态 HTML 挂载事件处理器；3）实现服务端 renderToString 的状态序列化（Signal snapshot → HTML 内联）；4）处理 hydration mismatch 的优雅降级。验收标准：基础 hydration 流程可运行，服务端渲染 → 客户端激活的 Counter 演示通过。",
-      "updatedAt": "2026-04-17T03:03:44.660Z",
+      "updatedAt": "2026-04-17T03:33:46.237Z",
       "links": [],
       "roadmapRefs": [
         "ROADMAP-0004"
       ],
-      "recordVersion": 1
+      "recordVersion": 2
     },
     {
       "id": "TASK-0065",
@@ -990,7 +990,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 209,
+    "tasks_version": 210,
     "roadmaps_version": 7,
     "store_schema_version": 3
   },
@@ -998,9 +998,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 209,
-      "lastBuiltAt": "2026-04-17T03:10:57.395Z",
-      "recordVersion": 623
+      "lastSourceVersion": 210,
+      "lastBuiltAt": "2026-04-17T03:33:46.246Z",
+      "recordVersion": 626
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
