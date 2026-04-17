@@ -10,7 +10,7 @@ import {
   INTERNAL_TEXT_NODE_TYPE,
 } from '../basic/common.js'
 import { createCommitWalker } from '../basic/commit-walker.js'
-import { getDebugElementName, removeDeletions, insertDomIntoParent, createPropClassifier } from '../basic/commit-helpers.js'
+import { removeDeletions, insertDomIntoParent, createPropClassifier } from '../basic/commit-helpers.js'
 import { PluginContext } from '../basic/plugins/index.js'
 import { hydrate as clientHydrate, type HydrateOptions } from '../browser/index.js'
 
@@ -199,8 +199,8 @@ export function render(pluginContext: PluginContext, element: AirxElement, onCom
         return
       }
 
-      const classifier = createPropClassifier(prevProps, nextProps)
-      const { isStyle, isClass, isProperty, isGone, isNew } = classifier
+      const classifier = createPropClassifier()
+      const { isProperty, isGone, isNew } = classifier
 
       // remove old style
       const oldStyle = prevProps?.style

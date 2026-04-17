@@ -78,10 +78,7 @@ export type PropPredicate = (key: string) => boolean
 /**
  * Factory for creating property classification predicates used in updateDomProperties.
  */
-export function createPropClassifier(
-  prevProps: Record<string, unknown>,
-  nextProps: Record<string, unknown>
-) {
+export function createPropClassifier() {
   const isKey = (key: string) => key === 'key'
   const isRef = (key: string) => key === 'ref'
   const isStyle = (key: string) => key === 'style'

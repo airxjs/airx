@@ -884,6 +884,19 @@
         "ROADMAP-0003"
       ],
       "recordVersion": 3
+    },
+    {
+      "id": "TASK-0060",
+      "title": "修复 6 个 ESLint no-unused-vars 错误",
+      "status": "TODO",
+      "owner": "",
+      "summary": "当前代码库存在 6 个 @typescript-eslint/no-unused-vars 错误，分布在 commit-helpers.ts、browser.ts、server.ts 中。需清理未使用的变量声明。验收标准：npm run lint 零错误，测试套件通过。",
+      "updatedAt": "2026-04-17T00:58:42.414Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0003"
+      ],
+      "recordVersion": 1
     }
   ],
   "roadmaps": [
@@ -912,7 +925,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 193,
+    "tasks_version": 194,
     "roadmaps_version": 7,
     "store_schema_version": 3
   },
@@ -920,9 +933,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 193,
-      "lastBuiltAt": "2026-04-17T00:23:53.964Z",
-      "recordVersion": 575
+      "lastSourceVersion": 194,
+      "lastBuiltAt": "2026-04-17T00:58:42.422Z",
+      "recordVersion": 578
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",

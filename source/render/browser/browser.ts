@@ -10,7 +10,7 @@ import {
   performUnitOfWork,
 } from '../basic/common.js'
 import { createCommitWalker } from '../basic/commit-walker.js'
-import { getDebugElementName, removeDeletions, insertDomIntoParent } from '../basic/commit-helpers.js'
+import { removeDeletions, insertDomIntoParent } from '../basic/commit-helpers.js'
 
 class BrowserElement extends Element implements AbstractElement {}
 
