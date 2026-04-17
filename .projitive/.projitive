@@ -953,15 +953,15 @@
     {
       "id": "TASK-0065",
       "title": "hydrate() stub 运行时警告与 API 稳定性标注",
-      "status": "TODO",
+      "status": "DONE",
       "owner": "",
       "summary": "当前 hydrate() 是 no-op stub，用户调用后不会有任何效果也不报错，这会误导下游。需：1）在 hydrate() 被调用时输出明确的运行时警告（console.warn），说明当前为 stub 状态；2）参照 api-stability-audit.md，为所有实验性 API（hydrate、plugin、renderToHTML）添加 @alpha 或 @experimental 标签；3）确保警告信息指向 0.8.x roadmap，让用户知道这是计划中的功能。验收标准：调用 hydrate() 时控制台有明确警告，ts 类型注解中有 @experimental 标记。",
-      "updatedAt": "2026-04-17T03:03:56.195Z",
+      "updatedAt": "2026-04-17T03:08:12.783Z",
       "links": [],
       "roadmapRefs": [
         "ROADMAP-0004"
       ],
-      "recordVersion": 1
+      "recordVersion": 3
     }
   ],
   "roadmaps": [
@@ -990,7 +990,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 205,
+    "tasks_version": 207,
     "roadmaps_version": 7,
     "store_schema_version": 3
   },
@@ -998,9 +998,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 205,
-      "lastBuiltAt": "2026-04-17T03:03:56.204Z",
-      "recordVersion": 611
+      "lastSourceVersion": 207,
+      "lastBuiltAt": "2026-04-17T03:08:12.797Z",
+      "recordVersion": 617
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
