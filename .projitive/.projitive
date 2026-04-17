@@ -927,15 +927,15 @@
     {
       "id": "TASK-0063",
       "title": "Hydrate 架构设计与 ADR",
-      "status": "TODO",
+      "status": "DONE",
       "owner": "",
       "summary": "基于 designs/roadmap-0.8-planning.md，设计 Hydration 完整架构方案并输出 ADR（Architecture Decision Record）。核心设计点：1）服务端 Signal 状态序列化方案（HTML 内联格式）；2）客户端状态恢复机制；3）事件委托模式设计；4）hydration 边界的定义；5）mismatch 处理策略。验收标准：ADR 文档落地，包含 API 草案、风险分析和替代方案对比。",
-      "updatedAt": "2026-04-17T03:03:30.477Z",
+      "updatedAt": "2026-04-17T03:10:57.386Z",
       "links": [],
       "roadmapRefs": [
         "ROADMAP-0004"
       ],
-      "recordVersion": 1
+      "recordVersion": 3
     },
     {
       "id": "TASK-0064",
@@ -990,7 +990,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 207,
+    "tasks_version": 209,
     "roadmaps_version": 7,
     "store_schema_version": 3
   },
@@ -998,9 +998,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 207,
-      "lastBuiltAt": "2026-04-17T03:08:12.797Z",
-      "recordVersion": 617
+      "lastSourceVersion": 209,
+      "lastBuiltAt": "2026-04-17T03:10:57.395Z",
+      "recordVersion": 623
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
