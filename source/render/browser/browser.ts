@@ -8,10 +8,9 @@ import {
   INTERNAL_TEXT_NODE_TYPE,
   Instance,
   performUnitOfWork,
-  getParentDom,
-  getChildDoms,
 } from '../basic/common.js'
 import { createCommitWalker } from '../basic/commit-walker.js'
+import { getDebugElementName, removeDeletions, insertDomIntoParent } from '../basic/commit-helpers.js'
 
 class BrowserElement extends Element implements AbstractElement {}
 
@@ -80,32 +79,8 @@ export function render(pluginContext: PluginContext, element: AirxElement, domRe
     }
 
     function commitInstanceDom(nextInstance: Instance<BrowserElement>, oldNode?: ChildNode) {
-      const getDebugElementName = (instance?: Instance<BrowserElement>): string => {
-        if (typeof instance?.element?.type === 'string') {
-          return `<${instance.element.type}>`
-        }
-
-        if (typeof instance?.element?.type === 'function') {
-          const componentName = instance.element.type.name || 'AnonymousComponent'
-          return `Component(${componentName})`
-        }
-
-        return '<unknown>'
-      }
-
       // 移除标删元素
-      if (nextInstance.deletions) {
-        for (const deletion of nextInstance.deletions) {
-          const domList = getChildDoms(deletion)
-          for (let index = 0; index < domList.length; index++) {
-            const dom = domList[index]
-            if (dom && dom.parentNode) dom.parentNode.removeChild(dom)
-          }
-          deletion.context.triggerUnmounted()
-        }
-
-        nextInstance.deletions.clear()
-      }
+      removeDeletions(nextInstance)
 
       // 创建 dom
       if (nextInstance.domRef == null) {
@@ -143,29 +118,7 @@ export function render(pluginContext: PluginContext, element: AirxElement, domRe
 
       // 插入 parent
       if (nextInstance.domRef != null) {
-        if (oldNode !== nextInstance.domRef) {
-          const parentDom = getParentDom(nextInstance)
-          if (
-            parentDom.nodeType === Node.TEXT_NODE
-            || parentDom.nodeType === Node.COMMENT_NODE
-          ) {
-            const parentInstance = (parentDom as { airxInstance?: Instance<BrowserElement> }).airxInstance
-            throw new Error(
-              `[airx] Invalid DOM hierarchy: cannot append ${getDebugElementName(nextInstance)} to ${getDebugElementName(parentInstance)}. `
-              + 'A text/comment node cannot contain child nodes.'
-            )
-          }
-
-          // 优化：同父节点内移动使用 insertBefore，避免 remove + append
-          if (nextInstance.domRef.parentNode === parentDom) {
-            parentDom.insertBefore(nextInstance.domRef, oldNode ?? null)
-          } else {
-            if (nextInstance.domRef.parentNode) {
-              nextInstance.domRef.parentNode.removeChild(nextInstance.domRef)
-            }
-            parentDom.appendChild(nextInstance.domRef)
-          }
-        }
+        insertDomIntoParent(nextInstance, nextInstance.domRef, oldNode)
       }
     }
 

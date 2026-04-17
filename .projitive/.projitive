@@ -871,6 +871,19 @@
       "links": [],
       "roadmapRefs": [],
       "recordVersion": 3
+    },
+    {
+      "id": "TASK-0059",
+      "title": "Iteration B Phase 2: Extract shared commitInstanceDom helper",
+      "status": "IN_PROGRESS",
+      "owner": "",
+      "summary": "基于 ROADMAP-0003 Iteration B (optimization-roadmap-0.8.md)，Phase 2 目标：将 browser.ts 和 server.ts 中仍存在重复的 commitInstanceDom 和 updateDomProperties 函数提取为共享辅助函数。当前两份代码在 commitDom 函数内部定义了几乎相同的 commitInstanceDom 和 updateDomProperties 逻辑，仅类型和部分 DOM 操作有差异。需要：1）对比两份实现的差异点；2）提取共用的 props diff 和 DOM 操作逻辑；3）保留平台特定的 DOM 创建/绑定差异。验收标准：提取后两份代码行数减少 > 30 行，且双端回归测试通过。",
+      "updatedAt": "2026-04-17T00:16:26.030Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0003"
+      ],
+      "recordVersion": 2
     }
   ],
   "roadmaps": [
@@ -899,7 +912,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 190,
+    "tasks_version": 192,
     "roadmaps_version": 7,
     "store_schema_version": 3
   },
@@ -907,9 +920,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 190,
-      "lastBuiltAt": "2026-04-16T20:46:47.452Z",
-      "recordVersion": 566
+      "lastSourceVersion": 192,
+      "lastBuiltAt": "2026-04-17T00:16:26.042Z",
+      "recordVersion": 572
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",

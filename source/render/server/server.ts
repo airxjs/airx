@@ -8,10 +8,9 @@ import {
   AbstractElement,
   INTERNAL_COMMENT_NODE_TYPE,
   INTERNAL_TEXT_NODE_TYPE,
-  getParentDom,
-  getChildDoms,
 } from '../basic/common.js'
 import { createCommitWalker } from '../basic/commit-walker.js'
+import { getDebugElementName, removeDeletions, insertDomIntoParent, createPropClassifier } from '../basic/commit-helpers.js'
 import { PluginContext } from '../basic/plugins/index.js'
 import { hydrate as clientHydrate, type HydrateOptions } from '../browser/index.js'
 
@@ -191,24 +190,17 @@ export function render(pluginContext: PluginContext, element: AirxElement, onCom
     type PropsType = Record<string, unknown>
 
     function updateDomProperties(dom: ServerElement, nextProps: PropsType, prevProps: PropsType = {}) {
-      const isKey = (key: string) => key === 'key'
-      const isRef = (key: string) => key === 'ref'
-      const isStyle = (key: string) => key === 'style'
-      const isClass = (key: string) => key === 'class'
-      const isEvent = (key: string) => key.startsWith("on")
-      const isChildren = (key: string) => key === 'children'
-      const isGone = (_prev: PropsType, next: PropsType) => (key: string) => !(key in next)
-      const isNew = (prev: PropsType, next: PropsType) => (key: string) => prev[key] !== next[key]
-      const isProperty = (key: string) => !isChildren(key) && !isEvent(key) && !isStyle(key) && !isClass(key) && !isKey(key) && !isRef(key)
-
       // https://developer.mozilla.org/zh-CN/docs/Web/API/Node
       if (dom.nodeName === '#text' || dom.nodeName === '#comment') {
-        const textNode = (dom as unknown as Text | Comment)
+        const textNode = dom as unknown as Text | Comment
         if (textNode.nodeValue !== nextProps.textContent) {
           textNode.nodeValue = String(nextProps.textContent)
         }
         return
       }
+
+      const classifier = createPropClassifier(prevProps, nextProps)
+      const { isStyle, isClass, isProperty, isGone, isNew } = classifier
 
       // remove old style
       const oldStyle = prevProps?.style
@@ -254,32 +246,8 @@ export function render(pluginContext: PluginContext, element: AirxElement, onCom
     }
 
     function commitInstanceDom(nextInstance: Instance<ServerElement>, oldNode?: ServerElement) {
-      const getDebugElementName = (instance?: Instance<ServerElement>): string => {
-        if (typeof instance?.element?.type === 'string') {
-          return `<${instance.element.type}>`
-        }
-
-        if (typeof instance?.element?.type === 'function') {
-          const componentName = instance.element.type.name || 'AnonymousComponent'
-          return `Component(${componentName})`
-        }
-
-        return '<unknown>'
-      }
-
       // 移除标删元素
-      if (nextInstance.deletions) {
-        for (const deletion of nextInstance.deletions) {
-          const domList = getChildDoms(deletion)
-          for (let index = 0; index < domList.length; index++) {
-            const dom = domList[index]
-            if (dom && dom.parentNode) dom.parentNode.removeChild(dom)
-          }
-          deletion.context.triggerUnmounted()
-        }
-
-        nextInstance.deletions.clear()
-      }
+      removeDeletions(nextInstance)
 
       // 创建 dom
       if (nextInstance.domRef == null) {
@@ -310,25 +278,7 @@ export function render(pluginContext: PluginContext, element: AirxElement, onCom
 
       // 插入 parent
       if (nextInstance.domRef != null) {
-        if (oldNode !== nextInstance.domRef) {
-          const parentDom = getParentDom(nextInstance)
-          if (parentDom.nodeName === '#text' || parentDom.nodeName === '#comment') {
-            throw new Error(
-              `[airx] Invalid DOM hierarchy: cannot append ${getDebugElementName(nextInstance)} to ${getDebugElementName(nextInstance.parent)}. `
-              + 'A text/comment node cannot contain child nodes.'
-            )
-          }
-
-          // 优化：同父节点内移动使用 insertBefore，避免 remove + append
-          if (nextInstance.domRef.parentNode === parentDom) {
-            parentDom.insertBefore(nextInstance.domRef, oldNode ?? null)
-          } else {
-            if (nextInstance.domRef.parentNode) {
-              nextInstance.domRef.parentNode.removeChild(nextInstance.domRef)
-            }
-            parentDom.appendChild(nextInstance.domRef)
-          }
-        }
+        insertDomIntoParent(nextInstance, nextInstance.domRef, oldNode)
       }
     }
 
