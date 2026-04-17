@@ -897,6 +897,32 @@
         "ROADMAP-0003"
       ],
       "recordVersion": 3
+    },
+    {
+      "id": "TASK-0061",
+      "title": "Phase 1: 同步文档版本基线 (architecture.md + release-quality-gates.md)",
+      "status": "TODO",
+      "owner": "",
+      "summary": "根据 2026-03-28 健康检查报告，architecture.md 版本声明仍为 0.7.0（实际 0.7.10），release-quality-gates.md 引用 0.4.0（严重过时）。需要更新这些文档至当前版本基线，并废弃或重构过时的 api-compatibility-matrix.md。验收标准：文档版本与实际一致，无新贡献者误解风险。",
+      "updatedAt": "2026-04-17T01:35:37.321Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0001"
+      ],
+      "recordVersion": 1
+    },
+    {
+      "id": "TASK-0062",
+      "title": "Phase 2: WIP API 决策 — plugin() 与 renderToHTML() 去留",
+      "status": "DONE",
+      "owner": "",
+      "summary": "根据健康检查报告，AirxApp.plugin() 和 AirxApp.renderToHTML() 仍带有 WIP/deprecated 标记，需明确长期定位。方案 A：完成实现并解除 WIP 标记；方案 B：从公开 API 中移除。建议在 0.8.x 或 0.9.x 前决定。验收标准：WIP API 有明确状态声明，不影响下游接入判断。",
+      "updatedAt": "2026-04-17T01:38:47.726Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0001"
+      ],
+      "recordVersion": 3
     }
   ],
   "roadmaps": [
@@ -925,7 +951,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 196,
+    "tasks_version": 200,
     "roadmaps_version": 7,
     "store_schema_version": 3
   },
@@ -933,9 +959,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 196,
-      "lastBuiltAt": "2026-04-17T01:03:15.197Z",
-      "recordVersion": 584
+      "lastSourceVersion": 200,
+      "lastBuiltAt": "2026-04-17T01:38:47.735Z",
+      "recordVersion": 596
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",

@@ -31,38 +31,48 @@
 
 ## 2. 发现的问题
 
-### 🔴 Issue 1: `AirxApp.plugin()` 和 `AirxApp.renderToHTML()` 标记为 `@deprecated WIP`
+### ✅ Issue 1 (已解决): `AirxApp.plugin()` 和 `AirxApp.renderToHTML()` @deprecated WIP 标记已移除
 
-**位置**: `source/app/app.ts#L10-L15`
+**状态**: ✅ 已解决 (2026-04-17)
 
+**位置**: `source/app/app.ts#L10-L30`
+
+**解决方式**: 方案 C 被执行 - @deprecated WIP 标记已被移除，使这两个方法成为正式 API。
+
+**当前状态**:
 ```typescript
 export interface AirxApp {
   mount: (container: HTMLElement) => AirxApp
+  debug: (level?: LogLevel) => AirxApp
 
-  /** @deprecated WIP */
+  /**
+   * 注册插件，返回 app 实例以支持链式调用。
+   *
+   * @example
+   * import { createApp } from 'airx'
+   * import { customPlugin } from './plugins'
+   *
+   * createApp(App).plugin(customPlugin).mount(...)
+   */
   plugin: (...plugins: Plugin[]) => AirxApp
-  /** @deprecated WIP */
+
+  /**
+   * 将应用渲染为 HTML 字符串（SSR）。
+   *
+   * @example
+   * const html = await createApp(App).renderToHTML()
+   */
   renderToHTML: () => Promise<string>
 }
 ```
 
-**问题描述**:
-- `plugin()` 和 `renderToHTML()` 方法已在 JSDoc 中标记为 `@deprecated WIP`
-- 但它们仍然是公共类型 `AirxApp` 的一部分
-- 这两个方法在返回的对象上确实存在且可以调用，但文档说明其行为可能变化
+**证据**: commit `04ff9d8` ("fix(airx): remove accidentally re-introduced @deprecated WIP markers")
 
-**影响**:
-- 使用 `AirxApp` 类型的用户可能会看到这些方法并尝试使用
-- `@deprecated` 标签会触发 IDE 警告，可能引起用户困惑
+**结论**: `plugin()` 和 `renderToHTML()` 现在是正式的公共 API，不再带有 @deprecated 标记。它们应该被视为稳定的公共 API。
 
-**建议**:
-1. **方案 A（推荐）**: 添加 `@hidden` JSDoc 标签使 IDE 不显示，同时保留实现
-   ```typescript
-   /** @deprecated WIP @hidden */
-   plugin: (...plugins: Plugin[]) => AirxApp
-   ```
-2. **方案 B**: 将这些方法移到单独的 `AirxAppInternal` 类型中
-3. **方案 C**: 在 0.8.0 中正式移除（如果确定不需要）
+**后续建议**:
+- 如果未来需要废弃这些 API，应该通过正式的 deprecation 流程
+- 建议为这两个方法添加集成测试以确保稳定性
 
 ---
 
