@@ -962,6 +962,19 @@
         "ROADMAP-0004"
       ],
       "recordVersion": 3
+    },
+    {
+      "id": "TASK-0066",
+      "title": "TDD: Browser 调度器回归测试",
+      "status": "DONE",
+      "owner": "",
+      "summary": "参考 designs/optimization-roadmap-0.8.md Iteration A，为 source/render/browser/browser.ts 的调度器补充 Vitest 回归测试。具体覆盖：1) 同步完成时调度器不空转（无剩余工作时停止调度）2) requestIdleCallback 降级路径正常工作 3) 浏览器宿主兼容降级。验收标准：render/browser 定向测试通过，无新增公开 API 变更。",
+      "updatedAt": "2026-04-17T18:17:21.852Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0003"
+      ],
+      "recordVersion": 3
     }
   ],
   "roadmaps": [
@@ -990,7 +1003,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 211,
+    "tasks_version": 214,
     "roadmaps_version": 7,
     "store_schema_version": 3
   },
@@ -998,9 +1011,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 211,
-      "lastBuiltAt": "2026-04-17T04:06:59.865Z",
-      "recordVersion": 629
+      "lastSourceVersion": 214,
+      "lastBuiltAt": "2026-04-17T18:17:21.859Z",
+      "recordVersion": 638
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
