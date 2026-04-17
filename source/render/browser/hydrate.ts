@@ -9,6 +9,8 @@ import {
 
 /**
  * Hydrate options for client-side activation
+ *
+ * @experimental
  */
 export interface HydrateOptions {
   /**
@@ -23,6 +25,8 @@ export interface HydrateOptions {
 
 /**
  * Signal state snapshot structure
+ *
+ * @experimental
  */
 export interface StateSnapshot {
   signals: Record<string, { id: string; value: unknown }>
@@ -32,6 +36,8 @@ export interface StateSnapshot {
 
 /**
  * Interface for hydrated app instance
+ *
+ * @experimental
  */
 export interface HydratedApp {
   /**
