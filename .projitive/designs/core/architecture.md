@@ -107,6 +107,24 @@
 - `Plugin` interface — `{ install(ctx: PluginContext): void }`
 - `PluginContext` — Central plugin registry; passed to plugins on app creation
 
+**`plugins/plugin.ts`** — Plugin hook interface:
+- `isReRender?(instance)` — 插件检查是否需要重新渲染，返回 `true` 则强制重新渲染
+- `updateDom?(dom, nextProps, prevProps?)` — DOM 属性更新钩子，在 Browser renderer 中调用，SSR 中不使用
+- `isReuseInstance?(instance, nextElement)` — 插件检查是否复用现有实例，返回 `false` 则强制重新创建
+
+**Plugin `updateDom` 职责边界** (Browser renderer):
+| 操作 | 实现位置 | 说明 |
+|------|----------|------|
+| 文本内容更新 | `updateDom` 钩子 | 通过 `textContent` 设置 |
+| 样式更新 | `updateDom` 钩子 | 遍历 `style` 对象，增量更新 |
+| class 更新 | `updateDom` 钩子 | `setAttribute('class', ...)` |
+| 普通属性更新 | `updateDom` 钩子 | `setAttribute`/`removeAttribute` |
+| 事件监听 | `updateDom` 钩子 | `addEventListener`/`removeEventListener` |
+| DOM 创建 | renderer 内核 | `document.createElement` 等平台 API |
+| DOM 插入 | renderer 内核 | `insertDomIntoParent` |
+| DOM 删除 | renderer 内核 | `removeDeletions` |
+| 组件实例复用 | renderer 内核 + `isReuseInstance` 钩子 | 协同决策 |
+
 #### `render/browser/` — Browser Renderer
 
 **`browser.ts`** (~200 lines):

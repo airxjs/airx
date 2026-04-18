@@ -77,6 +77,17 @@ export type PropPredicate = (key: string) => boolean
 
 /**
  * Factory for creating property classification predicates used in updateDomProperties.
+ *
+ * 属性分类规则:
+ * - `key`: 不参与 DOM 操作
+ * - `ref`: ref 回调不参与 DOM 操作
+ * - `style`: 单独处理（增量更新 style 对象属性）
+ * - `class`: 通过 `setAttribute('class', ...)` 处理
+ * - `on*`: 事件处理器，通过 `addEventListener`/`removeEventListener` 处理
+ * - `children`: 不渲染到 DOM
+ * - `isProperty`: 其他普通属性，通过 `setAttribute`/`removeAttribute` 处理
+ * - `isGone(prev, next)`: 返回在新 props 中不存在、需要移除的属性
+ * - `isNew(prev, next)`: 返回新旧 props 中值发生变化、需要更新的属性
  */
 export function createPropClassifier() {
   const isKey = (key: string) => key === 'key'
