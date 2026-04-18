@@ -979,15 +979,15 @@
     {
       "id": "TASK-0067",
       "title": "Airx 0.8.0: 提交流程收敛 - 提取 browser/server 共用 commit walker",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "owner": "ai-copilot",
       "summary": "基于 optimization-roadmap-0.8.md 的 Iteration B，提取 browser/server 共用的 commit helper，收敛 DOM 创建/删除/父节点查找逻辑，降低维护成本与回归风险。",
-      "updatedAt": "2026-04-18T12:04:23.079Z",
+      "updatedAt": "2026-04-18T12:08:05.853Z",
       "links": [],
       "roadmapRefs": [
         "ROADMAP-0003"
       ],
-      "recordVersion": 2
+      "recordVersion": 3
     }
   ],
   "roadmaps": [
@@ -1016,7 +1016,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 216,
+    "tasks_version": 217,
     "roadmaps_version": 7,
     "store_schema_version": 3
   },
@@ -1024,9 +1024,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 216,
-      "lastBuiltAt": "2026-04-18T12:04:23.087Z",
-      "recordVersion": 644
+      "lastSourceVersion": 217,
+      "lastBuiltAt": "2026-04-18T12:08:05.865Z",
+      "recordVersion": 647
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
