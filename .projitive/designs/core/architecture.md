@@ -135,12 +135,23 @@
 
 #### `render/server/` — SSR Renderer
 
-**`server.ts`** (~200 lines):
+**`server.ts`** (~350 lines):
 - `serverRender(ctx, element, callback)` — Renders to string via callback
 - `SSRApp` interface: `renderToString()` → Promise\<string\>
 - `createSSRApp(element)` — Creates SSR app instance
 - `hydrate()` — Activates SSR-rendered HTML on the client for interactive updates
 - Limitation: String-based, not streaming
+- Calls `clearSSRSignals()` before each render to avoid stale SSR state
+
+#### `render/ssr/` — SSR State Management
+
+**`ssr-state.ts`** (~110 lines):
+- `registerSSRSignal(id, signal)` — Registers Signal.State for SSR tracking
+- `getRegisteredSignals()` — Returns all signals as serializable map
+- `generateStateSnapshot()` — Creates `StateSnapshot` { signals, version, timestamp }
+- `clearSSRSignals()` — Clears registry between SSR renders (called by serverRender)
+- `injectStateSnapshotIntoHTML(html, snapshot)` — Appends `airx/ssr-state` script tag
+- Enables stateful SSR: signal values are captured and embedded in HTML for client restoration
 
 ### `source/signal/` — Signal Integration
 
@@ -224,21 +235,28 @@
    ↓
 2. app.renderToString()
    └── serverRender(appContext, element, resolve)
-       ↓
-       3. serverRender() recursively renders elements to string
-          ├── Text nodes → escaped text content
-          ├── Element nodes → `<tag>...children...</tag>`
-          └── Fragment → just children
+       ├── clearSSRSignals() — clear stale state
+       ├── serverRender() recursively renders elements to string
+       │   ├── registerSSRSignal() — track Signal.State values during render
+       │   ├── Text nodes → escaped text content
+       │   ├── Element nodes → `<tag>...children...</tag>`
+       │   └── Fragment → just children
+       └── generateStateSnapshot() — capture signal values
+           └── injectStateSnapshotIntoHTML(html, snapshot)
+               └── Append `<script type="airx/ssr-state">` with JSON state
 ```
 
 ### Hydration Flow
 
 ```
-1. SSR HTML injected into DOM
+1. SSR HTML injected into DOM (contains airx/ssr-state script tag)
    ↓
-2. hydrate(container)(appContext, element)
-   └── Attaches event listeners and reactive state to existing DOM
-       ↓
+2. createSSRApp(element)
+   └── app.hydrate(container, options)
+       ├── Parse state snapshot from `airx/ssr-state` script tag
+       ├── Restore Signal.State values from snapshot
+       └── Attach event listeners and reactive state to existing DOM
+           ↓
        3. After hydration, component tree is interactive
           └── Signal changes trigger targeted re-renders via scheduleUpdate()
 ```
