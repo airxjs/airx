@@ -147,6 +147,17 @@
 
 **`ssr-state.ts`** (~110 lines):
 - `registerSSRSignal(id, signal)` — Registers Signal.State for SSR tracking
+- `getRegisteredSignals()` — Returns all tracked signals as serializable map
+- `generateStateSnapshot()` — Creates complete StateSnapshot for SSR
+- `injectStateSnapshotIntoHTML(html, snapshot)` — Appends `airx/ssr-state` script tag
+- `readStateSnapshotFromDOM(container)` — Parses state snapshot from DOM
+- `clearSSRSignals()` — Clears registry between SSR renders (called by serverRender)
+- Enables stateful SSR: signal values are captured and embedded in HTML for client restoration
+
+**`render/browser/hydrate.ts`** — StateSnapshot interface definition
+- `StateSnapshot` interface: `{ signals, version, timestamp }`
+- `HydrateOptions`: `{ stateSnapshot?, forceReset? }`
+- `HydratedApp`: `{ container, unmount }`
 - `getRegisteredSignals()` — Returns all signals as serializable map
 - `generateStateSnapshot()` — Creates `StateSnapshot` { signals, version, timestamp }
 - `clearSSRSignals()` — Clears registry between SSR renders (called by serverRender)
