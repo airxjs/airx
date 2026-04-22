@@ -988,6 +988,32 @@
         "ROADMAP-0003"
       ],
       "recordVersion": 3
+    },
+    {
+      "id": "TASK-0068",
+      "title": "确定 plugin()/renderToHTML() API 去留（0.8.0 P1）",
+      "status": "DONE",
+      "owner": "",
+      "summary": "Duplicate task - work completed by TASK-0062. plugin()/renderToHTML() @deprecated WIP markers removed, both APIs now formally stable.",
+      "updatedAt": "2026-04-20T23:29:14.731Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0003"
+      ],
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0069",
+      "title": "审查并更新核心文档：确保 architecture.md 反映 SSR hydrate 最新实现",
+      "status": "DONE",
+      "owner": "ai-copilot",
+      "summary": "最近提交实现了 hydrate state 序列化/读取 (commit 16e9116)，需检查 designs/core/architecture.md 是否反映 SSR/Hydration 最新状态。其他核心文档 (code-style.md, ui-style.md) 也需验证时效性。",
+      "updatedAt": "2026-04-21T15:47:20.563Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0003"
+      ],
+      "recordVersion": 3
     }
   ],
   "roadmaps": [
@@ -1016,7 +1042,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 217,
+    "tasks_version": 223,
     "roadmaps_version": 7,
     "store_schema_version": 3
   },
@@ -1024,9 +1050,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 217,
-      "lastBuiltAt": "2026-04-18T12:08:05.865Z",
-      "recordVersion": 647
+      "lastSourceVersion": 223,
+      "lastBuiltAt": "2026-04-21T15:47:20.572Z",
+      "recordVersion": 665
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
