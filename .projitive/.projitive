@@ -1014,6 +1014,32 @@
         "ROADMAP-0003"
       ],
       "recordVersion": 3
+    },
+    {
+      "id": "TASK-0070",
+      "title": "Airx 文档版本基线同步检查",
+      "status": "DONE",
+      "owner": "ai-copilot",
+      "summary": "验证 airx 0.7.x 文档基线是否已同步（基于 2026-03-28 健康检查报告 Phase 1）。检查 architecture.md、release-quality-gates.md、api-compatibility-matrix.md 版本是否与当前 0.7.10 一致，如有过时则更新。",
+      "updatedAt": "2026-04-23T23:38:54.489Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0001"
+      ],
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0071",
+      "title": "Airx WIP API 决策：plugin()/renderToHTML() 定稿",
+      "status": "DONE",
+      "owner": "ai-copilot",
+      "summary": "基于 2026-03-28 健康检查报告 Phase 2，明确 AirxApp.plugin() 和 AirxApp.renderToHTML() 的状态：方案 A - 完成实现解除 WIP；方案 B - 从公开 API 移除。建议在 0.8.x 前决定。",
+      "updatedAt": "2026-04-23T23:37:35.803Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0001"
+      ],
+      "recordVersion": 3
     }
   ],
   "roadmaps": [
@@ -1042,7 +1068,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 223,
+    "tasks_version": 229,
     "roadmaps_version": 7,
     "store_schema_version": 3
   },
@@ -1050,9 +1076,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 223,
-      "lastBuiltAt": "2026-04-21T15:47:20.572Z",
-      "recordVersion": 665
+      "lastSourceVersion": 229,
+      "lastBuiltAt": "2026-04-23T23:38:54.498Z",
+      "recordVersion": 683
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
