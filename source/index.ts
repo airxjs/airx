@@ -40,6 +40,28 @@ export {
 } from './element/index.js'
 
 /**
+ * Error Boundary API.
+ * 
+ * @example
+ * import { ErrorBoundary } from 'airx'
+ *
+ * function App() {
+ *   return (
+ *     <ErrorBoundary fallback={(error) => <div>Error: {error.message}</div>}>
+ *       <Child />
+ *     </ErrorBoundary>
+ *   )
+ * }
+ */
+export {
+  ErrorBoundary,
+  createErrorBoundary,
+  type ErrorBoundaryProps,
+  type ErrorBoundaryState,
+  type ErrorBoundaryRef
+} from './element/index.js'
+
+/**
  * 组件上下文 Hook API。
  *
  * @example
