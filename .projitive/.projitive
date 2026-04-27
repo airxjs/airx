@@ -1040,6 +1040,40 @@
         "ROADMAP-0001"
       ],
       "recordVersion": 3
+    },
+    {
+      "id": "TASK-0072",
+      "title": "规划 Airx 0.8.0 版本 roadmap",
+      "status": "DONE",
+      "owner": "",
+      "summary": "基于 ROADMAP-0001/0002/0003 的已完成状态，规划 Airx 下一个版本（0.8.0）的目标、关键功能和发布计划。参考当前 0.7.x 的稳定性状态和 SSR hydrate 完成情况，制定 0.8.0 版本 roadmap。",
+      "updatedAt": "2026-04-25T18:56:58.718Z",
+      "links": [
+        "designs/research/TASK-0072.0.8.0-roadmap-planning.md"
+      ],
+      "roadmapRefs": [
+        "ROADMAP-0001",
+        "ROADMAP-0002",
+        "ROADMAP-0003"
+      ],
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0073",
+      "title": "Airx 0.8.0 M1-1: 实现 Error Boundaries 错误边界",
+      "status": "IN_PROGRESS",
+      "owner": "ai-copilot",
+      "summary": "基于 TASK-0072 0.8.0 Roadmap 规划，实现 Airx Error Boundaries 错误边界机制。当前状态：组件渲染错误时直接显示错误块（createErrorRender），无边界捕获能力。目标实现：1）创建 <ErrorBoundary> 组件，支持 getDerivedStateFromError 模式设置降级 UI；2）在 commit 阶段用 try/catch 捕获子组件渲染错误；3）提供 onError Callback 机制；4）支持 error reset/resetError 恢复机制；5）提供类型定义和文档。参考 React ErrorBoundary 设计，但适配 Airx 的响应式组件模型。",
+      "updatedAt": "2026-04-27T01:54:52.698Z",
+      "links": [
+        "designs/research/TASK-0072.0.8.0-roadmap-planning.md"
+      ],
+      "roadmapRefs": [
+        "ROADMAP-0001",
+        "ROADMAP-0002",
+        "ROADMAP-0003"
+      ],
+      "recordVersion": 4
     }
   ],
   "roadmaps": [
@@ -1068,7 +1102,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 229,
+    "tasks_version": 236,
     "roadmaps_version": 7,
     "store_schema_version": 3
   },
@@ -1076,9 +1110,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 229,
-      "lastBuiltAt": "2026-04-23T23:38:54.498Z",
-      "recordVersion": 683
+      "lastSourceVersion": 236,
+      "lastBuiltAt": "2026-04-27T01:54:52.706Z",
+      "recordVersion": 704
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
