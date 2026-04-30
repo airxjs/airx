@@ -4,6 +4,45 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.8.0] - 2026-04-30
+
+### Added
+
+- **ErrorBoundary Component** — Implemented ErrorBoundary component for graceful error handling in the component tree
+- **Hydrate State Serialization** — Implemented `hydrate()` state serialization and reading for SSR hydration state transfer
+- **Experimental Markers & Runtime Warnings** — Added experimental API markers and runtime warnings when hydrate stateSnapshot restore is incomplete
+
+### Performance
+
+- **Idle Scheduling Fix** — Prevent unnecessary idle scheduling after work completion
+
+### Refactor
+
+- **Shared Commit Helpers** — Extracted shared `createCommitWalker` function to eliminate browser/server commit logic duplication
+- **Plugin/Commit Responsibility Docs** — Documented `plugin.updateDom` boundary and commit responsibilities (TASK-0067)
+
+### Fixed
+
+- **Hydrate Dev Mode Warning** — Added runtime warning in dev mode when hydrate stateSnapshot restore is incomplete
+- **DOM Updates During Yield** — Enhanced render logic to ensure DOM updates correctly after signal changes during yield
+- **Lint Warnings** — Removed 6 unused variable/eslint warnings across the codebase
+
+### Testing
+
+- **Scheduler Idle Regression Tests** — Added regression tests for browser scheduler idle behavior (TASK-0066)
+- **Hydrate Integration Tests** — Strengthened `hydrate()` integration test coverage (370 tests)
+
+### Documentation
+
+- **Architecture Updates** — Updated architecture.md with hydrate state snapshot docs and SSR state management
+- **API Stability Audit** — Updated api-stability-audit for plugin/renderToHTML boundaries
+
+### Infrastructure
+
+- **TypeScript Typecheck in CI** — Added typecheck step to CI pipeline for early type error detection
+
+---
+
 ## [0.7.10] - 2026-04-16
 
 ### Added
