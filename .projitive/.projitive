@@ -1087,6 +1087,58 @@
         "ROADMAP-0001"
       ],
       "recordVersion": 3
+    },
+    {
+      "id": "TASK-0075",
+      "title": "构建 airx 0.8.0 版本的 changelog 和发布说明",
+      "status": "DONE",
+      "owner": "",
+      "summary": "基于 0.8.0 roadmap (TASK-0072) 研究文档，构建正式 changelog 和发版说明",
+      "updatedAt": "2026-04-30T07:03:34.901Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0001"
+      ],
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0076",
+      "title": "Review airx README and identify next actionable milestone",
+      "status": "DONE",
+      "owner": "",
+      "summary": "基于 README 和 roadmap-0.8-planning.md 审查，识别出 0.8.0 版本下一步行动：1) TASK-0077 - finalize hydrate() API (移除 @experimental 标记)；2) TASK-0078 - resolve plugin()/renderToHTML() WIP 状态。这两个任务是 0.8.0 稳定发布的关键前置。",
+      "updatedAt": "2026-05-03T04:21:36.030Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0001"
+      ],
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0077",
+      "title": "Airx 0.8.0: Finalize hydrate() API for stable release",
+      "status": "TODO",
+      "owner": "",
+      "summary": "基于 TASK-0076 研究结论：1) 移除 hydrate() 的 @experimental 标记，标记为 @stable；2) 更新 README 中 hydration 章节，说明 hydration 已稳定；3) 更新 source/render/server/server.ts 中 hydrate 相关 JSDoc。验收标准：npm run typecheck && npm test 通过。",
+      "updatedAt": "2026-05-03T04:21:16.784Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0001"
+      ],
+      "recordVersion": 1
+    },
+    {
+      "id": "TASK-0078",
+      "title": "Airx 0.8.0: Resolve plugin()/renderToHTML() WIP status",
+      "status": "TODO",
+      "owner": "",
+      "summary": "基于 TASK-0076 研究结论和 TASK-0062 决策记录：plugin() 和 renderToHTML() 均已稳定实现，需决定去留。推荐方案：保留 API，移除 @deprecated WIP 标记，改为 @stable。同时更新相关文档和 JSDoc。验收标准：npm run typecheck && npm test 通过。",
+      "updatedAt": "2026-05-03T04:21:27.186Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0001"
+      ],
+      "recordVersion": 1
     }
   ],
   "roadmaps": [
@@ -1115,7 +1167,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 240,
+    "tasks_version": 248,
     "roadmaps_version": 7,
     "store_schema_version": 3
   },
@@ -1123,9 +1175,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 240,
-      "lastBuiltAt": "2026-04-27T03:08:38.129Z",
-      "recordVersion": 716
+      "lastSourceVersion": 248,
+      "lastBuiltAt": "2026-05-03T04:21:36.040Z",
+      "recordVersion": 740
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
