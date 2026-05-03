@@ -4,9 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [0.8.0] - 2026-04-30
+## [0.8.0] - 2026-05-03
 
-### Added
+### Breaking Changes
+
+- **hydrate() API Stabilized** — Removed @experimental marker and runtime warnings from `hydrate()`, which is now a stable public API. Update any code that relied on the experimental warning.
 
 - **ErrorBoundary Component** — Implemented ErrorBoundary component for graceful error handling in the component tree
 - **Hydrate State Serialization** — Implemented `hydrate()` state serialization and reading for SSR hydration state transfer

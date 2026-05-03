@@ -1117,28 +1117,28 @@
     {
       "id": "TASK-0077",
       "title": "Airx 0.8.0: Finalize hydrate() API for stable release",
-      "status": "TODO",
+      "status": "IN_PROGRESS",
       "owner": "",
       "summary": "基于 TASK-0076 研究结论：1) 移除 hydrate() 的 @experimental 标记，标记为 @stable；2) 更新 README 中 hydration 章节，说明 hydration 已稳定；3) 更新 source/render/server/server.ts 中 hydrate 相关 JSDoc。验收标准：npm run typecheck && npm test 通过。",
-      "updatedAt": "2026-05-03T04:21:16.784Z",
+      "updatedAt": "2026-05-03T04:24:54.098Z",
       "links": [],
       "roadmapRefs": [
         "ROADMAP-0001"
       ],
-      "recordVersion": 1
+      "recordVersion": 2
     },
     {
       "id": "TASK-0078",
       "title": "Airx 0.8.0: Resolve plugin()/renderToHTML() WIP status",
-      "status": "TODO",
+      "status": "DONE",
       "owner": "",
-      "summary": "基于 TASK-0076 研究结论和 TASK-0062 决策记录：plugin() 和 renderToHTML() 均已稳定实现，需决定去留。推荐方案：保留 API，移除 @deprecated WIP 标记，改为 @stable。同时更新相关文档和 JSDoc。验收标准：npm run typecheck && npm test 通过。",
-      "updatedAt": "2026-05-03T04:21:27.186Z",
+      "summary": "plugin()/renderToHTML() 的 @deprecated WIP 标记已在 bf2c6f9 和 04ff9d8 中正确移除。当前 source/app/app.ts 中的接口定义已无 @deprecated WIP 标记，相关文档 (api-stability-audit.md, WIP-api-decision.md) 也已更新。TASK-0062 和 TASK-0068 的结论已落地。此任务为重复创建，实际无需执行。",
+      "updatedAt": "2026-05-03T04:24:33.758Z",
       "links": [],
       "roadmapRefs": [
         "ROADMAP-0001"
       ],
-      "recordVersion": 1
+      "recordVersion": 3
     }
   ],
   "roadmaps": [
@@ -1167,7 +1167,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 248,
+    "tasks_version": 251,
     "roadmaps_version": 7,
     "store_schema_version": 3
   },
@@ -1175,9 +1175,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 248,
-      "lastBuiltAt": "2026-05-03T04:21:36.040Z",
-      "recordVersion": 740
+      "lastSourceVersion": 251,
+      "lastBuiltAt": "2026-05-03T04:24:54.108Z",
+      "recordVersion": 749
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",

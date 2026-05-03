@@ -360,12 +360,16 @@ export function createSSRApp(element: AirxElement | AirxComponent): SSRApp {
       })
     },
 
+    /**
+     * 激活 SSR 应用输出的 HTML，使客户端可交互。
+     * 
+     * @example
+     * const app = createSSRApp(<App />)
+     * const html = await app.renderToString()
+     * container.innerHTML = html
+     * app.hydrate(container)
+     */
     hydrate(container: HTMLElement, options?: HydrateOptions): void {
-      console.warn(
-        '[Airx SSR] hydrate() is an experimental API (0.8.x). ' +
-        'It may change behavior before stabilization. ' +
-        'See https://github.com/airxjs/airx/blob/main/CHANGELOG.md#080'
-      )
       const logger = createLogger('SSRApp:hydrate')
       logger.debug('hydrating SSR app', { container, options })
 
@@ -385,21 +389,21 @@ export function renderToString(app: SSRApp): Promise<string> {
 
 /**
  * 客户端激活 SSR 输出的 HTML
- *
- * @experimental 此函数是实验性 API，计划在 0.8.x 中稳定。
- * 当前实现已可用，但 API 可能在 0.8.x 正式发布前进行调整。
- *
+ * 
+ * @stable 0.8.0
+ * 
+ * @example
+ * const app = createSSRApp(<App />)
+ * const html = await app.renderToString()
+ * container.innerHTML = html
+ * hydrate(html, container, app)
+ * 
  * @param _html 服务端渲染的 HTML 字符串（暂未使用，DOM already in container）
  * @param container 容器元素
  * @param app SSR 应用实例
  * @param options Hydrate 选项
  */
 export function hydrate(_html: string, container: HTMLElement, app: SSRApp, options?: HydrateOptions): void {
-  console.warn(
-    '[Airx] hydrate() is an experimental API (0.8.x). ' +
-    'It may change behavior before stabilization. ' +
-    'See https://github.com/airxjs/airx/blob/main/CHANGELOG.md#080'
-  )
   const logger = createLogger('hydrate')
   logger.debug('top-level hydrate called')
   app.hydrate(container, options)

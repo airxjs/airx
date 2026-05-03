@@ -118,7 +118,7 @@ async function renderPage() {
 
 ### Hydration (Client-Side Activation)
 
-> ✅ Hydration is available in 0.7.x+ for activating server-rendered HTML on the client.
+> ✅ Hydration is stable in 0.8.0+ for activating server-rendered HTML on the client.
 
 ```tsx
 import { createSSRApp, hydrate } from 'airx'
