@@ -8,8 +8,8 @@ This file is generated from .projitive governance store by Projitive MCP. Manual
 
 ## TASK-0087 | DONE | Fix Airx benchmark runner - cannot find .js modules
 - owner: (none)
-- summary: The benchmark runner.mjs imports .ts files as .js (e.g. render-throughput.js) but these aren't compiled. Need to either compile them or switch to tsx runtime.
-- updatedAt: 2026-05-06T11:41:51.365Z
+- summary: Airx health check 2026-05-06 23:26
+- updatedAt: 2026-05-06T15:34:53.645Z
 - roadmapRefs: ROADMAP-0004
 - links:
   - (none)
