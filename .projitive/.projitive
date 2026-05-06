@@ -1117,15 +1117,15 @@
     {
       "id": "TASK-0077",
       "title": "Airx 0.8.0: Finalize hydrate() API for stable release",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "owner": "",
-      "summary": "基于 TASK-0076 研究结论：1) 移除 hydrate() 的 @experimental 标记，标记为 @stable；2) 更新 README 中 hydration 章节，说明 hydration 已稳定；3) 更新 source/render/server/server.ts 中 hydrate 相关 JSDoc。验收标准：npm run typecheck && npm test 通过。",
-      "updatedAt": "2026-05-03T04:24:54.098Z",
+      "summary": "完成 hydrate() API 稳定化：1) 移除 @experimental 标记，添加 @stable 0.8.0 JSDoc；2) 更新 SSRApp.hydrate() JSDoc；3) 更新 README.md 说明 hydration 在 0.8.0+ 稳定；4) 更新 CHANGELOG.md 添加 Breaking Changes。验收通过：typecheck ✅, lint ✅, tests 378/378 ✅, 已推送 main。",
+      "updatedAt": "2026-05-03T04:26:34.401Z",
       "links": [],
       "roadmapRefs": [
         "ROADMAP-0001"
       ],
-      "recordVersion": 2
+      "recordVersion": 3
     },
     {
       "id": "TASK-0078",
@@ -1139,6 +1139,19 @@
         "ROADMAP-0001"
       ],
       "recordVersion": 3
+    },
+    {
+      "id": "TASK-0079",
+      "title": "Evaluate 0.8.0 release scope and create follow-up tasks",
+      "status": "IN_PROGRESS",
+      "owner": "",
+      "summary": "Based on TASK-0076 output, analyze 0.8.0 changelog and create executable TODO tasks for next development cycle",
+      "updatedAt": "2026-05-06T05:13:20.370Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0001"
+      ],
+      "recordVersion": 2
     }
   ],
   "roadmaps": [
@@ -1167,7 +1180,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 251,
+    "tasks_version": 254,
     "roadmaps_version": 7,
     "store_schema_version": 3
   },
@@ -1175,9 +1188,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 251,
-      "lastBuiltAt": "2026-05-03T04:24:54.108Z",
-      "recordVersion": 749
+      "lastSourceVersion": 254,
+      "lastBuiltAt": "2026-05-06T05:13:20.378Z",
+      "recordVersion": 758
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
