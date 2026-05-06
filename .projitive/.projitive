@@ -1156,13 +1156,52 @@
     {
       "id": "TASK-0080",
       "title": "Plan Airx 0.9.0 roadmap: identify next priority features and improvements",
-      "status": "TODO",
+      "status": "IN_PROGRESS",
       "owner": "",
       "summary": "Based on 0.8.0 completion, identify high-value targets for 0.9.0: bundle size optimization, devtools, performance benchmarking, or new feature development. Create concrete roadmap milestones.",
-      "updatedAt": "2026-05-06T05:14:11.718Z",
+      "updatedAt": "2026-05-06T05:14:46.303Z",
       "links": [],
       "roadmapRefs": [
         "ROADMAP-0001"
+      ],
+      "recordVersion": 2
+    },
+    {
+      "id": "TASK-0081",
+      "title": "Airx 0.9.0: Bundle size audit and optimization plan",
+      "status": "TODO",
+      "owner": "",
+      "summary": "Measure current airx bundle size (output/), identify largest contributors, create optimization plan with specific targets. Deliverables: bundle analysis report, optimization recommendations, before/after size comparison.",
+      "updatedAt": "2026-05-06T05:15:32.781Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0004"
+      ],
+      "recordVersion": 1
+    },
+    {
+      "id": "TASK-0082",
+      "title": "Airx 0.9.0: Performance benchmark suite",
+      "status": "TODO",
+      "owner": "",
+      "summary": "Create performance benchmark suite for: render throughput, signal update latency, SSR speed. Establish baselines for 0.9.0 release. Deliverables: benchmark scripts, baseline metrics, CI integration.",
+      "updatedAt": "2026-05-06T05:15:32.850Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0004"
+      ],
+      "recordVersion": 1
+    },
+    {
+      "id": "TASK-0083",
+      "title": "Airx 0.9.0: Enhanced error messages and debug experience",
+      "status": "TODO",
+      "owner": "",
+      "summary": "Improve runtime error messages to be more actionable. Add component stack traces, signal access error context, hydration error details. Deliverables: error message improvements, documentation update.",
+      "updatedAt": "2026-05-06T05:15:33.020Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0004"
       ],
       "recordVersion": 1
     }
@@ -1190,27 +1229,35 @@
       "status": "done",
       "updatedAt": "2026-03-29T18:13:07.935Z",
       "recordVersion": 2
+    },
+    {
+      "id": "ROADMAP-0004",
+      "title": "Airx 0.9.0 - Developer Experience & Performance",
+      "status": "active",
+      "time": "2026-Q2~Q3",
+      "updatedAt": "2026-05-06T05:15:19.992Z",
+      "recordVersion": 1
     }
   ],
   "meta": {
-    "tasks_version": 256,
-    "roadmaps_version": 7,
+    "tasks_version": 260,
+    "roadmaps_version": 8,
     "store_schema_version": 3
   },
   "view_state": {
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 256,
-      "lastBuiltAt": "2026-05-06T05:14:19.395Z",
-      "recordVersion": 764
+      "lastSourceVersion": 260,
+      "lastBuiltAt": "2026-05-06T05:15:33.030Z",
+      "recordVersion": 776
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
       "dirty": false,
-      "lastSourceVersion": 7,
-      "lastBuiltAt": "2026-03-29T18:13:07.938Z",
-      "recordVersion": 21
+      "lastSourceVersion": 8,
+      "lastBuiltAt": "2026-05-06T05:15:19.996Z",
+      "recordVersion": 23
     }
   },
   "migration_history": []
