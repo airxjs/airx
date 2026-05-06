@@ -1143,15 +1143,28 @@
     {
       "id": "TASK-0079",
       "title": "Evaluate 0.8.0 release scope and create follow-up tasks",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "owner": "",
-      "summary": "Based on TASK-0076 output, analyze 0.8.0 changelog and create executable TODO tasks for next development cycle",
-      "updatedAt": "2026-05-06T05:13:20.370Z",
+      "summary": "完成 0.8.0 版本审查：1) 发现 package.json 版本 (0.7.10) 与 CHANGELOG.md (0.8.0) 不同步，已修复；2) 创建 TASK-0079 研究文档，分析 0.8.0 状态；3) 创建 TASK-0080 规划 0.9.0 roadmap。验收通过：git commit 完成，版本已同步。",
+      "updatedAt": "2026-05-06T05:14:19.387Z",
       "links": [],
       "roadmapRefs": [
         "ROADMAP-0001"
       ],
-      "recordVersion": 2
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0080",
+      "title": "Plan Airx 0.9.0 roadmap: identify next priority features and improvements",
+      "status": "TODO",
+      "owner": "",
+      "summary": "Based on 0.8.0 completion, identify high-value targets for 0.9.0: bundle size optimization, devtools, performance benchmarking, or new feature development. Create concrete roadmap milestones.",
+      "updatedAt": "2026-05-06T05:14:11.718Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0001"
+      ],
+      "recordVersion": 1
     }
   ],
   "roadmaps": [
@@ -1180,7 +1193,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 254,
+    "tasks_version": 256,
     "roadmaps_version": 7,
     "store_schema_version": 3
   },
@@ -1188,9 +1201,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 254,
-      "lastBuiltAt": "2026-05-06T05:13:20.378Z",
-      "recordVersion": 758
+      "lastSourceVersion": 256,
+      "lastBuiltAt": "2026-05-06T05:14:19.395Z",
+      "recordVersion": 764
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
