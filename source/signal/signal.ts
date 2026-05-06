@@ -31,7 +31,7 @@ function getSignal() {
   const globalSignal: typeof Polyfill = globalNS['Signal']
   if (globalSignal == null) throw new Error('Signal is undefined')
   if (firstSignal == null) firstSignal = globalSignal
-  if (firstSignal !== globalSignal) throw new Error('Signal have multiple instances')
+  if (firstSignal !== globalSignal) throw new Error('Signal has multiple instances: detected different Signal implementations. Ensure only one version of signal-polyfill is installed.')
 
   return globalSignal
 }

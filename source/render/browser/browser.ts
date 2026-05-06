@@ -84,7 +84,7 @@ export function render(pluginContext: PluginContext, element: AirxElement, domRe
 
       // 创建 dom
       if (nextInstance.domRef == null) {
-        if (nextInstance.element == null) throw new Error('???')
+        if (nextInstance.element == null) throw new Error('Failed to render element: element is null. This may indicate a hydration mismatch or internal state corruption.')
         if (typeof nextInstance.element.type === 'string') {
           if (nextInstance.element.type === INTERNAL_TEXT_NODE_TYPE) {
             const textContent = nextInstance.element.props.textContent

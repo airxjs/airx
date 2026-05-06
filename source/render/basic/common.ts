@@ -194,7 +194,7 @@ export function getParentDom<E extends AbstractElement>(instance: Instance<E>): 
     return getParentDom(instance.parent)
   }
 
-  throw new Error('Cant find dom')
+  throw new Error('Cannot find DOM reference: parent instance has no domRef. This may indicate a hydration mismatch or SSR/CSR state inconsistency.')
 }
 
 /**

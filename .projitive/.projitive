@@ -1156,15 +1156,15 @@
     {
       "id": "TASK-0080",
       "title": "Plan Airx 0.9.0 roadmap: identify next priority features and improvements",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "owner": "",
-      "summary": "Based on 0.8.0 completion, identify high-value targets for 0.9.0: bundle size optimization, devtools, performance benchmarking, or new feature development. Create concrete roadmap milestones.",
-      "updatedAt": "2026-05-06T05:14:46.303Z",
+      "summary": "完成 0.9.0 roadmap 规划：1) 创建 ROADMAP-0004 (Developer Experience & Performance)；2) 创建 TASK-0081 (bundle size audit)、TASK-0082 (benchmark suite)、TASK-0083 (error messages)。验收通过：git commit 完成。",
+      "updatedAt": "2026-05-06T05:15:51.682Z",
       "links": [],
       "roadmapRefs": [
         "ROADMAP-0001"
       ],
-      "recordVersion": 2
+      "recordVersion": 3
     },
     {
       "id": "TASK-0081",
@@ -1195,15 +1195,15 @@
     {
       "id": "TASK-0083",
       "title": "Airx 0.9.0: Enhanced error messages and debug experience",
-      "status": "TODO",
+      "status": "IN_PROGRESS",
       "owner": "",
       "summary": "Improve runtime error messages to be more actionable. Add component stack traces, signal access error context, hydration error details. Deliverables: error message improvements, documentation update.",
-      "updatedAt": "2026-05-06T05:15:33.020Z",
+      "updatedAt": "2026-05-06T05:16:38.466Z",
       "links": [],
       "roadmapRefs": [
         "ROADMAP-0004"
       ],
-      "recordVersion": 1
+      "recordVersion": 2
     }
   ],
   "roadmaps": [
@@ -1240,7 +1240,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 260,
+    "tasks_version": 262,
     "roadmaps_version": 8,
     "store_schema_version": 3
   },
@@ -1248,9 +1248,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 260,
-      "lastBuiltAt": "2026-05-06T05:15:33.030Z",
-      "recordVersion": 776
+      "lastSourceVersion": 262,
+      "lastBuiltAt": "2026-05-06T05:16:38.475Z",
+      "recordVersion": 782
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
