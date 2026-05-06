@@ -5,10 +5,10 @@
  * This is the main entry point for `npm run benchmark`.
  */
 
-import { runRenderThroughputBenchmarks } from './render-throughput.js'
-import { runSignalLatencyBenchmarks } from './signal-latency.js'
-import { runSSRSpeedBenchmarks } from './ssr-speed.js'
-import { printBenchmarkResult, JsonBaselineStore } from './bench-framework.js'
+import { runRenderThroughputBenchmarks } from './render-throughput.ts'
+import { runSignalLatencyBenchmarks } from './signal-latency.ts'
+import { runSSRSpeedBenchmarks } from './ssr-speed.ts'
+import { printBenchmarkResult, JsonBaselineStore } from './bench-framework.ts'
 import * as fs from 'fs'
 
 async function main() {

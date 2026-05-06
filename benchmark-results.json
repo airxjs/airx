@@ -1,0 +1,72 @@
+{
+  "Signal.State set/get (100 ops)": {
+    "name": "Signal.State set/get (100 ops)",
+    "mean": 0.018533909999999806,
+    "stddev": 0.0059413306659286385,
+    "median": 0.01646400000000625,
+    "min": 0.01054500000000047,
+    "max": 0.046948000000000434,
+    "iterations": 100,
+    "opsPerSec": 53955.155711882195
+  },
+  "Signal.Computed derivation": {
+    "name": "Signal.Computed derivation",
+    "mean": 0.012856299999999977,
+    "stddev": 0.006042620213947176,
+    "median": 0.012616000000008398,
+    "min": 0.008025000000003502,
+    "max": 0.04615599999999631,
+    "iterations": 100,
+    "opsPerSec": 77782.87687748435
+  },
+  "Signal.Watcher (100 updates)": {
+    "name": "Signal.Watcher (100 updates)",
+    "mean": 0.12364091999999971,
+    "stddev": 0.3102956439558145,
+    "median": 0.07749700000000814,
+    "min": 0.029848000000001207,
+    "max": 2.977930999999998,
+    "iterations": 100,
+    "opsPerSec": 8087.937229842696
+  },
+  "Simple div element": {
+    "name": "Simple div element",
+    "mean": 0.01002827000000039,
+    "stddev": 0.06476380029149822,
+    "median": 0.002772000000007324,
+    "min": 0.002423999999990656,
+    "max": 0.6535659999999979,
+    "iterations": 100,
+    "opsPerSec": 99718.09693994687
+  },
+  "Element with 5 children": {
+    "name": "Element with 5 children",
+    "mean": 0.007527699999999555,
+    "stddev": 0.009433770800162042,
+    "median": 0.005977999999998929,
+    "min": 0.00539799999999957,
+    "max": 0.09435399999999561,
+    "iterations": 100,
+    "opsPerSec": 132842.70095780373
+  },
+  "Deep tree (depth=5)": {
+    "name": "Deep tree (depth=5)",
+    "mean": 0.015071069999999765,
+    "stddev": 0.09049652770236577,
+    "median": 0.0048659999999927095,
+    "min": 0.004576999999997611,
+    "max": 0.9109339999999975,
+    "iterations": 100,
+    "opsPerSec": 66352.28951892703
+  },
+  "Wide tree (breadth=20)": {
+    "name": "Wide tree (breadth=20)",
+    "mean": 0.03473852000000079,
+    "stddev": 0.11947597329207876,
+    "median": 0.016412000000002536,
+    "min": 0.01446099999999717,
+    "max": 1.0919159999999977,
+    "iterations": 100,
+    "opsPerSec": 28786.48831326082
+  }
+}

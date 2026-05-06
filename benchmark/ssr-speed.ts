@@ -5,10 +5,10 @@
  * Reports: average time per render, renders per second.
  */
 
-import { runBenchmark, runAllBenchmarks, BenchmarkResult, printBenchmarkResult } from './bench-framework.js'
-import { createElement, Fragment } from '../source/element/index.js'
-import { createState } from '../source/signal/index.js'
-import { createSSRApp, renderToString } from '../source/render/server/server.js'
+import { runBenchmark, runAllBenchmarks, BenchmarkResult, printBenchmarkResult } from './bench-framework.ts'
+import { createElement, Fragment } from '../source/element/index.ts'
+import { createState } from '../source/signal/index.ts'
+import { createSSRApp, renderToString } from '../source/render/server/server.ts'
 
 // Mock global Signal for SSR environment
 import { Signal } from 'signal-polyfill'

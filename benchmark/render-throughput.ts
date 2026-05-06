@@ -5,11 +5,11 @@
  * Reports: components rendered per second, timing statistics.
  */
 
-import { runBenchmark, runAllBenchmarks, BenchmarkResult, printBenchmarkResult } from './bench-framework.js'
-import { createElement, Fragment } from '../source/element/index.js'
-import { createState, createComputed } from '../source/signal/index.js'
-import { render } from '../source/render/browser/browser.js'
-import { PluginContext } from '../source/render/basic/plugins/index.js'
+import { runBenchmark, runAllBenchmarks, BenchmarkResult, printBenchmarkResult } from './bench-framework.ts'
+import { createElement, Fragment } from '../source/element/index.ts'
+import { createState, createComputed } from '../source/signal/index.ts'
+import { render } from '../source/render/browser/browser.ts'
+import { PluginContext } from '../source/render/basic/plugins/index.ts'
 
 // Mock global Signal for browser environment
 import { Signal } from 'signal-polyfill'

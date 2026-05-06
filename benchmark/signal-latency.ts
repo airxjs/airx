@@ -5,11 +5,11 @@
  * Reports: latency percentiles (p50, p95, p99), update throughput.
  */
 
-import { runBenchmark, runAllBenchmarks, BenchmarkResult, printBenchmarkResult } from './bench-framework.js'
-import { createElement } from '../source/element/index.js'
-import { createState, createComputed, createWatch } from '../source/signal/index.js'
-import { render } from '../source/render/browser/browser.js'
-import { PluginContext } from '../source/render/basic/plugins/index.js'
+import { runBenchmark, runAllBenchmarks, BenchmarkResult, printBenchmarkResult } from './bench-framework.ts'
+import { createElement } from '../source/element/index.ts'
+import { createState, createComputed, createWatch } from '../source/signal/index.ts'
+import { render } from '../source/render/browser/browser.ts'
+import { PluginContext } from '../source/render/basic/plugins/index.ts'
 
 // Mock global Signal for browser environment
 import { Signal } from 'signal-polyfill'
