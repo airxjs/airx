@@ -1251,15 +1251,15 @@
     {
       "id": "TASK-0087",
       "title": "Fix Airx benchmark runner - cannot find .js modules",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "owner": "",
       "summary": "The benchmark runner.mjs imports .ts files as .js (e.g. render-throughput.js) but these aren't compiled. Need to either compile them or switch to tsx runtime.",
-      "updatedAt": "2026-05-06T11:41:14.811Z",
+      "updatedAt": "2026-05-06T11:41:51.365Z",
       "links": [],
       "roadmapRefs": [
         "ROADMAP-0004"
       ],
-      "recordVersion": 3
+      "recordVersion": 4
     }
   ],
   "roadmaps": [
@@ -1296,7 +1296,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 279,
+    "tasks_version": 280,
     "roadmaps_version": 8,
     "store_schema_version": 3
   },
@@ -1304,9 +1304,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 279,
-      "lastBuiltAt": "2026-05-06T11:41:14.821Z",
-      "recordVersion": 833
+      "lastSourceVersion": 280,
+      "lastBuiltAt": "2026-05-06T11:41:51.374Z",
+      "recordVersion": 836
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
