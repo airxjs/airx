@@ -1204,6 +1204,19 @@
         "ROADMAP-0004"
       ],
       "recordVersion": 3
+    },
+    {
+      "id": "TASK-0084",
+      "title": "Add esbuild minification step to build pipeline",
+      "status": "IN_PROGRESS",
+      "owner": "",
+      "summary": "Implement Priority 1 bundle optimization from TASK-0081: add esbuild post-build minification to reduce bundle size ~40%. Current: raw TypeScript output (~50KB ESM). Target: minified ESM (<30KB).",
+      "updatedAt": "2026-05-06T07:16:52.325Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0004"
+      ],
+      "recordVersion": 2
     }
   ],
   "roadmaps": [
@@ -1240,7 +1253,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 267,
+    "tasks_version": 269,
     "roadmaps_version": 8,
     "store_schema_version": 3
   },
@@ -1248,9 +1261,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 267,
-      "lastBuiltAt": "2026-05-06T05:45:11.474Z",
-      "recordVersion": 797
+      "lastSourceVersion": 269,
+      "lastBuiltAt": "2026-05-06T07:16:52.338Z",
+      "recordVersion": 803
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",

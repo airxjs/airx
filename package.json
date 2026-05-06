@@ -22,11 +22,25 @@
     }
   },
   "files": [
-    "output/*"
+    "output/index.js",
+    "output/index.d.ts",
+    "output/index.umd.cjs",
+    "output/jsx-runtime.js",
+    "output/jsx-runtime.d.ts",
+    "output/jsx-dev-runtime.js",
+    "output/jsx-dev-runtime.d.ts",
+    "output/legacy.d.ts",
+    "output/app",
+    "output/element",
+    "output/render",
+    "output/signal",
+    "output/logger"
   ],
   "scripts": {
     "dev": "tsc -w",
     "build": "tsc",
+    "build:minify": "node scripts/minify.mjs",
+    "postbuild": "npm run build:minify",
     "lint": "eslint source",
     "typecheck": "tsc --noEmit",
     "prepublishOnly": "npm run build",
@@ -45,6 +59,7 @@
     "@typescript-eslint/typescript-estree": "^8.35.1",
     "@vitest/coverage-v8": "^3.2.4",
     "@vitest/ui": "^3.2.4",
+    "esbuild": "^0.28.0",
     "eslint": "^8.57.0",
     "jsdom": "^26.1.0",
     "signal-polyfill": "^0.2.2",
