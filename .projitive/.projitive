@@ -1275,6 +1275,19 @@
         "ROADMAP-0001"
       ],
       "recordVersion": 3
+    },
+    {
+      "id": "TASK-0089",
+      "title": "Improve benchmark documentation and baseline reporting",
+      "status": "DONE",
+      "owner": "",
+      "summary": "Benchmark results show regression in some areas (Signal.State ops: -15%, Computed derivation: -10%). Update bench-runner.mjs output to include historical comparison, improve benchmark docs to explain what metrics mean, and document how to run and interpret results. This helps track performance over time.",
+      "updatedAt": "2026-05-06T23:08:27.299Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0004"
+      ],
+      "recordVersion": 3
     }
   ],
   "roadmaps": [
@@ -1311,7 +1324,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 284,
+    "tasks_version": 287,
     "roadmaps_version": 9,
     "store_schema_version": 3
   },
@@ -1319,9 +1332,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 284,
-      "lastBuiltAt": "2026-05-06T19:43:35.362Z",
-      "recordVersion": 848
+      "lastSourceVersion": 287,
+      "lastBuiltAt": "2026-05-06T23:08:27.309Z",
+      "recordVersion": 857
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
