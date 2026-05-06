@@ -19,6 +19,16 @@
       "types": "./output/jsx-dev-runtime.d.ts",
       "import": "./output/jsx-dev-runtime.js",
       "default": "./output/jsx-dev-runtime.js"
+    },
+    "./browser": {
+      "types": "./output/render/browser/index.d.ts",
+      "import": "./output/render/browser/index.js",
+      "default": "./output/render/browser/index.js"
+    },
+    "./server": {
+      "types": "./output/render/server/index.d.ts",
+      "import": "./output/render/server/index.js",
+      "default": "./output/render/server/index.js"
     }
   },
   "files": [
