@@ -1,6 +1,10 @@
 /**
  * Airx Benchmark Runner
  * Tests what can run in pure Node.js: Signal operations and element creation
+ * 
+ * Usage: node benchmark/bench-runner.mjs
+ * 
+ * Results are saved to benchmark-results.json for historical comparison.
  */
 import { runAllBenchmarks, printBenchmarkResult, JsonBaselineStore } from './bench-framework.mjs'
 import { createElement, Fragment, component } from '../output/element/index.js'
@@ -13,9 +17,78 @@ const { State, Computed, subtle: { Watcher } } = Signal
 // Make Signal available globally
 globalThis.Signal = Signal
 
+const BASELINE_FILE = './benchmark-results.json'
+
+/**
+ * Load previous baseline results for comparison
+ */
+function loadPreviousBaseline() {
+  try {
+    if (fs.existsSync(BASELINE_FILE)) {
+      const data = JSON.parse(fs.readFileSync(BASELINE_FILE, 'utf-8'))
+      return data
+    }
+  } catch (e) {
+    // Baseline file doesn't exist or is invalid
+  }
+  return null
+}
+
+/**
+ * Calculate percentage change between values
+ */
+function calcChange(current, previous) {
+  if (!previous || previous === 0) return null
+  return ((current - previous) / previous) * 100
+}
+
+/**
+ * Format change string with emoji indicator
+ */
+function formatChange(change) {
+  if (change === null) return ''
+  const emoji = change > 0 ? '📈' : change < 0 ? '📉' : '➡️'
+  const sign = change > 0 ? '+' : ''
+  return `${emoji} ${sign}${change.toFixed(1)}%`
+}
+
+/**
+ * Print benchmark result with historical comparison
+ */
+function printResultWithBaseline(result, previous) {
+  console.log(`\n📊 ${result.name}`)
+  console.log(`   Mean:     ${result.mean.toFixed(4)} ms`)
+  console.log(`   Median:   ${result.median.toFixed(4)} ms`)
+  console.log(`   StdDev:   ${result.stddev.toFixed(4)} ms`)
+  console.log(`   Min/Max:  ${result.min.toFixed(4)} / ${result.max.toFixed(4)} ms`)
+  console.log(`   Ops/Sec:  ${result.opsPerSec.toFixed(2)}`)
+  console.log(`   Iterations: ${result.iterations}`)
+  
+  if (previous) {
+    // Compare mean latency (lower is better)
+    const latencyChange = calcChange(result.mean, previous.mean)
+    if (latencyChange !== null) {
+      console.log(`   vs prev:  ${formatChange(-latencyChange)} (latency)`)
+    }
+    // Compare ops/sec (higher is better)
+    const opsChange = calcChange(result.opsPerSec, previous.opsPerSec)
+    if (opsChange !== null) {
+      console.log(`            ${formatChange(opsChange)} (throughput)`)
+    }
+  }
+}
+
 async function main() {
-  console.log('🚀 Starting Airx Performance Benchmark Suite\n')
+  console.log('🚀 Airx Performance Benchmark Suite\n')
   console.log('='.repeat(50))
+
+  // Load previous baseline for comparison
+  const previousBaseline = loadPreviousBaseline()
+  if (previousBaseline) {
+    console.log('📂 Loaded previous baseline for comparison\n')
+  } else {
+    console.log('📂 No previous baseline found (first run or file missing)\n')
+  }
 
   const results = []
 
@@ -105,13 +178,14 @@ async function main() {
 
   results.push(...elementResults)
 
-  // Summary
+  // Summary with comparison
   console.log('\n' + '='.repeat(50))
   console.log('📊 Benchmark Summary')
   console.log('='.repeat(50))
 
   for (const result of results) {
-    printBenchmarkResult(result)
+    const prev = previousBaseline ? previousBaseline[result.name] : null
+    printResultWithBaseline(result, prev)
   }
 
   // Store results for CI comparison
@@ -120,9 +194,8 @@ async function main() {
     store.save(result.name, result)
   }
 
-  const resultsPath = './benchmark-results.json'
-  fs.writeFileSync(resultsPath, JSON.stringify(store.toJSON(), null, 2))
-  console.log(`\n📁 Results saved to ${resultsPath}`)
+  fs.writeFileSync(BASELINE_FILE, JSON.stringify(store.toJSON(), null, 2))
+  console.log(`\n📁 Results saved to ${BASELINE_FILE}`)
   console.log('\n✅ Benchmark suite completed successfully')
 }
 
