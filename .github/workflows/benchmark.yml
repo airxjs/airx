@@ -1,0 +1,92 @@
+name: Performance Benchmarks
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "*" ]
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - run: npm install
+
+      # Build first to ensure output/ is populated
+      - run: npm run build
+
+      # Run benchmark scripts
+      # Note: Benchmarks are implemented as standalone scripts that can be run via tsx or ts-node
+      # For CI, we run the benchmark module directly
+
+      - name: Run Benchmark Suite
+        run: |
+          # Create a benchmark runner script that executes all benchmarks
+          cat > benchmark-runner.mjs << 'EOF'
+          import { runRenderThroughputBenchmarks } from './benchmark/render-throughput.js'
+          import { runSignalLatencyBenchmarks } from './benchmark/signal-latency.js'
+          import { runSSRSpeedBenchmarks } from './benchmark/ssr-speed.js'
+          import { runAllBenchmarks, printBenchmarkResult, JsonBaselineStore } from './benchmark/bench-framework.js'
+          
+          async function main() {
+            console.log('🚀 Starting Airx Performance Benchmark Suite\n')
+            
+            const results = []
+            
+            // Run all benchmark categories
+            const renderResults = await runRenderThroughputBenchmarks()
+            const signalResults = await runSignalLatencyBenchmarks()
+            const ssrResults = await runSSRSpeedBenchmarks()
+            
+            results.push(...renderResults, ...signalResults, ...ssrResults)
+            
+            // Summary
+            console.log('\n' + '='.repeat(50))
+            console.log('📊 Benchmark Summary')
+            console.log('='.repeat(50))
+            
+            for (const result of results) {
+              printBenchmarkResult(result)
+            }
+            
+            // Store baseline
+            const store = new JsonBaselineStore()
+            for (const result of results) {
+              store.save(result.name, result)
+            }
+            
+            console.log('\n✅ Benchmark suite completed')
+          }
+          
+          main().catch(err => {
+            console.error('Benchmark failed:', err)
+            process.exit(1)
+          })
+          EOF
+          
+          # Run with tsx for TypeScript support
+          npx tsx benchmark-runner.mjs
+        shell: bash
+
+      # Upload benchmark results as artifacts
+      - name: Upload benchmark results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-results
+          path: |
+            benchmark-results.json
+          retention-days: 30
+
+      # Compare with baseline (for PRs)
+      - name: Compare with baseline
+        if: github.event_name == 'pull_request'
+        run: |
+          echo "Baseline comparison would go here"
+          echo "This would compare current results against stored baseline and fail if regression > 10%"

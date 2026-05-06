@@ -32,7 +32,8 @@
     "prepublishOnly": "npm run build",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "test:coverage": "vitest --coverage"
+    "test:coverage": "vitest --coverage",
+    "benchmark": "node --experimental-vm-modules benchmark/runner.mjs"
   },
   "dependencies": {
     "csstype": "^3.1.3"
@@ -47,6 +48,7 @@
     "eslint": "^8.57.0",
     "jsdom": "^26.1.0",
     "signal-polyfill": "^0.2.2",
+    "tsx": "^4.19.0",
     "typescript": "^5.4.5",
     "vitest": "^3.2.4"
   },

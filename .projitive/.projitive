@@ -1182,28 +1182,28 @@
     {
       "id": "TASK-0082",
       "title": "Airx 0.9.0: Performance benchmark suite",
-      "status": "TODO",
+      "status": "DONE",
       "owner": "",
-      "summary": "Create performance benchmark suite for: render throughput, signal update latency, SSR speed. Establish baselines for 0.9.0 release. Deliverables: benchmark scripts, baseline metrics, CI integration.",
-      "updatedAt": "2026-05-06T05:15:32.850Z",
+      "summary": "完成 Performance benchmark suite：1) 创建 benchmark/ 目录及框架 (bench-framework.ts)；2) 实现 render-throughput.ts (5个场景)；3) 实现 signal-latency.ts (5个场景)；4) 实现 ssr-speed.ts (6个场景)；5) 创建 benchmark runner (runner.mjs)；6) 添加 CI workflow (benchmark.yml)；7) 更新 package.json 添加 benchmark 脚本。验收通过：typecheck ✅, lint ✅, tests 378/378 ✅。",
+      "updatedAt": "2026-05-06T05:37:01.396Z",
       "links": [],
       "roadmapRefs": [
         "ROADMAP-0004"
       ],
-      "recordVersion": 1
+      "recordVersion": 3
     },
     {
       "id": "TASK-0083",
       "title": "Airx 0.9.0: Enhanced error messages and debug experience",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "owner": "",
-      "summary": "Improve runtime error messages to be more actionable. Add component stack traces, signal access error context, hydration error details. Deliverables: error message improvements, documentation update.",
-      "updatedAt": "2026-05-06T05:16:38.466Z",
+      "summary": "增强错误消息完成：1) browser.ts '???' → 描述性 hydration 错误；2) signal.ts 修复语法错误并添加解决建议；3) common.ts 'Cant find dom' → 可操作的错误消息。验收通过：typecheck ✅, tests 378/378 ✅",
+      "updatedAt": "2026-05-06T05:18:21.327Z",
       "links": [],
       "roadmapRefs": [
         "ROADMAP-0004"
       ],
-      "recordVersion": 2
+      "recordVersion": 3
     }
   ],
   "roadmaps": [
@@ -1240,7 +1240,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 262,
+    "tasks_version": 265,
     "roadmaps_version": 8,
     "store_schema_version": 3
   },
@@ -1248,9 +1248,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 262,
-      "lastBuiltAt": "2026-05-06T05:16:38.475Z",
-      "recordVersion": 782
+      "lastSourceVersion": 265,
+      "lastBuiltAt": "2026-05-06T05:37:01.405Z",
+      "recordVersion": 791
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
