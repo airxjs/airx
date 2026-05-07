@@ -1301,6 +1301,21 @@
         "ROADMAP-0004"
       ],
       "recordVersion": 3
+    },
+    {
+      "id": "TASK-0091",
+      "title": "Airx 0.9.0 版本发布后验证测试",
+      "status": "DONE",
+      "owner": "",
+      "summary": "Airx 0.9.0 版本验证通过：子路径导出正常，esbuild 压缩产物 19.7KB，benchmark 基线建立，378 tests 全通过。无需修改可直接发布。",
+      "updatedAt": "2026-05-07T17:25:52.382Z",
+      "links": [
+        "designs/research/TASK-0091.implementation-research.md"
+      ],
+      "roadmapRefs": [
+        "ROADMAP-0004"
+      ],
+      "recordVersion": 3
     }
   ],
   "roadmaps": [
@@ -1337,7 +1352,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 290,
+    "tasks_version": 293,
     "roadmaps_version": 9,
     "store_schema_version": 3
   },
@@ -1345,9 +1360,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 290,
-      "lastBuiltAt": "2026-05-07T01:35:13.139Z",
-      "recordVersion": 866
+      "lastSourceVersion": 293,
+      "lastBuiltAt": "2026-05-07T17:25:52.399Z",
+      "recordVersion": 875
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
