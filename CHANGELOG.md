@@ -4,6 +4,29 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.9.0] - 2026-05-07
+
+### Performance
+
+- **Bundle Minification** — Added esbuild post-build minification step, reducing bundle size ~40% (from ~50KB to <30KB raw ESM)
+- **Subpath Exports** — Added `./browser` and `./server` subpath exports for tree-shaking, enabling SSR users to eliminate ~7.5KB of unnecessary hydrate code
+- **Benchmark Suite** — Added performance benchmark suite with historical comparison tracking for ongoing performance monitoring
+
+### Developer Experience
+
+- **Enhanced Error Messages** — Improved error messages and debug experience for faster issue resolution
+- **Tree-shaking Audit** — Verified dead code elimination works correctly with subpath exports, documented findings in TASK-0086 research brief
+
+### Documentation
+
+- **Benchmark Documentation** — Improved benchmark docs with historical comparison output and interpretation guidance
+
+### Infrastructure
+
+- **Build Pipeline** — Integrated esbuild minification into build pipeline, removed source maps from published package
+
+---
+
 ## [0.8.0] - 2026-05-03
 
 ### Breaking Changes
