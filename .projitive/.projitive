@@ -1292,15 +1292,15 @@
     {
       "id": "TASK-0090",
       "title": "Release Airx 0.9.0 - update CHANGELOG and version",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "owner": "",
       "summary": "Airx 0.9.0 work is complete (ROADMAP-0004 closed) but not released. Tasks done: subpath exports (./browser, ./server), esbuild minification, enhanced error messages, benchmark suite. Need to: 1) Update CHANGELOG.md with 0.9.0 changes, 2) Bump version to 0.9.0 in package.json, 3) Create git tag v0.9.0",
-      "updatedAt": "2026-05-07T01:29:30.612Z",
+      "updatedAt": "2026-05-07T01:35:13.127Z",
       "links": [],
       "roadmapRefs": [
         "ROADMAP-0004"
       ],
-      "recordVersion": 2
+      "recordVersion": 3
     }
   ],
   "roadmaps": [
@@ -1337,7 +1337,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 289,
+    "tasks_version": 290,
     "roadmaps_version": 9,
     "store_schema_version": 3
   },
@@ -1345,9 +1345,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 289,
-      "lastBuiltAt": "2026-05-07T01:29:30.622Z",
-      "recordVersion": 863
+      "lastSourceVersion": 290,
+      "lastBuiltAt": "2026-05-07T01:35:13.139Z",
+      "recordVersion": 866
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
