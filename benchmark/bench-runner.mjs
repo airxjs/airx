@@ -65,10 +65,10 @@ function printResultWithBaseline(result, previous) {
   console.log(`   Iterations: ${result.iterations}`)
   
   if (previous) {
-    // Compare mean latency (lower is better)
-    const latencyChange = calcChange(result.mean, previous.mean)
+    // Compare median latency (more stable than mean, less affected by outliers)
+    const latencyChange = calcChange(result.median, previous.median)
     if (latencyChange !== null) {
-      console.log(`   vs prev:  ${formatChange(-latencyChange)} (latency)`)
+      console.log(`   vs prev:  ${formatChange(-latencyChange)} (median latency)`)
     }
     // Compare ops/sec (higher is better)
     const opsChange = calcChange(result.opsPerSec, previous.opsPerSec)

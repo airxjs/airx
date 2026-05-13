@@ -16,7 +16,7 @@ export class BenchmarkResult {
 }
 
 const DEFAULT_CONFIG = {
-  warmupIterations: 10,
+  warmupIterations: 50,
   measuredIterations: 100,
   maxDurationMs: 60000,
 }
