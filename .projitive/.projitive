@@ -1316,6 +1316,19 @@
         "ROADMAP-0004"
       ],
       "recordVersion": 3
+    },
+    {
+      "id": "TASK-0092",
+      "title": "Investigate benchmark performance regression",
+      "status": "IN_PROGRESS",
+      "owner": "",
+      "summary": "Benchmark results show performance regression across multiple metrics since last run (Signal ops -18%, Computed -9%, Watcher -20%). Verify if this is real regression or benchmark noise, and identify root cause if actual regression.",
+      "updatedAt": "2026-05-13T07:39:20.676Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0004"
+      ],
+      "recordVersion": 2
     }
   ],
   "roadmaps": [
@@ -1352,7 +1365,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 293,
+    "tasks_version": 295,
     "roadmaps_version": 9,
     "store_schema_version": 3
   },
@@ -1360,9 +1373,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 293,
-      "lastBuiltAt": "2026-05-07T17:25:52.399Z",
-      "recordVersion": 875
+      "lastSourceVersion": 295,
+      "lastBuiltAt": "2026-05-13T07:39:20.686Z",
+      "recordVersion": 881
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
