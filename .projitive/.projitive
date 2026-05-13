@@ -1329,6 +1329,19 @@
         "ROADMAP-0004"
       ],
       "recordVersion": 3
+    },
+    {
+      "id": "TASK-0093",
+      "title": "Implement benchmark stability improvements",
+      "status": "DONE",
+      "owner": "ai-copilot",
+      "summary": "Implement improvements from TASK-0092 benchmark investigation findings: 1) Increase warmup from 10 to 50 iterations for better JIT warmup 2) Use median instead of mean for latency comparison (more stable, less affected by outliers). Commit: dc1091d",
+      "updatedAt": "2026-05-13T08:22:52.278Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0004"
+      ],
+      "recordVersion": 3
     }
   ],
   "roadmaps": [
@@ -1365,7 +1378,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 296,
+    "tasks_version": 299,
     "roadmaps_version": 9,
     "store_schema_version": 3
   },
@@ -1373,9 +1386,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 296,
-      "lastBuiltAt": "2026-05-13T07:40:36.206Z",
-      "recordVersion": 884
+      "lastSourceVersion": 299,
+      "lastBuiltAt": "2026-05-13T08:22:52.287Z",
+      "recordVersion": 893
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
