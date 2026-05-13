@@ -1320,15 +1320,15 @@
     {
       "id": "TASK-0092",
       "title": "Investigate benchmark performance regression",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "owner": "",
-      "summary": "Benchmark results show performance regression across multiple metrics since last run (Signal ops -18%, Computed -9%, Watcher -20%). Verify if this is real regression or benchmark noise, and identify root cause if actual regression.",
-      "updatedAt": "2026-05-13T07:39:20.676Z",
+      "summary": "Benchmark regression investigation complete. Conclusion: No actual regression. Benchmark variance ±10-30% is normal for Node.js due to JIT, GC, and system fluctuations. Three consecutive runs showed Signal.State ops: 33K-59K, Computed: 75K-92K, Watcher: 11K-18K. Simple div element stable at ~333K (±2%). All verifications passed: lint, typecheck, tests 378/378, build. Recommendation: benchmark framework should use median instead of mean and add warmup runs. Research brief: designs/research/TASK-0092.implementation-research.md. Git commit: 7363c3c.",
+      "updatedAt": "2026-05-13T07:40:36.194Z",
       "links": [],
       "roadmapRefs": [
         "ROADMAP-0004"
       ],
-      "recordVersion": 2
+      "recordVersion": 3
     }
   ],
   "roadmaps": [
@@ -1365,7 +1365,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 295,
+    "tasks_version": 296,
     "roadmaps_version": 9,
     "store_schema_version": 3
   },
@@ -1373,9 +1373,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 295,
-      "lastBuiltAt": "2026-05-13T07:39:20.686Z",
-      "recordVersion": 881
+      "lastSourceVersion": 296,
+      "lastBuiltAt": "2026-05-13T07:40:36.206Z",
+      "recordVersion": 884
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
