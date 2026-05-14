@@ -1342,6 +1342,19 @@
         "ROADMAP-0004"
       ],
       "recordVersion": 3
+    },
+    {
+      "id": "TASK-0094",
+      "title": "Merge dev branch: extract createCommitWalker",
+      "status": "DONE",
+      "owner": "",
+      "summary": "Local dev branch (fc4551a) has a completed refactoring that extracts duplicated commitWalkV2 logic from browser.ts and server.ts into a shared createCommitWalker helper in source/render/basic/commit-walker.ts. This commit is ahead of origin/dev by 1 and has not been merged to main. Merge dev into main and push to origin.",
+      "updatedAt": "2026-05-14T08:35:58.954Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0004"
+      ],
+      "recordVersion": 3
     }
   ],
   "roadmaps": [
@@ -1378,7 +1391,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 299,
+    "tasks_version": 302,
     "roadmaps_version": 9,
     "store_schema_version": 3
   },
@@ -1386,9 +1399,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 299,
-      "lastBuiltAt": "2026-05-13T08:22:52.287Z",
-      "recordVersion": 893
+      "lastSourceVersion": 302,
+      "lastBuiltAt": "2026-05-14T08:35:58.964Z",
+      "recordVersion": 902
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
