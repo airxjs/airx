@@ -1355,6 +1355,19 @@
         "ROADMAP-0004"
       ],
       "recordVersion": 3
+    },
+    {
+      "id": "TASK-0095",
+      "title": "Airx 0.9.0 release preparation",
+      "status": "DONE",
+      "owner": "",
+      "summary": "Complete ROADMAP-0004 milestone: prepare Airx 0.9.0 release, update changelog, verify benchmark performance",
+      "updatedAt": "2026-05-14T19:36:28.420Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0004"
+      ],
+      "recordVersion": 3
     }
   ],
   "roadmaps": [
@@ -1391,7 +1404,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 302,
+    "tasks_version": 305,
     "roadmaps_version": 9,
     "store_schema_version": 3
   },
@@ -1399,9 +1412,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 302,
-      "lastBuiltAt": "2026-05-14T08:35:58.964Z",
-      "recordVersion": 902
+      "lastSourceVersion": 305,
+      "lastBuiltAt": "2026-05-14T19:36:28.430Z",
+      "recordVersion": 911
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
