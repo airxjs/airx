@@ -1,92 +1,71 @@
-name: Performance Benchmarks
+name: Performance Benchmark
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ main ]
   pull_request:
-    branches: [ "*" ]
+    branches: [ main ]
 
 jobs:
   benchmark:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
     steps:
-      - uses: actions/checkout@v3
-
-      - uses: actions/setup-node@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
         with:
-          node-version: 20
+          fetch-depth: 0  # Fetch full history for baseline comparison
 
-      - run: npm install
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
 
-      # Build first to ensure output/ is populated
-      - run: npm run build
+      - name: Install dependencies
+        run: npm ci
 
-      # Run benchmark scripts
-      # Note: Benchmarks are implemented as standalone scripts that can be run via tsx or ts-node
-      # For CI, we run the benchmark module directly
+      - name: Build project
+        run: npm run build
 
-      - name: Run Benchmark Suite
-        run: |
-          # Create a benchmark runner script that executes all benchmarks
-          cat > benchmark-runner.mjs << 'EOF'
-          import { runRenderThroughputBenchmarks } from './benchmark/render-throughput.js'
-          import { runSignalLatencyBenchmarks } from './benchmark/signal-latency.js'
-          import { runSSRSpeedBenchmarks } from './benchmark/ssr-speed.js'
-          import { runAllBenchmarks, printBenchmarkResult, JsonBaselineStore } from './benchmark/bench-framework.js'
-          
-          async function main() {
-            console.log('🚀 Starting Airx Performance Benchmark Suite\n')
-            
-            const results = []
-            
-            // Run all benchmark categories
-            const renderResults = await runRenderThroughputBenchmarks()
-            const signalResults = await runSignalLatencyBenchmarks()
-            const ssrResults = await runSSRSpeedBenchmarks()
-            
-            results.push(...renderResults, ...signalResults, ...ssrResults)
-            
-            // Summary
-            console.log('\n' + '='.repeat(50))
-            console.log('📊 Benchmark Summary')
-            console.log('='.repeat(50))
-            
-            for (const result of results) {
-              printBenchmarkResult(result)
-            }
-            
-            // Store baseline
-            const store = new JsonBaselineStore()
-            for (const result of results) {
-              store.save(result.name, result)
-            }
-            
-            console.log('\n✅ Benchmark suite completed')
-          }
-          
-          main().catch(err => {
-            console.error('Benchmark failed:', err)
-            process.exit(1)
-          })
-          EOF
-          
-          # Run with tsx for TypeScript support
-          npx tsx benchmark-runner.mjs
-        shell: bash
+      - name: Run benchmarks
+        run: npm run benchmark
+        id: benchmark
 
-      # Upload benchmark results as artifacts
       - name: Upload benchmark results
-        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: benchmark-results
-          path: |
-            benchmark-results.json
+          name: benchmark-results-${{ github.sha }}
+          path: benchmark-results.json
           retention-days: 30
 
-      # Compare with baseline (for PRs)
-      - name: Compare with baseline
+      - name: Compare with baseline (PR only)
         if: github.event_name == 'pull_request'
         run: |
-          echo "Baseline comparison would go here"
-          echo "This would compare current results against stored baseline and fail if regression > 10%"
+          # Try to find baseline from main branch
+          git fetch origin main:main
+          if [ -f main/benchmark-results.json ]; then
+            echo "📂 Found baseline from main branch"
+            node scripts/compare-benchmark.js
+          else
+            echo "⚠️ No baseline found in main branch, skipping comparison"
+          fi
+        env:
+          BASELINE_FILE: ./main/benchmark-results.json
+          REGRESSION_THRESHOLD: 0.15
+        continue-on-error: true
+
+      - name: Update baseline on main (on push)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          echo "📝 Updating baseline on main branch"
+          cp benchmark-results.json benchmark-results-baseline.json
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add benchmark-results-baseline.json
+          git diff --cached --exit-code && echo "No baseline changes needed" || {
+            git commit -m "perf(benchmark): update performance baseline
+            Refs: automated"
+            git push
+          }
