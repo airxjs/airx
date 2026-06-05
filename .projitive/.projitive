@@ -1368,6 +1368,19 @@
         "ROADMAP-0004"
       ],
       "recordVersion": 3
+    },
+    {
+      "id": "TASK-0096",
+      "title": "Auto Task: 2026-06-04 1354 Health Check",
+      "status": "DONE",
+      "owner": "",
+      "summary": "定期健康检查 ✅ 系统健康：typecheck ✅ lint ✅ build ✅ test ✅ (378 tests)，benchmark.yml 和 compare-benchmark.js 已就位，治理任务 100% 闭环",
+      "updatedAt": "2026-06-04T09:15:26.842Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0004"
+      ],
+      "recordVersion": 3
     }
   ],
   "roadmaps": [
@@ -1404,7 +1417,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 305,
+    "tasks_version": 308,
     "roadmaps_version": 9,
     "store_schema_version": 3
   },
@@ -1412,9 +1425,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 305,
-      "lastBuiltAt": "2026-05-14T19:36:28.430Z",
-      "recordVersion": 911
+      "lastSourceVersion": 308,
+      "lastBuiltAt": "2026-06-04T09:15:26.851Z",
+      "recordVersion": 920
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
