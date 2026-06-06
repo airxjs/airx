@@ -1394,6 +1394,19 @@
         "ROADMAP-0004"
       ],
       "recordVersion": 3
+    },
+    {
+      "id": "TASK-0098",
+      "title": "Fix benchmark-results.json tracking noise",
+      "status": "TODO",
+      "owner": "ai-copilot",
+      "summary": "The benchmark-results.json file is committed but changes on every benchmark run due to natural variance. This creates constant uncommitted changes and noise. Solution: remove it from git tracking, keep only benchmark-results-baseline.json as the stable reference, and add benchmark-results.json to .gitignore.",
+      "updatedAt": "2026-06-06T14:34:53.533Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0004"
+      ],
+      "recordVersion": 1
     }
   ],
   "roadmaps": [
@@ -1430,7 +1443,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 311,
+    "tasks_version": 312,
     "roadmaps_version": 9,
     "store_schema_version": 3
   },
@@ -1438,9 +1451,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 311,
-      "lastBuiltAt": "2026-06-06T06:52:21.721Z",
-      "recordVersion": 929
+      "lastSourceVersion": 312,
+      "lastBuiltAt": "2026-06-06T14:34:53.543Z",
+      "recordVersion": 932
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
