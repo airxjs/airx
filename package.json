@@ -57,7 +57,7 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
-    "benchmark": "node benchmark/bench-runner.mjs"
+    "benchmark": "npm run build && node benchmark/bench-runner.mjs"
   },
   "dependencies": {
     "csstype": "^3.1.3"
