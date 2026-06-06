@@ -130,3 +130,6 @@ dist
 .pnp.*
 
 output/
+
+# Benchmark results (vary per run, do not commit)
+benchmark-results.json
