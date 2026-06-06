@@ -1381,6 +1381,19 @@
         "ROADMAP-0004"
       ],
       "recordVersion": 3
+    },
+    {
+      "id": "TASK-0097",
+      "title": "Add build freshness check to benchmark CI",
+      "status": "DONE",
+      "owner": "",
+      "summary": "Prevent false regression alerts from stale build output. Benchmark CI should verify build timestamp is recent before comparing results, or run build as part of benchmark step.",
+      "updatedAt": "2026-06-06T06:52:21.708Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0004"
+      ],
+      "recordVersion": 3
     }
   ],
   "roadmaps": [
@@ -1417,7 +1430,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 308,
+    "tasks_version": 311,
     "roadmaps_version": 9,
     "store_schema_version": 3
   },
@@ -1425,9 +1438,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 308,
-      "lastBuiltAt": "2026-06-04T09:15:26.851Z",
-      "recordVersion": 920
+      "lastSourceVersion": 311,
+      "lastBuiltAt": "2026-06-06T06:52:21.721Z",
+      "recordVersion": 929
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
