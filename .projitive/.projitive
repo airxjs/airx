@@ -1407,6 +1407,19 @@
         "ROADMAP-0004"
       ],
       "recordVersion": 3
+    },
+    {
+      "id": "TASK-0099",
+      "title": "Add core governance docs (architecture + style-guide)",
+      "status": "DONE",
+      "owner": "",
+      "summary": "Airx 项目缺少 designs/core/ 下的核心治理文档（architecture.md, style-guide.md）。参照 airouter 的 governance 结构，为 airx 添加了架构文档和代码风格指南，覆盖模块架构、依赖关系、命名规范、TypeScript 规范、组件规范和提交规范。已提交并推送。",
+      "updatedAt": "2026-06-06T17:46:34.786Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0001"
+      ],
+      "recordVersion": 3
     }
   ],
   "roadmaps": [
@@ -1443,7 +1456,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 314,
+    "tasks_version": 317,
     "roadmaps_version": 9,
     "store_schema_version": 3
   },
@@ -1451,9 +1464,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 314,
-      "lastBuiltAt": "2026-06-06T14:35:34.911Z",
-      "recordVersion": 938
+      "lastSourceVersion": 317,
+      "lastBuiltAt": "2026-06-06T17:46:34.797Z",
+      "recordVersion": 947
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
