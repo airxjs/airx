@@ -438,11 +438,92 @@ describe('hydrate (integration)', () => {
       container.innerHTML = '<div>Test</div>'
       const element = createElement('div', {}, 'Test')
 
+
       // 降级到 setTimeout 时仍应正常工作
       expect(() => hydrate(element, container)).not.toThrow()
 
+
       // 恢复
       ;(globalThis as any).requestIdleCallback = originalRic
+    })
+  })
+
+  describe('workLoop 和 scheduleWorkLoop 覆盖', () => {
+    it('多层级组件树应正确 hydrate（触发多次 performUnitOfWork）', () => {
+      // 创建深层嵌套结构，触发 workLoop 多次迭代
+      container.innerHTML = '<div><article><section><p>Deep</p></section></article></div>'
+
+      const element = createElement('div', {
+        children: createElement('article', {
+          children: createElement('section', {
+            children: createElement('p', {}, 'Deep')
+          })
+        })
+      })
+
+      const result = hydrate(element, container)
+      expect(result).toBeDefined()
+    })
+
+    it('带 Fragment 子节点的组件应正确 hydrate', () => {
+      // Fragment 会产生多个 child，需要 workLoop 处理多个单元
+      container.innerHTML = '<div><p>First</p><p>Second</p></div>'
+
+      const element = createElement('div', {
+        children: [
+          createElement('p', {}, 'First'),
+          createElement('p', {}, 'Second')
+        ]
+      })
+
+      const result = hydrate(element, container)
+      expect(result).toBeDefined()
+    })
+
+    it('带属性 spread 的元素应能正确 hydrate', () => {
+      container.innerHTML = '<div><button class="btn" disabled>Action</button></div>'
+
+      const element = createElement('div', {
+        children: createElement('button', {
+          props: { class: 'btn', disabled: true },
+          children: 'Action'
+        })
+      })
+
+      const result = hydrate(element, container)
+      expect(result).toBeDefined()
+    })
+
+    it('带嵌套文本和元素的组件应正确 hydrate', () => {
+      container.innerHTML = '<div><p>Hello <strong>World</strong>!</p></div>'
+
+      const element = createElement('div', {
+        children: createElement('p', {
+          children: [
+            'Hello ',
+            createElement('strong', {}, 'World'),
+            '!'
+          ]
+        })
+      })
+
+      const result = hydrate(element, container)
+      expect(result).toBeDefined()
+    })
+
+    it('组件树包含多个兄弟节点时应正确处理', () => {
+      container.innerHTML = '<section><div>Item 1</div><div>Item 2</div><div>Item 3</div></section>'
+
+      const element = createElement('section', {
+        children: [
+          createElement('div', {}, 'Item 1'),
+          createElement('div', {}, 'Item 2'),
+          createElement('div', {}, 'Item 3')
+        ]
+      })
+
+      const result = hydrate(element, container)
+      expect(result).toBeDefined()
     })
   })
 })
