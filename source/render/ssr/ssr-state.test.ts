@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { type StateSnapshot } from '../browser/hydrate.js'
 import {
   registerSSRSignal,
   getRegisteredSignals,
@@ -99,7 +100,7 @@ describe('SSR State Module', () => {
 
     it('should return original HTML unchanged when signals is null', () => {
       const html = '<div>Hello</div>'
-      const snapshot = { signals: null as any, version: '1.0', timestamp: 1234567890 }
+      const snapshot = { signals: null } as unknown as StateSnapshot
 
       const result = injectStateSnapshotIntoHTML(html, snapshot)
 

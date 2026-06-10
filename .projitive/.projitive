@@ -1431,6 +1431,58 @@
       "links": [],
       "roadmapRefs": [],
       "recordVersion": 3
+    },
+    {
+      "id": "TASK-0101",
+      "title": "Airx 0.10.0: Update api-stability-audit - resolve outdated hydrate stub issue",
+      "status": "DONE",
+      "owner": "",
+      "summary": "api-stability-audit.md documents hydrate() as a stub (Issue 2, marked 🔴) but hydrate now has a full implementation. Update the audit doc to mark Issue 2 as resolved, review remaining open issues (Issue 3 & 4), and verify all API stability findings are current.",
+      "updatedAt": "2026-06-10T01:47:54.408Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0005"
+      ],
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0102",
+      "title": "Airx 0.10.0: README vs code export consistency audit",
+      "status": "DONE",
+      "owner": "",
+      "summary": "Audit consistency between README/README_CN documentation and actual source/index.ts exports. Check: (1) all exported APIs are documented, (2) all documented APIs exist in code, (3) API signatures match documentation. Fix any discrepancies found.",
+      "updatedAt": "2026-06-10T01:47:02.005Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0005"
+      ],
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0103",
+      "title": "Airx 0.10.0: Downstream package version alignment (router, vite-plugin)",
+      "status": "DONE",
+      "owner": "",
+      "summary": "Align airx 0.10.0 version notes and API constraints with downstream packages (airxjs/router, airxjs/vite-plugin). Audit: (1) peer dependency version ranges, (2) API compatibility between airx core and downstream packages, (3) update version documentation in downstream READMEs.",
+      "updatedAt": "2026-06-10T01:45:09.071Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0005"
+      ],
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0104",
+      "title": "Airx 0.10.0: 修复 ssr-state.test.ts 中的 @typescript-eslint/no-explicit-any lint 错误",
+      "status": "TODO",
+      "owner": "",
+      "summary": "修复 source/render/ssr/ssr-state.test.ts 第 102 行的 @typescript-eslint/no-explicit-any 错误，提升代码质量并确保 lint 通过。",
+      "updatedAt": "2026-06-10T23:18:48.098Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0005"
+      ],
+      "recordVersion": 1
     }
   ],
   "roadmaps": [
@@ -1464,27 +1516,35 @@
       "time": "2026-Q2~Q3",
       "updatedAt": "2026-05-06T13:39:49.545Z",
       "recordVersion": 2
+    },
+    {
+      "id": "ROADMAP-0005",
+      "title": "Airx 0.10.0 - API & Ecosystem Closure",
+      "status": "active",
+      "time": "2026-Q3~Q4",
+      "updatedAt": "2026-06-10T01:42:21.834Z",
+      "recordVersion": 1
     }
   ],
   "meta": {
-    "tasks_version": 320,
-    "roadmaps_version": 9,
+    "tasks_version": 330,
+    "roadmaps_version": 10,
     "store_schema_version": 3
   },
   "view_state": {
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 320,
-      "lastBuiltAt": "2026-06-08T19:22:15.940Z",
-      "recordVersion": 956
+      "lastSourceVersion": 330,
+      "lastBuiltAt": "2026-06-10T23:18:48.111Z",
+      "recordVersion": 986
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
       "dirty": false,
-      "lastSourceVersion": 9,
-      "lastBuiltAt": "2026-05-06T13:39:49.550Z",
-      "recordVersion": 25
+      "lastSourceVersion": 10,
+      "lastBuiltAt": "2026-06-10T01:42:21.840Z",
+      "recordVersion": 27
     }
   },
   "migration_history": []
