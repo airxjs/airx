@@ -3,6 +3,8 @@
 > 审计日期: 2026-03-25
 > 任务: TASK-0019
 > 目标: 为 0.8.x 版本稳定性承诺提供依据
+> 更新日期: 2026-06-10 (TASK-0101)
+> 状态: Issue 2 (hydrate stub) 已解决 - hydrate 现为完整实现
 
 ---
 
@@ -76,41 +78,35 @@ export interface AirxApp {
 
 ---
 
-### 🔴 Issue 2: `hydrate()` 是 stub（空实现）
+### ✅ Issue 2 (已解决): `hydrate()` 是 stub（空实现）
+**状态**: ✅ 已解决 (2026-06-10)
 
-**位置**: `source/render/server/server.ts#L446-L451`
 
+**位置**: `source/render/server/server.ts#L406-L425`
+
+
+**问题描述**: `hydrate` 作为公共 SSR API 导出，但实现为空（no-op）。
+
+**解决方式**: hydrate 现在是完整实现，委托给 `source/render/browser/hydrate.ts` 的客户端 hydrate 功能。
+
+**当前实现**:
 ```typescript
-hydrate(_container: HTMLElement): void {
-  // 初步版本暂不实现，实际使用时 hydrate 是客户端行为
+export function hydrate(_html: string, container: HTMLElement, app: SSRApp, options?: HydrateOptions): void {
+  const logger = createLogger('hydrate')
+  // ... hydration logic delegating to client-side hydrate
 }
 ```
 
-**问题描述**:
-- `hydrate` 作为公共 SSR API 导出
-- 实际上是一个空操作（no-op）
-- README 明确说明 hydration 是 "planned for 0.8.x"
 
-**影响**:
-- 用户调用 `hydrate()` 时不会有任何效果，也没有错误提示
-- 可能在用户不知情的情况下导致 hydration 不生效，难以调试
+**证据**:
+- `source/render/browser/hydrate.ts` - full client-side hydrate implementation with `HydrateOptions` interface
+- `source/render/browser/hydrate.integration.test.ts` - integration tests
+- README updated to show correct `hydrate()` usage from `airx/server`
 
-**建议**:
-1. **方案 A（推荐）**: 添加运行时警告
-   ```typescript
-   hydrate(_container: HTMLElement): void {
-     console.warn('[airx] hydrate() is not implemented yet. Planned for 0.8.x')
-   }
-   ```
-2. **方案 B**: 抛出 `Error` 提示功能未实现
-   ```typescript
-   hydrate(_container: HTMLElement): void {
-     throw new Error('[airx] hydrate() is not implemented yet. Planned for 0.8.x')
-   }
-   ```
-3. **方案 C**: 在 TypeScript 类型中标记为可选或实验性
+**结论**: `hydrate()` is no longer a stub. It is a fully implemented SSR API that activates server-rendered HTML on the client.
 
 ---
+
 
 ### 🟡 Issue 3: Element 模块导出了非公共 API
 
@@ -198,24 +194,26 @@ export function performUnitOfWork<E extends AbstractElement>(...) { }
 
 | 方面 | 评分 | 说明 |
 |------|------|------|
-| 公共 API 边界清晰度 | ⭐⭐⭐☆☆ | 有 2 个 WIP 方法泄露到公共类型 |
-| 内部实现隔离 | ⭐⭐⭐☆☆ | 内部模块导出链较长 |
+| 公共 API 边界清晰度 | ⭐⭐⭐⭐☆ | Issue 1 & 2 resolved; public API surface stable |
+| 内部实现隔离 | ⭐⭐⭐☆☆ | 内部模块导出链较长（Issue 3 & 4 still present but low impact） |
 | API 命名一致性 | ⭐⭐⭐⭐⭐ | 命名规范且一致 |
-| 文档完整性 | ⭐⭐⭐⭐☆ | 有架构文档，但部分 API 缺失使用说明 |
-| 对 0.8.x 准备度 | ⭐⭐⭐☆☆ | `hydrate()` 需要明确处理策略 |
+| 文档完整性 | ⭐⭐⭐⭐⭐ | README updated with ErrorBoundary and SSR import path fixes (TASK-0102) |
+| 对 0.9.x 准备度 | ⭐⭐⭐⭐⭐ | All must-fix items resolved; hydrate fully implemented |
+
+**更新 (2026-06-10)**: Airx 0.9.0 已发布。Issue 2 (hydrate stub) 已完全解决，hydrate 现在是完整实现。
 
 ---
 
-## 5. 对 0.8.x 的建议
+## 5. 对 0.10.x 的建议
 
-### 必须修复 (0.8.0 前)
-1. **处理 `hydrate()` stub** - 选择运行时警告或错误
-2. **处理 `@deprecated WIP` 方法** - 决定是移除还是正式化
+### 已完成 (0.9.0)
+1. ✅ **hydrate stub** - 已完全实现
+2. ✅ **`@deprecated WIP` 方法** - 已移除，plugin/renderToHTML 为正式 API
 
-### 建议改进
+### 建议改进 (0.10.0+)
 3. 为内部 API 添加 `/** @internal */` 标签
 4. 考虑使用 TypeScript 的 `stripInternal` 编译选项
-5. 在 0.8.0 发布说明中明确哪些是稳定 API
+5. 在 CHANGELOG 中明确哪些是稳定 API
 
 ### 低优先级
 6. 限制 `element/index.ts` 的导出范围
