@@ -3,6 +3,7 @@ import { CSSProperties } from '../types/index.js'
 
 type AirxElementType<P> = string | AirxComponent<P>
 
+/** @internal */
 export type Props = { [propKey: string]: unknown }
 
 /**
@@ -42,8 +43,12 @@ export type AirxChildren =
  *
  * 组件函数返回值本身是一个 "render 函数"，该函数最终返回子节点。
  */
+/** @internal */
 export type AirxComponentRender = () => AirxChildren
+
 export type AirxComponent<P = unknown> = ReactiveComponent<P>
+
+/** @internal */
 export type ReactiveComponent<P = unknown> = (props: P) => AirxComponentRender
 
 /**
@@ -94,9 +99,7 @@ export function createElement<P = any>(
   }
 }
 
-/**
- * 判断一个值是否是合法的 AirxElement。
- */
+/** @internal */
 export function isValidElement(element: unknown): element is AirxElement {
   return typeof element === 'object'
     && element !== null
@@ -120,7 +123,10 @@ export function Fragment(props: { children: AirxElement }) {
   return () => props.children
 }
 
+/** @internal */
 export type AirxComponentUnmountedListener = () => void
+
+/** @internal */
 export type AirxComponentMountedListener = () => (() => void) | void
 
 export interface AirxComponentLifecycle {
@@ -151,6 +157,7 @@ export function component<P = unknown>(comp: AirxComponent<P>): AirxComponent<P>
   return comp
 }
 
+/** @internal */
 export function createErrorRender(error: unknown): AirxComponentRender {
   console.error(error)
 

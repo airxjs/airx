@@ -1474,15 +1474,28 @@
     {
       "id": "TASK-0104",
       "title": "Airx 0.10.0: 修复 ssr-state.test.ts 中的 @typescript-eslint/no-explicit-any lint 错误",
-      "status": "TODO",
+      "status": "DONE",
       "owner": "",
       "summary": "修复 source/render/ssr/ssr-state.test.ts 第 102 行的 @typescript-eslint/no-explicit-any 错误，提升代码质量并确保 lint 通过。",
-      "updatedAt": "2026-06-10T23:18:48.098Z",
+      "updatedAt": "2026-06-10T23:20:42.455Z",
       "links": [],
       "roadmapRefs": [
         "ROADMAP-0005"
       ],
-      "recordVersion": 1
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0105",
+      "title": "Airx 0.10.0: 为内部 API 添加 @internal JSDoc 标签",
+      "status": "IN_PROGRESS",
+      "owner": "",
+      "summary": "根据 api-stability-audit.md 的建议，为 element/index.ts 和 render/basic/common.ts 中标记为内部的 API 添加 /** @internal */ JSDoc 标签，提升 API 边界清晰度。",
+      "updatedAt": "2026-06-10T23:25:41.862Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0005"
+      ],
+      "recordVersion": 2
     }
   ],
   "roadmaps": [
@@ -1527,7 +1540,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 330,
+    "tasks_version": 334,
     "roadmaps_version": 10,
     "store_schema_version": 3
   },
@@ -1535,9 +1548,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 330,
-      "lastBuiltAt": "2026-06-10T23:18:48.111Z",
-      "recordVersion": 986
+      "lastSourceVersion": 334,
+      "lastBuiltAt": "2026-06-10T23:25:41.873Z",
+      "recordVersion": 998
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",

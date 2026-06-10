@@ -20,10 +20,13 @@ import {
 import { PluginContext } from './plugins/index.js'
 import { globalContext } from './hooks/hooks.js'
 
-// Internal element types for text and comment nodes
+/** @internal */
 export const INTERNAL_TEXT_NODE_TYPE = '__airx_text__'
+
+/** @internal */
 export const INTERNAL_COMMENT_NODE_TYPE = '__airx_comment__'
 
+/** @internal */
 export function getInstanceLabel<E extends AbstractElement>(instance: Instance<E>): string {
   const type = instance.element?.type
   if (typeof type === 'function') {
@@ -35,8 +38,10 @@ export function getInstanceLabel<E extends AbstractElement>(instance: Instance<E
   return '<root>'
 }
 
+/** @internal */
 export type Disposer = () => void
 
+/** @internal */
 export class InnerAirxComponentContext<E extends AbstractElement> implements AirxComponentContext {
   public instance!: Instance<E>
   private disposers = new Set<Disposer>()
@@ -170,8 +175,8 @@ export class InnerAirxComponentContext<E extends AbstractElement> implements Air
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface AbstractElement { }
+/** @internal */
+export interface AbstractElement { } // eslint-disable-line @typescript-eslint/no-empty-object-type
 
 /**
  * 树结构
@@ -186,6 +191,7 @@ export interface AbstractElement { }
  * @param instance 
  * @returns 父级 DOM 引用
  */
+/** @internal */
 export function getParentDom<E extends AbstractElement>(instance: Instance<E>): E {
   if (instance.parent?.domRef != null) {
     return instance.parent.domRef
@@ -202,6 +208,7 @@ export function getParentDom<E extends AbstractElement>(instance: Instance<E>): 
  * @param instance 
  * @returns DOM 列表
  */
+/** @internal */
 export function getChildDoms<E extends AbstractElement>(instance: Instance<E>): E[] {
   const domList: E[] = []
   const todoList: Instance<E>[] = [instance]
@@ -230,6 +237,7 @@ export function getChildDoms<E extends AbstractElement>(instance: Instance<E>): 
   return domList
 }
 
+/** @internal */
 export interface Instance<E extends AbstractElement = AbstractElement> {
   domRef?: E
 
@@ -257,6 +265,7 @@ export interface Instance<E extends AbstractElement = AbstractElement> {
    * @param parentInstance  当前正在处理的组件的实例
    * @param children  当前组件的子节点
    */
+/** @internal */
 export function reconcileChildren<E extends AbstractElement>(appContext: PluginContext, parentInstance: Instance<E>, childrenElementArray: AirxElement[]) {
   // parentInstance ←-------- 
   //   |    ↑                ↑
@@ -464,6 +473,7 @@ type OnUpdateRequire<E extends AbstractElement> = (instance: Instance<E>) => voi
  * @param instance 当前处理的实例
  * @returns 返回下一个需要处理的 instance
  */
+/** @internal */
 export function performUnitOfWork<E extends AbstractElement>(pluginContext: PluginContext, instance: Instance<E>, onUpdateRequire?: OnUpdateRequire<E>): Instance<E> | null {
   const element = instance.element
 
