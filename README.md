@@ -380,6 +380,23 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 7. Push to the branch (`git push origin feature/amazing-feature`)
 8. Open a Pull Request
 
+## 🌐 Ecosystem & Version Compatibility
+
+Airx 0.9.0 is compatible with the following ecosystem packages:
+
+| Package | Version | Peer Dependency |
+|---------|---------|----------------|
+| [airx-router](https://github.com/airxjs/router) | 0.9.0 | `airx: ^0.9.0` |
+| [vite-plugin-airx](https://github.com/airxjs/vite-plugin) | 0.9.0 | `airx: ^0.9.0` |
+
+**Note**: Previous versions of ecosystem packages (≤0.7.x) specified `airx: ^0.7.1` as peer dependency. When upgrading to airx 0.9.0, please also upgrade ecosystem packages to their 0.9.0 versions.
+
+
+```bash
+# Install airx 0.9.0 with compatible ecosystem packages
+npm install airx airx-router vite-plugin-airx
+```
+
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
