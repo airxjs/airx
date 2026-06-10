@@ -74,6 +74,11 @@ app.mount(document.getElementById('app'))
 
 Airx supports server-side rendering (SSR) out of the box. SSR allows you to render your components to HTML strings on the server, which can improve initial page load performance and SEO.
 
+> 📦 SSR APIs (`createSSRApp`, `hydrate`, `renderToString`) are available via the `airx/server` subpath export:
+> ```tsx
+> import { createSSRApp, hydrate, renderToString } from 'airx/server'
+> ```
+
 ### Quick Start
 
 ```tsx
@@ -90,7 +95,7 @@ const html = await app.renderToString()
 ### Full SSR Example
 
 ```tsx
-import { createSSRApp } from 'airx'
+import { createSSRApp } from 'airx/server'
 
 // Define a component
 function UserCard({ name, email }: { name: string; email: string }) {
@@ -121,7 +126,7 @@ async function renderPage() {
 > ✅ Hydration is stable in 0.8.0+ for activating server-rendered HTML on the client.
 
 ```tsx
-import { createSSRApp, hydrate } from 'airx'
+import { createSSRApp, hydrate } from 'airx/server'
 
 // Server: render HTML
 const app = createSSRApp(<App />)
@@ -132,7 +137,7 @@ const ssrHtml = await app.renderToString()
 const container = document.getElementById('app')
 if (container) {
   container.innerHTML = ssrHtml
-  const { unmount } = hydrate(<App />, container)
+  hydrate(ssrHtml, container, app)
   // App is now interactive!
 }
 ```
@@ -320,6 +325,22 @@ function App() {
       <div>First</div>
       <div>Second</div>
     </airx.Fragment>
+  )
+}
+```
+
+### `ErrorBoundary`
+
+A component that catches JavaScript errors in child components and displays a fallback UI.
+
+```tsx
+import { ErrorBoundary } from 'airx'
+
+function App() {
+  return (
+    <ErrorBoundary fallback={(error) => <div>Error: {error.message}</div>}>
+      <Child />
+    </ErrorBoundary>
   )
 }
 ```
