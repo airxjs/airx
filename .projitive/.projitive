@@ -1487,15 +1487,54 @@
     {
       "id": "TASK-0105",
       "title": "Airx 0.10.0: 为内部 API 添加 @internal JSDoc 标签",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "owner": "",
       "summary": "根据 api-stability-audit.md 的建议，为 element/index.ts 和 render/basic/common.ts 中标记为内部的 API 添加 /** @internal */ JSDoc 标签，提升 API 边界清晰度。",
-      "updatedAt": "2026-06-10T23:25:41.862Z",
+      "updatedAt": "2026-06-10T23:28:31.213Z",
       "links": [],
       "roadmapRefs": [
         "ROADMAP-0005"
       ],
-      "recordVersion": 2
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0106",
+      "title": "审计 airx 0.9.x 公共 API surface，识别 breaking change 风险",
+      "status": "TODO",
+      "owner": "",
+      "summary": "为 0.10.0 API 关闭做准备：梳理当前公共 API，识别需要清理的 deprecated API、breaking change 风险点，输出 API 审计报告",
+      "updatedAt": "2026-06-11T00:36:09.958Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0005"
+      ],
+      "recordVersion": 1
+    },
+    {
+      "id": "TASK-0107",
+      "title": "制定 airx 0.10.0 生态关闭计划",
+      "status": "TODO",
+      "owner": "",
+      "summary": "制定 0.10.0 版本关闭计划：明确需要关闭的功能、deprecated API 时间表、迁移路径、文档更新计划，输出版本规划文档",
+      "updatedAt": "2026-06-11T00:36:17.583Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0005"
+      ],
+      "recordVersion": 1
+    },
+    {
+      "id": "TASK-0108",
+      "title": "审查 airx 生态完整性：插件、文档、示例",
+      "status": "DONE",
+      "owner": "",
+      "summary": "审查 airx 生态系统完整性：检查官方插件状态、文档完整性、示例代码质量，识别需要关闭或交接的生态项目，输出生态审计报告",
+      "updatedAt": "2026-06-11T00:39:33.552Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0005"
+      ],
+      "recordVersion": 3
     }
   ],
   "roadmaps": [
@@ -1540,7 +1579,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 334,
+    "tasks_version": 340,
     "roadmaps_version": 10,
     "store_schema_version": 3
   },
@@ -1548,9 +1587,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 334,
-      "lastBuiltAt": "2026-06-10T23:25:41.873Z",
-      "recordVersion": 998
+      "lastSourceVersion": 340,
+      "lastBuiltAt": "2026-06-11T00:39:33.562Z",
+      "recordVersion": 1016
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
