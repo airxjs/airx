@@ -1513,15 +1513,15 @@
     {
       "id": "TASK-0107",
       "title": "制定 airx 0.10.0 生态关闭计划",
-      "status": "TODO",
+      "status": "DONE",
       "owner": "",
       "summary": "制定 0.10.0 版本关闭计划：明确需要关闭的功能、deprecated API 时间表、迁移路径、文档更新计划，输出版本规划文档",
-      "updatedAt": "2026-06-11T00:36:17.583Z",
+      "updatedAt": "2026-06-11T00:40:53.581Z",
       "links": [],
       "roadmapRefs": [
         "ROADMAP-0005"
       ],
-      "recordVersion": 1
+      "recordVersion": 3
     },
     {
       "id": "TASK-0108",
@@ -1579,7 +1579,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 340,
+    "tasks_version": 342,
     "roadmaps_version": 10,
     "store_schema_version": 3
   },
@@ -1587,9 +1587,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 340,
-      "lastBuiltAt": "2026-06-11T00:39:33.562Z",
-      "recordVersion": 1016
+      "lastSourceVersion": 342,
+      "lastBuiltAt": "2026-06-11T00:40:53.595Z",
+      "recordVersion": 1022
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
