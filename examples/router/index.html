@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Airx Router Example</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        background: #f5f5f5;
+        margin: 0;
+        padding: 0;
+      }
+      nav { background: #1f2937; padding: 1rem; }
+      nav a { color: white; text-decoration: none; margin-right: 1.5rem; font-weight: 500; }
+      nav a:hover { text-decoration: underline; }
+      #app { max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
+      .page { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.1); }
+      h1 { color: #333; margin-top: 0; }
+      .params { background: #f3f4f6; padding: 0.75rem 1rem; border-radius: 6px; font-family: monospace; margin: 1rem 0; }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/about">About</a>
+      <a href="/users/42">User Profile</a>
+      <a href="/users/99">Another User</a>
+    </nav>
+    <div id="app"></div>
+    <script type="module" src="./source/main.ts"></script>
+  </body>
+</html>

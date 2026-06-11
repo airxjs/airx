@@ -1535,6 +1535,19 @@
         "ROADMAP-0005"
       ],
       "recordVersion": 3
+    },
+    {
+      "id": "TASK-0109",
+      "title": "创建 airx 官方 examples 目录（3-5 个完整示例）",
+      "status": "DONE",
+      "owner": "",
+      "summary": "根据 TASK-0108 生态审计报告，airx 缺少官方示例代码是最高优先级缺口。为 0.10.0 生态关闭准备，创建 examples/ 目录，包含：1) 基础计数器 (signal state/computed) 2) 异步数据获取 (useEffect/loading) 3) SSR hydration 完整流程 4) 路由集成示例 (airx-router) 5) 插件系统示例",
+      "updatedAt": "2026-06-11T00:47:26.743Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0005"
+      ],
+      "recordVersion": 3
     }
   ],
   "roadmaps": [
@@ -1579,7 +1592,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 344,
+    "tasks_version": 347,
     "roadmaps_version": 10,
     "store_schema_version": 3
   },
@@ -1587,9 +1600,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 344,
-      "lastBuiltAt": "2026-06-11T00:42:45.212Z",
-      "recordVersion": 1028
+      "lastSourceVersion": 347,
+      "lastBuiltAt": "2026-06-11T00:47:26.755Z",
+      "recordVersion": 1037
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
