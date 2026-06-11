@@ -1500,15 +1500,15 @@
     {
       "id": "TASK-0106",
       "title": "审计 airx 0.9.x 公共 API surface，识别 breaking change 风险",
-      "status": "TODO",
+      "status": "DONE",
       "owner": "",
       "summary": "为 0.10.0 API 关闭做准备：梳理当前公共 API，识别需要清理的 deprecated API、breaking change 风险点，输出 API 审计报告",
-      "updatedAt": "2026-06-11T00:36:09.958Z",
+      "updatedAt": "2026-06-11T00:42:45.202Z",
       "links": [],
       "roadmapRefs": [
         "ROADMAP-0005"
       ],
-      "recordVersion": 1
+      "recordVersion": 3
     },
     {
       "id": "TASK-0107",
@@ -1579,7 +1579,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 342,
+    "tasks_version": 344,
     "roadmaps_version": 10,
     "store_schema_version": 3
   },
@@ -1587,9 +1587,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 342,
-      "lastBuiltAt": "2026-06-11T00:40:53.595Z",
-      "recordVersion": 1022
+      "lastSourceVersion": 344,
+      "lastBuiltAt": "2026-06-11T00:42:45.212Z",
+      "recordVersion": 1028
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
