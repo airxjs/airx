@@ -1548,6 +1548,19 @@
         "ROADMAP-0005"
       ],
       "recordVersion": 3
+    },
+    {
+      "id": "TASK-0110",
+      "title": "Close ROADMAP-0005: Airx 0.10.0 生态关闭",
+      "status": "DONE",
+      "owner": "",
+      "summary": "ROADMAP-0005 正式关闭。所有任务（TASK-0105~0110）已完成，关闭报告已产出至 reports/ROADMAP-0005-closure-report.md。",
+      "updatedAt": "2026-06-11T01:53:55.672Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0005"
+      ],
+      "recordVersion": 3
     }
   ],
   "roadmaps": [
@@ -1592,7 +1605,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 347,
+    "tasks_version": 350,
     "roadmaps_version": 10,
     "store_schema_version": 3
   },
@@ -1600,9 +1613,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 347,
-      "lastBuiltAt": "2026-06-11T00:47:26.755Z",
-      "recordVersion": 1037
+      "lastSourceVersion": 350,
+      "lastBuiltAt": "2026-06-11T01:53:55.687Z",
+      "recordVersion": 1046
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
