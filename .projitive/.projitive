@@ -1561,6 +1561,22 @@
         "ROADMAP-0005"
       ],
       "recordVersion": 3
+    },
+    {
+      "id": "TASK-0111",
+      "title": "Airx 0.10.0 规划：确定核心改进方向",
+      "status": "DONE",
+      "owner": "",
+      "summary": "基于 0.9.0 完成的反馈，确定 Airx 0.10.0 的核心改进方向。分析当前痛点、社区反馈、API 稳定性问题，制定下一版本路线图。",
+      "updatedAt": "2026-06-18T05:08:51.493Z",
+      "links": [
+        ".projitive/designs/airx-0.10.0-planning.md",
+        ".projitive/roadmap.md"
+      ],
+      "roadmapRefs": [
+        "ROADMAP-0005"
+      ],
+      "recordVersion": 3
     }
   ],
   "roadmaps": [
@@ -1598,31 +1614,31 @@
     {
       "id": "ROADMAP-0005",
       "title": "Airx 0.10.0 - API & Ecosystem Closure",
-      "status": "active",
+      "status": "done",
       "time": "2026-Q3~Q4",
-      "updatedAt": "2026-06-10T01:42:21.834Z",
-      "recordVersion": 1
+      "updatedAt": "2026-06-16T04:18:10.744Z",
+      "recordVersion": 2
     }
   ],
   "meta": {
-    "tasks_version": 350,
-    "roadmaps_version": 10,
+    "tasks_version": 353,
+    "roadmaps_version": 11,
     "store_schema_version": 3
   },
   "view_state": {
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 350,
-      "lastBuiltAt": "2026-06-11T01:53:55.687Z",
-      "recordVersion": 1046
+      "lastSourceVersion": 353,
+      "lastBuiltAt": "2026-06-18T05:08:51.504Z",
+      "recordVersion": 1055
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
       "dirty": false,
-      "lastSourceVersion": 10,
-      "lastBuiltAt": "2026-06-10T01:42:21.840Z",
-      "recordVersion": 27
+      "lastSourceVersion": 11,
+      "lastBuiltAt": "2026-06-16T04:18:10.749Z",
+      "recordVersion": 29
     }
   },
   "migration_history": []
