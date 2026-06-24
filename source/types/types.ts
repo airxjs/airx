@@ -1157,7 +1157,7 @@ interface IntrinsicElementAttributesMap {
 }
 
 export interface RefAttributes {
-  ref?: Signal.State<any | undefined> | ((ele: any) => void)
+  ref?: Signal.State<Node | undefined> | ((ele: Node | null) => void)
 }
 
 export interface ReservedAttributes {
