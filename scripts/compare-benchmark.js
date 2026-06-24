@@ -39,6 +39,7 @@ function calcChange(current, previous) {
  * Determine if regression is acceptable
  * For latency metrics: positive change = regression (slower)
  * For ops/sec metrics: negative change = regression (lower throughput)
+ * For size metrics (bundle size): positive change = regression (larger)
  */
 function checkRegression(metricName, current, previous, threshold) {
   // Determine if this is a latency or throughput metric
@@ -49,9 +50,16 @@ function checkRegression(metricName, current, previous, threshold) {
   
   const isThroughput = metricName.includes('ops') || metricName.includes('throughput')
   
+  // Bundle size uses 'size' field (bytes), lower is better
+  const isSize = metricName === 'Bundle Size' || current.size != null
+  
   let change, isRegressed
   
-  if (isLatency) {
+  if (isSize) {
+    // Larger bundle = regression
+    change = calcChange(current.size, previous.size)
+    isRegressed = change > threshold * 100
+  } else if (isLatency) {
     // Higher latency = regression
     change = calcChange(current.median, previous.median)
     isRegressed = change > threshold * 100
@@ -65,16 +73,20 @@ function checkRegression(metricName, current, previous, threshold) {
     isRegressed = Math.abs(change) > threshold * 100
   }
   
-  return { change, isRegressed, isLatency, isThroughput }
+  return { change, isRegressed, isLatency, isThroughput, isSize }
 }
 
 /**
  * Format change with indicator
+ * For size metrics: negative change (smaller) = improvement, positive = regression
  */
-function formatChange(change, isRegressed) {
+function formatChange(change, isRegressed, isSize) {
   if (change === null) return 'N/A'
   const sign = change >= 0 ? '+' : ''
-  const emoji = isRegressed ? '🔴' : '✅'
+  // For size: smaller is better, so inverted logic
+  const emoji = isSize
+    ? (isRegressed ? '🔴' : '✅')
+    : (isRegressed ? '🔴' : '✅')
   return `${emoji} ${sign}${change.toFixed(2)}%`
 }
 
@@ -94,18 +106,23 @@ function compareWithBaseline(currentResults, baseline, threshold = DEFAULT_THRES
       continue
     }
     
-    const { change, isRegressed } = checkRegression(name, current, previous, threshold)
+    const { change, isRegressed, isSize } = checkRegression(name, current, previous, threshold)
     
     if (change === null) {
       noChange.push({ name, current, previous })
       continue
     }
     
-    const status = formatChange(change, isRegressed)
+    const status = formatChange(change, isRegressed, isSize)
     
     console.log(`\n📊 ${name}`)
-    console.log(`   Current:  ${current.median.toFixed(4)} ms (${current.opsPerSec.toFixed(2)} ops/s)`)
-    console.log(`   Baseline: ${previous.median.toFixed(4)} ms (${previous.opsPerSec.toFixed(2)} ops/s)`)
+    if (isSize) {
+      console.log(`   Current:  ${current.sizeKB} (${current.size} bytes)`)
+      console.log(`   Baseline: ${previous.sizeKB} (${previous.size} bytes)`)
+    } else {
+      console.log(`   Current:  ${current.median.toFixed(4)} ms (${current.opsPerSec.toFixed(2)} ops/s)`)
+      console.log(`   Baseline: ${previous.median.toFixed(4)} ms (${previous.opsPerSec.toFixed(2)} ops/s)`)
+    }
     console.log(`   Change:   ${status}`)
     
     if (isRegressed) {

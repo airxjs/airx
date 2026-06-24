@@ -10,6 +10,8 @@ import { runAllBenchmarks, printBenchmarkResult, JsonBaselineStore } from './ben
 import { createElement, Fragment, component } from '../output/element/index.js'
 import { Signal } from 'signal-polyfill'
 import * as fs from 'fs'
+import { join, dirname } from 'path'
+import { fileURLToPath } from 'url'
 
 // Destructure Signal properly
 const { State, Computed, subtle: { Watcher } } = Signal
@@ -192,6 +194,46 @@ async function main() {
   const store = new JsonBaselineStore()
   for (const result of results) {
     store.save(result.name, result)
+  }
+
+  // Bundle size benchmark - runs after build (which already happened)
+  console.log('\n📦 Bundle Size Benchmark')
+  console.log('-'.repeat(50))
+
+  const outputDir = join(process.cwd(), 'output')
+  const indexMin = join(outputDir, 'index.min.js')
+  
+  let bundleSizeResult
+  try {
+    const stats = fs.statSync(indexMin)
+    const sizeKB = (stats.size / 1024).toFixed(1)
+    
+    bundleSizeResult = {
+      name: 'Bundle Size',
+      size: stats.size,
+      sizeKB: `${sizeKB}KB`,
+      mean: stats.size,
+      stddev: 0,
+      median: stats.size,
+      min: stats.size,
+      max: stats.size,
+      iterations: 1,
+      opsPerSec: 1000 / stats.size, // higher = smaller bundle = better
+    }
+    
+    const prev = previousBaseline ? previousBaseline['Bundle Size'] : null
+    console.log(`\n📊 Bundle Size`)
+    console.log(`   Size:     ${sizeKB}KB (${stats.size} bytes)`)
+    if (prev) {
+      const change = ((stats.size - prev.size) / prev.size * 100)
+      const emoji = change > 0 ? '📈' : change < 0 ? '📉' : '➡️'
+      console.log(`   vs prev:  ${emoji} ${change >= 0 ? '+' : ''}${change.toFixed(1)}%`)
+    }
+    
+    store.save('Bundle Size', bundleSizeResult)
+    console.log('\n✅ Bundle size tracked successfully')
+  } catch (e) {
+    console.warn('⚠️  Could not measure bundle size:', e.message)
   }
 
   fs.writeFileSync(BASELINE_FILE, JSON.stringify(store.toJSON(), null, 2))
