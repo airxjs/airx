@@ -1577,6 +1577,32 @@
         "ROADMAP-0005"
       ],
       "recordVersion": 3
+    },
+    {
+      "id": "TASK-0112",
+      "title": "Airx 0.10.0 前置：修复 RefAttributes 类型 unsafe any",
+      "status": "DONE",
+      "owner": "ai-copilot",
+      "summary": "修复 source/types/types.ts 中 RefAttributes 的 unsafe any 类型：ref?: Signal.State<any | undefined> | ((ele: any) => void) 改为使用 Node | undefined。类型检查、lint、400 个测试全部通过。",
+      "updatedAt": "2026-06-24T04:55:32.958Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0005"
+      ],
+      "recordVersion": 3
+    },
+    {
+      "id": "TASK-0113",
+      "title": "Airx 0.10.0: 包体积基线建立与 CI 追踪",
+      "status": "DONE",
+      "owner": "",
+      "summary": "基于 0.9.0 建立包体积性能基线，在 CI 中添加 bundle size 追踪，确保 0.10.0 包体积不劣化",
+      "updatedAt": "2026-06-24T13:59:27.921Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0005"
+      ],
+      "recordVersion": 3
     }
   ],
   "roadmaps": [
@@ -1621,7 +1647,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 353,
+    "tasks_version": 359,
     "roadmaps_version": 11,
     "store_schema_version": 3
   },
@@ -1629,9 +1655,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 353,
-      "lastBuiltAt": "2026-06-18T05:08:51.504Z",
-      "recordVersion": 1055
+      "lastSourceVersion": 359,
+      "lastBuiltAt": "2026-06-24T13:59:27.936Z",
+      "recordVersion": 1073
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
