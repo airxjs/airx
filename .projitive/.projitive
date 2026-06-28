@@ -1603,6 +1603,19 @@
         "ROADMAP-0005"
       ],
       "recordVersion": 3
+    },
+    {
+      "id": "TASK-0114",
+      "title": "补充 TASK-0111 research brief - 治理工件修复",
+      "status": "DONE",
+      "owner": "",
+      "summary": "TASK-0111 已标记 DONE，但 required research brief designs/research/TASK-0111.implementation-research.md 缺失。需要基于现有的 airx-0.10.0-planning.md 规划文档，补充完整的 implementation-research.md，包含设计指南引用、代码架构发现、实现计划、风险与开放问题。",
+      "updatedAt": "2026-06-28T17:09:08.364Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0005"
+      ],
+      "recordVersion": 3
     }
   ],
   "roadmaps": [
@@ -1647,7 +1660,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 359,
+    "tasks_version": 362,
     "roadmaps_version": 11,
     "store_schema_version": 3
   },
@@ -1655,9 +1668,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 359,
-      "lastBuiltAt": "2026-06-24T13:59:27.936Z",
-      "recordVersion": 1073
+      "lastSourceVersion": 362,
+      "lastBuiltAt": "2026-06-28T17:09:08.382Z",
+      "recordVersion": 1082
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
