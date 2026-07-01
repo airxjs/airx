@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.10.0] - 2026-07-01
+
+### Ecosystem & API Closure
+
+- **Bundle Size Tracking** — Added performance benchmark suite with historical comparison tracking for ongoing monitoring (TASK-0113)
+- **Type Safety Improvements** — Replaced unsafe `any` in RefAttributes with proper Node type (TASK-0112)
+- **Examples Directory** — Created airx official examples directory for community reference (TASK-0109)
+- **0.10.0 Planning** — Defined core improvement directions and ecosystem audit (TASK-0111)
+
+### Infrastructure
+
+- **ROADMAP-0005 Closure** — Completed Airx 0.10.0 roadmap milestone: API & Ecosystem Closure
+
+---
+
 ## [0.9.0] - 2026-05-07
 
 ### Performance
