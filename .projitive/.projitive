@@ -1616,6 +1616,19 @@
         "ROADMAP-0005"
       ],
       "recordVersion": 3
+    },
+    {
+      "id": "TASK-0115",
+      "title": "Airx 0.10.0 发布后检查与版本收尾",
+      "status": "DONE",
+      "owner": "",
+      "summary": "验证 Airx 0.10.0 发布完整性：确认所有 roadmap items 已交付、CHANGELOG 已更新、版本号已递增、NPM 包状态正常",
+      "updatedAt": "2026-07-01T13:09:21.775Z",
+      "links": [],
+      "roadmapRefs": [
+        "ROADMAP-0005"
+      ],
+      "recordVersion": 3
     }
   ],
   "roadmaps": [
@@ -1660,7 +1673,7 @@
     }
   ],
   "meta": {
-    "tasks_version": 362,
+    "tasks_version": 365,
     "roadmaps_version": 11,
     "store_schema_version": 3
   },
@@ -1668,9 +1681,9 @@
     "tasks_markdown": {
       "name": "tasks_markdown",
       "dirty": false,
-      "lastSourceVersion": 362,
-      "lastBuiltAt": "2026-06-28T17:09:08.382Z",
-      "recordVersion": 1082
+      "lastSourceVersion": 365,
+      "lastBuiltAt": "2026-07-01T13:09:21.788Z",
+      "recordVersion": 1091
     },
     "roadmaps_markdown": {
       "name": "roadmaps_markdown",
